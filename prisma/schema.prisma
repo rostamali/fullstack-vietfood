@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User related models
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AccountStatus {
+  INACTIVE
+  ACTIVE
+}
+
+model User {
+  id         String        @id @unique @default(uuid())
+  firstName  String
+  lastName   String?
+  email      String        @unique
+  password   String
+  avatar     Avatar?
+  isVerified Boolean       @default(false)
+  role       Role          @default(USER)
+  totalSpend Float?
+  status     AccountStatus @default(INACTIVE)
+  files      File[]
+
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Address {
+  id           String   @id @unique @default(uuid())
+  contactName  String
+  phoneNumber  String
+  phoneCode    String
+  countryCode  String
+  stateCode    String
+  cityName     String?
+  zipCode      String
+  addressLine1 String?
+  addressLine2 String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Files related models
+model Avatar {
+  id        String   @id @unique @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  fileName  String
+  url       String
+  size      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model File {
+  id              String   @id @unique @default(uuid())
+  fileType        String
+  fileName        String   @unique
+  title           String
+  description     String?
+  url             String
+  size            String
+  gallery         Gallery? @relation(fields: [galleryId], references: [id])
+  galleryId       String?
+  isCompress      Boolean  @default(false)
+  compressPercent Float?
+  author          User     @relation(fields: [authorId], references: [id])
+  authorId        String
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  productCategory   ProductCategory? @relation(fields: [productCategoryId], references: [id])
+  productCategoryId String?          @unique
+  product           Product?         @relation(fields: [productId], references: [id])
+  productId         String?          @unique
+  brand             Brand?           @relation(fields: [brandId], references: [id])
+  brandId           String?          @unique
+}
+
+model Gallery {
+  id        String   @id @unique @default(uuid())
+  files     File[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @unique
+}
+
+// Products related models
+model ProductCategory {
+  id             String                @id @unique @default(uuid())
+  name           String
+  slug           String                @unique
+  thumbnail      File?
+  description    String?
+  products       CategoriesOnProduct[]
+  parentId       String?
+  parentCategory ProductCategory?      @relation("subCategories", fields: [parentId], references: [id])
+  subCategories  ProductCategory[]     @relation("subCategories")
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("category")
+}
+
+model CategoriesOnProduct {
+  product    Product         @relation(fields: [productId], references: [id])
+  productId  String
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  @@id([productId, categoryId])
+}
+
+model Product {
+  id            String   @id @unique @default(uuid())
+  name          String
+  slug          String
+  label         String?
+  isFeatured    Boolean  @default(false)
+  collection    String?
+  description   String?
+  excerpt       String?
+  thumbnail     File?
+  gallery       Gallery?
+  retailPrice   String?
+  regularPrice  String?
+  salePrice     String?
+  taxClass      String?
+  weight        String?
+  shippingClass String?
+  notice        String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  brand      Brand?                @relation(fields: [brandId], references: [id])
+  brandId    String?
+  categories CategoriesOnProduct[]
+}
+
+model Brand {
+  id             String    @id @unique @default(uuid())
+  name           String    @unique
+  slug           String    @unique
+  description    String?
+  thumbnail      File?
+  contactName    String?
+  contactEmail   String?
+  contactPhone   String?
+  contactWebsite String?
+  products       Product[]
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}

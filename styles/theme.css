@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	tbody tr:first-child td > div {
+		margin-top: 15px;
+	}
+	.otp-input-field::-webkit-outer-spin-button,
+	.otp-input-field::-webkit-inner-spin-button,
+	.otp-input-field {
+		-webkit-appearance: none;
+		margin: 0;
+		-moz-appearance: textfield;
+	}
+	/* Dashboard Layouts */
+	.dashboard-container {
+		@apply mx-auto w-full max-w-6xl px-6 sm:px-14;
+	}
+	.circle-icon-wrap {
+		@apply h-[45px] w-[45px] flex-center bg-gray-light rounded-full;
+	}
+	.circle-icon {
+		@apply h-[20px] text-primary-gray;
+	}
+	.dashboard-col-space {
+		@apply flex flex-col gap-[40px];
+	}
+
+	/* Dashboard Modal Library */
+	.modal-library-container {
+		@apply h-[390px] overflow-y-scroll scrollbar-sm;
+	}
+
+	/* Thumbnail Trigger */
+	.thumbnail-pen__trigger {
+		@apply absolute -bottom-2 right-2 h-[35px] w-[35px] bg-primary-green rounded-full text-white flex-center z-[2];
+	}
+	.profile-picture__trigger {
+		@apply absolute bottom-2 -right-2 h-[45px] w-[45px] bg-primary-green rounded-full text-white flex-center z-[2] cursor-pointer;
+	}
+
+	/* Scrollbar */
+	.scrollbar-sm::-webkit-scrollbar {
+		@apply w-[6px] bg-transparent;
+	}
+	.scrollbar-sm::-webkit-scrollbar-thumb {
+		@apply bg-black-dark bg-opacity-15 rounded;
+	}
+}
+
+@layer utilities {
+	/* Typography */
+	.heading-1 {
+		@apply text-[40px] font-poppins font-semibold text-black-dark;
+	}
+	.heading-2 {
+		@apply text-[36px] font-poppins font-semibold text-black-dark;
+	}
+	.heading-3 {
+		@apply text-[30px] font-poppins font-semibold text-black-dark;
+	}
+	.heading-4 {
+		@apply text-[24px] font-poppins font-medium text-black-dark;
+	}
+	.heading-5 {
+		@apply text-[18px] font-poppins font-normal text-black-dark;
+	}
+	.heading-6 {
+		@apply text-[16px] font-poppins font-normal text-black-dark;
+	}
+	.text-base-1 {
+		@apply text-[15px] font-poppins font-normal text-black-dark;
+	}
+	.text-base-2 {
+		@apply text-[14px] font-poppins font-normal text-black-dark;
+	}
+
+	/* Links Typography */
+	.menubar-item {
+		@apply text-[13px] font-poppins text-black-dark font-normal hover:bg-black-dark hover:bg-opacity-5;
+	}
+	.btn-navlink {
+		@apply p-[12px] flex rounded-md items-center gap-[8px] font-poppins text-[14px] font-normal w-full;
+	}
+	.btn-navlink-active {
+		@apply bg-primary-green text-white;
+	}
+
+	/* Forms */
+	.field-label-sm {
+		@apply font-poppins font-normal text-black-dark text-[15px];
+	}
+	.field-label-lg {
+		@apply font-poppins font-medium text-black-dark text-[16px];
+	}
+	.input-field-sm {
+		@apply h-[45px] border border-primary-gray border-opacity-15 placeholder:text-primary-gray placeholder:text-opacity-65 font-poppins font-normal text-primary-gray focus:ring-primary-green focus:ring-opacity-60;
+	}
+	.input-field-lg {
+		@apply h-[50px] border border-primary-gray border-opacity-15 placeholder:text-primary-gray placeholder:text-opacity-65 font-poppins font-normal text-primary-gray focus:ring-primary-green focus:ring-opacity-60;
+	}
+	.checkbox {
+		@apply rounded border-primary-gray border-opacity-35 data-[state=checked]:text-white data-[state=checked]:border-primary-green data-[state=checked]:bg-primary-green;
+	}
+	.checkbox-sm {
+		@apply h-[20px] w-[20px] checkbox;
+	}
+	.checkbox-lg {
+		@apply h-[22px] w-[22px] checkbox;
+	}
+	.form-grid-space {
+		@apply grid gap-[25px];
+	}
+	.form-flex-space {
+		@apply flex flex-col gap-[25px];
+	}
+	.form-error {
+		@apply text-[12px] font-poppins font-normal text-action-danger;
+	}
+
+	/* Buttons */
+	.btn-primary-sm {
+		@apply h-[45px] font-poppins text-[15px] bg-primary-green text-white font-normal;
+	}
+	.btn-primary-lg {
+		@apply h-[50px] font-poppins text-[15px] bg-primary-green text-white font-normal;
+	}
+	.btn-ghost-sm {
+		@apply h-[45px] border-2 border-primary-green font-poppins text-[15px] bg-transparent text-black-dark font-normal hover:bg-primary-green hover:text-white;
+	}
+	.btn-ghost-lg {
+		@apply h-[50px] border-2 border-primary-green font-poppins text-[15px] bg-transparent text-black-dark font-normal hover:bg-primary-green hover:text-white;
+	}
+	.btn-spinner-sm {
+		@apply h-[20px] w-[20px] stroke-white;
+	}
+
+	/* Badges */
+	.badge {
+		@apply border font-poppins text-[14px] py-[3px] px-[8px] rounded;
+	}
+	.badge-success {
+		@apply badge bg-action-success bg-opacity-10 text-action-success border-action-success border-opacity-40;
+	}
+	.badge-danger {
+		@apply badge bg-action-danger bg-opacity-10 text-action-danger border-action-danger border-opacity-40;
+	}
+	.badge-warning {
+		@apply badge bg-action-warning bg-opacity-10 text-action-warning border-action-warning border-opacity-40;
+	}
+	.badge-info {
+		@apply badge bg-action-info bg-opacity-10 text-action-info border-action-info border-opacity-40;
+	}
+
+	/* Toast */
+	.custom-toast {
+		@apply rounded-md p-[16px] max-xm:p-[12px] w-[320px] max-xm:w-[280px] border flex items-center gap-[15px];
+	}
+	.custom-toast-dismiss {
+		@apply h-[22px] w-[22px] border flex-center rounded-full max-xm:hidden;
+	}
+	.toast-success {
+		@apply custom-toast bg-[#ECFDF3] border-[#008A2E] border-opacity-30 text-[#008A2E];
+	}
+	.toast-success-dismiss {
+		@apply custom-toast-dismiss border-[#008A2E] text-[#008A2E];
+	}
+	.toast-error {
+		@apply custom-toast bg-[#FFF0F0] border-[#E60000] border-opacity-30 text-[#E60000];
+	}
+	.toast-error-dismiss {
+		@apply custom-toast-dismiss border-[#E60000] text-[#E60000];
+	}
+
+	/* Tables */
+	.table-head-data {
+		@apply h-full flex items-center border-t border-b font-poppins bg-gray-dark bg-opacity-40 px-4;
+	}
+	.table-head-start {
+		@apply table-head-data border-l rounded-tl-md rounded-bl-md;
+	}
+	.table-head-end {
+		@apply table-head-data border-r rounded-tr-md rounded-br-md;
+	}
+	.table-cell-data {
+		@apply p-3 border-t border-b my-1 flex font-poppins bg-white items-center w-full;
+	}
+	.table-cell-start {
+		@apply table-cell-data border-l rounded-tl-md rounded-bl-md;
+	}
+	.table-cell-end {
+		@apply table-cell-data border-r rounded-tr-md rounded-br-md;
+	}
+
+	/* Flex Class */
+	.flex-center {
+		@apply flex items-center justify-center;
+	}
+	.flex-between {
+		@apply flex items-center justify-between;
+	}
+
+	/* Shadcn custom style */
+	.PopoverContent {
+		width: var(--radix-popover-trigger-width);
+		max-height: var(--radix-popover-content-available-height);
+	}
+}
