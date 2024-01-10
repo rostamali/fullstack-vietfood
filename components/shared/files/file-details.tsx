@@ -1,29 +1,18 @@
 'use client';
-import { fetchFileDetailsbyAdmin } from '@/lib/actions/file.action';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import UpdateFile from '../forms/update-file';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { dateFormat } from '@/lib/helpers/formater';
 import FileDetailScreen from '@/components/loading/file-details-screen';
 import FileView from './file-view';
+import { useFileDetails } from '@/lib/react-query/hooks/useFile';
 
 const FileDetails = () => {
-	const [details, setDetails] = useState<FileDetailsView | null>(null);
 	const searchParams = useSearchParams();
 	const fileId = searchParams.get('file_view');
-	useEffect(() => {
-		const fetchDetails = async () => {
-			const result = await fetchFileDetailsbyAdmin({
-				id: fileId as string,
-			});
-			setDetails(result ? result : null);
-		};
-
-		fetchDetails();
-	}, [fileId]);
-	if (!details) return <FileDetailScreen />;
+	const { data, isLoading, isError } = useFileDetails(fileId as string);
+	if (isLoading || isError || !data) return <FileDetailScreen />;
 
 	return (
 		<div className="file-details">
@@ -31,16 +20,16 @@ const FileDetails = () => {
 				<DialogTitle asChild>
 					<h4 className="heading-4 !font-medium">File Details</h4>
 				</DialogTitle>
-				<div className="text-base-2">{details?.title}</div>
+				<div className="text-base-2">{data?.title}</div>
 			</DialogHeader>
 			<div className="grid md:grid-cols-2 grid-cols-1 gap-[25px] items-center my-[30px]">
 				<div className="flex flex-col gap-[10px]">
 					<FileView
 						file={{
-							id: details.id,
-							fileType: details.fileType,
-							url: details.url,
-							title: details.title,
+							id: data.id,
+							fileType: data.fileType,
+							url: data.url,
+							title: data.title,
 						}}
 						heightClass={'h-[220px]'}
 					/>
@@ -50,29 +39,27 @@ const FileDetails = () => {
 						<div className="file-info">
 							<h6 className="heading-6">Size:</h6>
 							<p className="text-base-2 mt-[4px]">
-								<span className="badge-info">
-									{details?.size}
-								</span>
+								<span className="badge-info">{data.size}</span>
 							</p>
 						</div>
 						<div className="file-info">
 							<h6 className="heading-6">Uploaded date:</h6>
 							<p className="text-base-2 mt-[4px]">
-								{dateFormat(details?.createdAt)}
+								{dateFormat(data?.createdAt)}
 							</p>
 						</div>
 						<div className="file-info">
 							<h6 className="heading-6">Compress:</h6>
 							<p className="text-base-2 mt-[4px]">
-								{details.isCompress ? 'True' : 'False'}
+								{data.isCompress ? 'True' : 'False'}
 							</p>
 						</div>
 						<div className="file-info">
 							<h6 className="heading-6">Compress %:</h6>
 							<p className="text-base-s mt-[4px]">
 								<span className="badge-info">
-									{details.compressPercent
-										? `${details.compressPercent}%`
+									{data.compressPercent
+										? `${data.compressPercent}%`
 										: '0%'}
 								</span>
 							</p>
@@ -93,18 +80,18 @@ const FileDetails = () => {
 			</div>
 			<UpdateFile
 				author={
-					details.author
+					data.author
 						? {
-								name: `${details.author.firstName} ${details.author.lastName}`,
-								role: details.author.role,
+								name: `${data.author.firstName} ${data.author.lastName}`,
+								role: data.author.role,
 						  }
 						: null
 				}
 				defaultValues={{
-					title: details.title,
-					description: details.description ? details.description : '',
+					title: data.title,
+					description: data.description ? data.description : '',
 				}}
-				fileId={details.id}
+				fileId={data.id}
 			/>
 		</div>
 	);

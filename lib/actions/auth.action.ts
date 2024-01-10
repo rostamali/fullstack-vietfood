@@ -16,6 +16,7 @@ import {
 import sendMail from '../helpers/send-mail';
 import { verifyEmailTokenOptions } from '../helpers/cookie-options';
 import { revalidatePath } from 'next/cache';
+import { AccountStatus } from '@prisma/client';
 
 export const registerUser = async (params: RegisterUser) => {
 	try {
@@ -249,13 +250,21 @@ export const createAccountByAdmin = async (params: {
 	role: string;
 	password: string;
 	sendMessage: boolean;
+	status: string;
 }) => {
 	try {
 		const isAdmin = await isAuthenticatedAdmin();
 		if (!isAdmin) return handleResponse(false, `You don't have permission`);
 
-		const { firstName, lastName, email, role, password, sendMessage } =
-			params;
+		const {
+			firstName,
+			lastName,
+			email,
+			role,
+			password,
+			sendMessage,
+			status,
+		} = params;
 		const userExist = await prisma.user.findUnique({
 			where: {
 				email,
@@ -265,7 +274,7 @@ export const createAccountByAdmin = async (params: {
 			},
 		});
 		if (userExist) return handleResponse(false, 'User already exists');
-		const bcryptPass = await bcryptPassword(password);
+		const bcryptPass = await bcryptPassword(password as string);
 
 		await prisma.user.create({
 			data: {
@@ -273,7 +282,7 @@ export const createAccountByAdmin = async (params: {
 				lastName,
 				email,
 				password: bcryptPass,
-				status: 'ACTIVE',
+				status: status as AccountStatus,
 				isVerified: true,
 				role: role as UserRole,
 			},
@@ -297,10 +306,10 @@ export const createAccountByAdmin = async (params: {
 				);
 			}
 		} else {
-			return handleResponse(true, `New account created successfully`);
+			return handleResponse(true, `Account created successfully`);
 		}
 	} catch (error) {
-		return handleResponse(false, `New user created failed`);
+		return handleResponse(false, `Account create action failed`);
 	}
 };
 export const fetchUserProfileById = async (params: { id: string }) => {

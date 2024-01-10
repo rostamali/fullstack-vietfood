@@ -21,22 +21,21 @@ type MethodUpdate = {
 	};
 };
 const MethodUpdate: FC<MethodUpdate> = ({ data }) => {
-	const [flatData, setFlatData] = useState<any>();
-	const [freeData, setFreeData] = useState<any>();
-	const [localData, setLocalData] = useState<LocalUpdateForm | null>();
+	// const [flatData, setFlatData] = useState<any>();
+	// const [freeData, setFreeData] = useState<any>();
+	// const [localData, setLocalData] = useState<LocalUpdateForm | null>();
 
-	useEffect(() => {
-		const fetchFlatData = async () => {
-			const result = await fetchMethDetailsByAdmin(data);
-			if (result) {
-				setFlatData(data.type === 'FLAT_RATE' ? result : null);
-				setFreeData(data.type === 'FREE_SHIPPING' ? result : null);
-				setLocalData(data.type === 'LOCAL_PICKUP' ? result : null);
-			}
-		};
-		fetchFlatData();
-	}, []);
-	console.log(localData);
+	// useEffect(() => {
+	// 	const fetchFlatData = async () => {
+	// 		const result = await fetchMethDetailsByAdmin(data);
+	// 		if (result) {
+	// 			setFlatData(data.type === 'FLAT_RATE' ? result : null);
+	// 			setFreeData(data.type === 'FREE_SHIPPING' ? result : null);
+	// 			setLocalData(data.type === 'LOCAL_PICKUP' ? result : null);
+	// 		}
+	// 	};
+	// 	fetchFlatData();
+	// }, []);
 
 	return (
 		<Dialog>
@@ -54,7 +53,7 @@ const MethodUpdate: FC<MethodUpdate> = ({ data }) => {
 						Create a brand new user and add them to this site.
 					</DialogDescription>
 				</DialogHeader>
-				{data.type === 'FLAT_RATE' && <FlatMethodForm />}
+				{/* {data.type === 'FLAT_RATE' && <FlatMethodForm />}
 				{data.type === 'FREE_SHIPPING' && <FreeMethodForm />}
 				{data.type === 'LOCAL_PICKUP' && localData && (
 					<LocalPickupForm
@@ -67,7 +66,7 @@ const MethodUpdate: FC<MethodUpdate> = ({ data }) => {
 						type={'UPDATE'}
 					/>
 				)}
-				{JSON.stringify(localData)}
+				{JSON.stringify(localData)} */}
 			</DialogContent>
 		</Dialog>
 	);

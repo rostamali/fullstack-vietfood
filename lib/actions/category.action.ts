@@ -242,10 +242,12 @@ export const fetchCategoryList = async () => {
 		});
 
 		return {
-			categories,
+			data: categories,
 		};
 	} catch (error) {
-		return;
+		return {
+			error: error,
+		};
 	}
 };
 export const importCategoryFromCSV = async (params: CSVCategory[]) => {

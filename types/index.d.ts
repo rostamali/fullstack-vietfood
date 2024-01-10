@@ -3,6 +3,7 @@
 /* ============================== */
 type UserStatus = 'ACTIVE' | 'INACTIVE';
 type UserRole = 'USER' | 'ADMIN';
+type FormTypes = 'CREATE' | 'UPDATE';
 interface RegisterUser {
 	firstName: string;
 	lastName?: string;

@@ -1,11 +1,6 @@
 'use client';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import {
 	Table,
 	TableBody,
 	TableCell,
@@ -33,7 +28,7 @@ import {
 } from '@/lib/helpers/formater';
 import ActionMenu from '../ui/action-menu';
 import { MenubarItem } from '@/components/ui/menubar';
-import UpdateUser from '../forms/update-user';
+import UpdateUser from '../modals/update-user';
 type UserListProps = {
 	data: UserList[];
 	pages: number;
@@ -138,125 +133,91 @@ const UserList: FC<UserListProps> = ({ data, pages }) => {
 					</TableHeader>
 					<TableBody className="border-t-0">
 						{data.map((user, index) => (
-							<Collapsible key={index} asChild>
-								<>
-									<TableRow className="border-b-0 border-t-0">
-										<TableCell className="p-0">
-											<div className="table-cell-start min-h-[80px]">
-												<div className="flex items-center gap-[10px]">
-													<Checkbox
-														className="checkbox-sm"
-														onClick={() =>
-															toggleSelectList(
-																selectedItems,
-																setSelectedItems,
-																user.id,
-															)
-														}
-														checked={isChecked(
-															selectedItems,
-															user.id,
-														)}
-													/>
-													<div className="flex flex-col gap-[5px]">
-														<span className="text-base-2">
-															{user.firstName}{' '}
-															{user.lastName}
-														</span>
-														<span className="text-base-2 !text-[13px] !text-primary-green">
-															{user.email}
-														</span>
-													</div>
-												</div>
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												{UserRoleFormat[user.role]}
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												{user.status === 'ACTIVE' ? (
-													<span className="badge-success">
-														{
-															UserStatusFormat[
-																user.status
-															]
-														}
-													</span>
-												) : (
-													<span className="badge-danger">
-														{
-															UserStatusFormat[
-																user.status
-															]
-														}
-													</span>
+							<TableRow
+								className="border-b-0 border-t-0"
+								key={index}
+							>
+								<TableCell className="p-0">
+									<div className="table-cell-start min-h-[80px]">
+										<div className="flex items-center gap-[10px]">
+											<Checkbox
+												className="checkbox-sm"
+												onClick={() =>
+													toggleSelectList(
+														selectedItems,
+														setSelectedItems,
+														user.id,
+													)
+												}
+												checked={isChecked(
+													selectedItems,
+													user.id,
 												)}
+											/>
+											<div className="flex flex-col gap-[5px]">
+												<span className="text-base-2">
+													{user.firstName}{' '}
+													{user.lastName}
+												</span>
+												<span className="text-base-2 !text-[13px] !text-primary-green">
+													{user.email}
+												</span>
 											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												127.0.0.1
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												{user.lastLogin
-													? dateFormat(user.lastLogin)
-													: 'No Activity'}
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-end min-h-[80px]">
-												<ActionMenu
-													content={
-														<>
-															<MenubarItem className="menubar-item">
-																<CollapsibleTrigger
-																	className="w-full text-left"
-																	onClick={() =>
-																		setSelectId(
-																			user.id,
-																		)
-																	}
-																>
-																	Edit Profile
-																</CollapsibleTrigger>
-															</MenubarItem>
-															<MenubarItem className="menubar-item">
-																Ban Profile
-															</MenubarItem>
-														</>
-													}
-												/>
-											</div>
-										</TableCell>
-									</TableRow>
-									<CollapsibleContent
-										asChild
-										className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
-									>
-										<>
-											<TableRow className="border-b-0 border-t-0">
-												<TableCell
-													colSpan={6}
-													className="p-0"
-												>
-													<div className="table-cell-data rounded-md table-cell-data-start table-cell-data-end w-full">
-														<UpdateUser
-															id={
-																selectId as string
-															}
-														/>
-													</div>
-												</TableCell>
-											</TableRow>
-										</>
-									</CollapsibleContent>
-								</>
-							</Collapsible>
+										</div>
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{UserRoleFormat[user.role]}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{user.status === 'ACTIVE' ? (
+											<span className="badge-success">
+												{UserStatusFormat[user.status]}
+											</span>
+										) : (
+											<span className="badge-danger">
+												{UserStatusFormat[user.status]}
+											</span>
+										)}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										127.0.0.1
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{user.lastLogin
+											? dateFormat(user.lastLogin)
+											: 'No Activity'}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-end min-h-[80px]">
+										<ActionMenu
+											content={
+												<>
+													<MenubarItem
+														className="menubar-item cursor-pointer"
+														onClick={() =>
+															setSelectId(user.id)
+														}
+													>
+														Edit Profile
+													</MenubarItem>
+													<MenubarItem className="menubar-item">
+														Ban Profile
+													</MenubarItem>
+												</>
+											}
+										/>
+									</div>
+								</TableCell>
+							</TableRow>
 						))}
 					</TableBody>
 				</Table>
@@ -297,6 +258,7 @@ const UserList: FC<UserListProps> = ({ data, pages }) => {
 					/>
 				</div>
 			</div>
+			{selectId && <UpdateUser id={selectId} onChange={setSelectId} />}
 		</div>
 	);
 };

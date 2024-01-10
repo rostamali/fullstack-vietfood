@@ -1,4 +1,4 @@
-import NewUser from '@/components/shared/modals/new-user';
+import CreateUser from '@/components/shared/modals/create-user';
 import UploadCSV from '@/components/shared/modals/upload-csv';
 import UserList from '@/components/shared/tables/user-list';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';
@@ -25,7 +25,8 @@ const UsersPage = async ({ searchParams }: SearchParams) => {
 			<div className="flex items-center justify-between gap-[40px]">
 				<DashboardPageTitle title={'Users'} links={[]} params={null} />
 				<div className="flex items-center gap-[15px]">
-					<NewUser />
+					{/* <NewUser /> */}
+					<CreateUser />
 					<UploadCSV type={'USER'} />
 				</div>
 			</div>

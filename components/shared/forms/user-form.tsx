@@ -1,7 +1,9 @@
 'use client';
+import { FC } from 'react';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UpdateUserFormSchema } from '@/lib/helpers/form-validation';
+import { UserFormSchema } from '@/lib/helpers/form-validation';
 import {
 	Form,
 	FormControl,
@@ -10,85 +12,49 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import SelectField from '../ui/select-field';
 import { UserRoles, UserStatus } from '@/constants';
 import PasswordField from '../ui/password-field';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import {
-	fetchUserProfileById,
-	updateUserProfileByAdmin,
-} from '@/lib/actions/auth.action';
-import { useEffect, useState } from 'react';
 import Spinner from '../ui/spinner';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
+import { useCreateUser, useUpdateUser } from '@/lib/react-query/hooks/useAuth';
+type UserFormProps = {
+	defaultValues: z.infer<typeof UserFormSchema>;
+	id: string;
+};
 
-const UpdateUser = ({ id }: { id: string }) => {
-	const [isPending, setIsPending] = useState(false);
-	const form = useForm<z.infer<typeof UpdateUserFormSchema>>({
-		resolver: zodResolver(UpdateUserFormSchema),
+const UserForm: FC<UserFormProps> = ({ defaultValues, id }) => {
+	const form = useForm<z.infer<typeof UserFormSchema>>({
+		resolver: zodResolver(UserFormSchema),
+		defaultValues,
 	});
-	useEffect(() => {
-		const fetchData = async () => {
-			const result = await fetchUserProfileById({ id });
-			if (result) {
-				form.setValue('firstName', result.firstName);
-				form.setValue(
-					'lastName',
-					result.lastName ? result.lastName : '',
-				);
-				form.setValue('email', result.email);
-				form.setValue('role', result.role);
-				form.setValue('status', result.status);
-				form.setValue('sendMessage', false);
-			}
-		};
-		fetchData();
-	}, [id]);
-	const handleUpdateUser = async (
-		data: z.infer<typeof UpdateUserFormSchema>,
-	) => {
-		setIsPending(true);
-		try {
-			const result = await updateUserProfileByAdmin({
-				id,
-				data: {
-					...data,
-					role: data.role as UserRole,
-					status: data.status as UserStatus,
+	const { mutate: createNewUser, isPending } = useCreateUser();
+	const { mutate: updateUser, isPending: isUpdating } = useUpdateUser(id);
+	const handleUserForm = async (data: z.infer<typeof UserFormSchema>) => {
+		if (form.watch('type') === 'CREATE') {
+			createNewUser(data, {
+				onSuccess: () => {
+					form.reset();
 				},
 			});
-			setIsPending(false);
-			if (result.success) {
-				toast.custom((t) => (
-					<ToastSuccess toastNumber={t} content={result.message} />
-				));
-			} else {
-				toast.custom((t) => (
-					<ToastError toastNumber={t} content={result.message} />
-				));
-			}
-		} catch (error) {
-			setIsPending(false);
-			toast.custom((t) => (
-				<ToastError toastNumber={t} content={`Account update failed`} />
-			));
+		} else {
+			updateUser(data);
 		}
 	};
+	console.log(form.formState.errors);
+
 	return (
 		<Form {...form}>
 			<form
-				className="form-flex-space w-full"
-				onSubmit={form.handleSubmit(handleUpdateUser)}
+				className="form-flex-space"
+				onSubmit={form.handleSubmit(handleUserForm)}
 			>
 				<div className="grid grid-cols-2 gap-[25px]">
 					<FormField
 						control={form.control}
 						name="firstName"
-						defaultValue=""
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="field-label-sm">
@@ -107,7 +73,6 @@ const UpdateUser = ({ id }: { id: string }) => {
 					<FormField
 						control={form.control}
 						name="lastName"
-						defaultValue=""
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="field-label-sm">
@@ -125,27 +90,7 @@ const UpdateUser = ({ id }: { id: string }) => {
 					/>
 					<FormField
 						control={form.control}
-						name="email"
-						defaultValue=""
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className="field-label-sm">
-									Email address
-								</FormLabel>
-								<FormControl>
-									<Input
-										className="input-field-sm"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage className="form-error" />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
 						name="role"
-						defaultValue=""
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="field-label-sm">
@@ -193,35 +138,56 @@ const UpdateUser = ({ id }: { id: string }) => {
 							</FormItem>
 						)}
 					/>
-					<FormField
-						control={form.control}
-						name="password"
-						defaultValue={null}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel
-									htmlFor="password"
-									className="field-label-sm"
-								>
-									Enter password
-								</FormLabel>
-								<FormControl>
-									<PasswordField
-										fieldClass={'input-field-sm'}
-										id={'password'}
-										onChange={field.onChange}
-										value={field.value}
-									/>
-								</FormControl>
-								<FormMessage className="form-error" />
-							</FormItem>
-						)}
-					/>
 				</div>
 				<FormField
 					control={form.control}
+					name="email"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel className="field-label-sm">
+								Email address
+							</FormLabel>
+							<FormControl>
+								<Input
+									type="email"
+									className="input-field-sm"
+									{...field}
+								/>
+							</FormControl>
+							<FormMessage className="form-error" />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="password"
+					defaultValue=""
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel
+								htmlFor="password"
+								className="field-label-sm"
+							>
+								Enter password
+							</FormLabel>
+							<FormControl>
+								<PasswordField
+									fieldClass={'input-field-sm'}
+									id={'password'}
+									onChange={(val) => {
+										field.onChange(val);
+									}}
+									value={field.value}
+								/>
+							</FormControl>
+							<FormMessage className="form-error" />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
 					name="sendMessage"
-					defaultValue={false}
 					render={({ field }) => (
 						<FormItem className="flex flex-col items-start space-x-3 space-y-0">
 							<FormControl>
@@ -236,7 +202,8 @@ const UpdateUser = ({ id }: { id: string }) => {
 										htmlFor="send-message"
 										className="field-label-sm !text-[14px] space-y-1 leading-none"
 									>
-										Send the update information to the user
+										Send the new user an email about their
+										account
 									</FormLabel>
 								</div>
 							</FormControl>
@@ -245,17 +212,24 @@ const UpdateUser = ({ id }: { id: string }) => {
 						</FormItem>
 					)}
 				/>
-				<div className="flex justify-end">
+				{form.watch('type') === 'CREATE' ? (
 					<Button className="btn-primary-sm" disabled={isPending}>
 						{isPending && (
 							<Spinner className={'btn-spinner-sm mr-[5px]'} />
 						)}
-						Save Update
+						Create User
 					</Button>
-				</div>
+				) : (
+					<Button className="btn-primary-sm" disabled={isUpdating}>
+						{isUpdating && (
+							<Spinner className={'btn-spinner-sm mr-[5px]'} />
+						)}
+						Save Changes
+					</Button>
+				)}
 			</form>
 		</Form>
 	);
 };
 
-export default UpdateUser;
+export default UserForm;

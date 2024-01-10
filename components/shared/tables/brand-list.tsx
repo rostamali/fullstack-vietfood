@@ -31,8 +31,9 @@ import { MenubarItem } from '@/components/ui/menubar';
 import EmptyError from '../ui/empty-error';
 import Pagination from '../filters/pagination';
 import Image from 'next/image';
-import Category from '../forms/category';
 import Brand from '../forms/brand';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategoryList } from '@/lib/actions/category.action';
 type BrandProps = {
 	data: BrandTable[];
 	pages: number;

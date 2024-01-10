@@ -111,7 +111,7 @@ export const fetchFilesByAdmin = async (params: {
 export const fetchFileDetailsbyAdmin = async (params: { id: string }) => {
 	try {
 		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		if (!isAdmin) return null;
 
 		const file = await prisma.file.findUnique({
 			where: {
@@ -139,7 +139,7 @@ export const fetchFileDetailsbyAdmin = async (params: { id: string }) => {
 		});
 		return file;
 	} catch (error) {
-		return;
+		return null;
 	}
 };
 export const fetchFilesOnModal = async (params: {
