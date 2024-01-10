@@ -17,7 +17,7 @@ export default function AdminLayout({
 							'max-lg:w-[50px] max-lg:h-[45px] w-[140px] h-[65px]'
 						}
 					/>
-					<DashboardLink />
+					<DashboardLink type={'ADMIN'} />
 				</section>
 				<section>
 					<AdminHeader />

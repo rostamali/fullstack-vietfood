@@ -1,3 +1,5 @@
+import UserHeader from '@/components/shared/headers/UserHeader';
+import DashboardLink from '@/components/shared/ui/dashboard-link';
 import Logo from '@/components/shared/ui/logo';
 
 export default function UserLayout({
@@ -15,10 +17,10 @@ export default function UserLayout({
 							'max-lg:w-[50px] max-lg:h-[45px] w-[140px] h-[65px]'
 						}
 					/>
-					{/* <DashboardLink /> */}
+					<DashboardLink type={'USER'} />
 				</section>
 				<section>
-					{/* <AdminHeader /> */}
+					<UserHeader />
 					<main className="dashboard-container py-16">
 						{children}
 					</main>

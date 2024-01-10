@@ -15,53 +15,15 @@ import {
 } from '@/components/ui/table';
 import { dateFormat } from '@/lib/helpers/formater';
 import { Button } from '@/components/ui/button';
-import { Trash2, PenSquare } from 'lucide-react';
-import ShipClassForm from '@/components/ecom/shipping/ship-class-form';
+import { PenSquare, Trash2 } from 'lucide-react';
 import Pagination from '../filters/pagination';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
-import { deleteShipClassByAdmin } from '@/lib/actions/ship.action';
 type ClassProps = {
-	data: ShipClassList[];
+	data: ShipZoneList[];
 	pages: number;
 };
-
-const ShipClassList: FC<ClassProps> = ({ data, pages }) => {
+const ShipZoneList: FC<ClassProps> = ({ data, pages }) => {
 	const [isPending, setIsPending] = useState(false);
-	const [details, setDetails] = useState<{
-		id: null | string;
-		data: ShipClassForm;
-	}>({
-		id: null,
-		data: {
-			name: '',
-			description: '',
-		},
-	});
-	const handleDeleteClass = async (ids: string[]) => {
-		setIsPending(true);
-		try {
-			const result = await deleteShipClassByAdmin({
-				classIds: ids,
-			});
-			setIsPending(false);
-			if (result.success) {
-				toast.custom((t) => (
-					<ToastSuccess toastNumber={t} content={result.message} />
-				));
-			} else {
-				toast.custom((t) => (
-					<ToastError toastNumber={t} content={result.message} />
-				));
-			}
-		} catch (error) {
-			setIsPending(false);
-			toast.custom((t) => (
-				<ToastError toastNumber={t} content={`Class id is required`} />
-			));
-		}
-	};
-
+	const handleDeleteClass = async (ids: string[]) => {};
 	return (
 		<div className="ship-class-table dashboard-col-space">
 			<Table>
@@ -90,21 +52,14 @@ const ShipClassList: FC<ClassProps> = ({ data, pages }) => {
 								<TableRow className="border-b-0 border-t-0">
 									<TableCell className="p-0">
 										<div className="table-cell-start min-h-[80px]">
-											<div className="flex flex-col gap-[5px]">
-												<span className="text-base-2">
-													{item.name}
-												</span>
-												<span className="text-base-2 !text-[13px] !text-primary-green">
-													{item.slug}
-												</span>
-											</div>
+											<span className="text-base-2">
+												{item.name}
+											</span>
 										</div>
 									</TableCell>
 									<TableCell className="p-0">
 										<div className="table-cell-data min-h-[80px]">
-											{item.description
-												? item.description
-												: '--'}
+											--
 										</div>
 									</TableCell>
 									<TableCell className="p-0">
@@ -115,21 +70,7 @@ const ShipClassList: FC<ClassProps> = ({ data, pages }) => {
 									<TableCell className="p-0">
 										<div className="table-cell-end min-h-[80px] gap-[10px]">
 											<CollapsibleTrigger asChild>
-												<Button
-													className="badge-success"
-													onClick={() => {
-														setDetails({
-															id: item.id,
-															data: {
-																name: item.name,
-																description:
-																	item.description
-																		? item.description
-																		: '',
-															},
-														});
-													}}
-												>
+												<Button className="badge-success">
 													<PenSquare size={16} />
 												</Button>
 											</CollapsibleTrigger>
@@ -156,15 +97,7 @@ const ShipClassList: FC<ClassProps> = ({ data, pages }) => {
 												className="p-0"
 											>
 												<div className="table-cell-data rounded-md table-cell-data-start table-cell-data-end w-full">
-													{details && (
-														<ShipClassForm
-															type={'UPDATE'}
-															values={
-																details.data
-															}
-															id={details.id}
-														/>
-													)}
+													Zone Details
 												</div>
 											</TableCell>
 										</TableRow>
@@ -192,4 +125,4 @@ const ShipClassList: FC<ClassProps> = ({ data, pages }) => {
 	);
 };
 
-export default ShipClassList;
+export default ShipZoneList;

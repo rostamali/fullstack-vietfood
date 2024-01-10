@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { LocalPickupMethodSchema } from '@/lib/helpers/form-validation';
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,16 +20,21 @@ import { TaxStatusList } from '@/constants';
 import { createMethodByAdmin } from '@/lib/actions/ship.action';
 import { toast } from 'sonner';
 import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+type LocalMethodProps = {
+	defaultValues: {
+		name: string;
+		taxStatus: undefined | taxStatusType;
+		cost: number;
+	};
+	type: 'CREATE' | 'UPDATE';
+	id?: string;
+};
 
-const LocalPickupForm = () => {
+const LocalPickupForm: FC<LocalMethodProps> = ({ defaultValues, type, id }) => {
 	const [isPending, setIsPending] = useState(false);
 	const form = useForm<z.infer<typeof LocalPickupMethodSchema>>({
 		resolver: zodResolver(LocalPickupMethodSchema),
-		defaultValues: {
-			name: '',
-			taxStatus: undefined,
-			cost: 0,
-		},
+		defaultValues,
 	});
 	const handleCreateMethod = async (
 		data: z.infer<typeof LocalPickupMethodSchema>,

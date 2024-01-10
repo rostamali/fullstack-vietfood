@@ -9,6 +9,8 @@ import {
 	Command,
 	Truck,
 	LayoutList,
+	BookUser,
+	ArrowDownUp,
 } from 'lucide-react';
 
 export const AdminNavlinks = [
@@ -60,6 +62,28 @@ export const AdminNavlinks = [
 	{
 		label: 'Profile',
 		url: '/admin/profile',
+		icon: CircleUser,
+	},
+];
+export const UserNavlinks = [
+	{
+		label: 'Account',
+		url: '/user/account',
+		icon: Component,
+	},
+	{
+		label: 'Orders',
+		url: '/user/order',
+		icon: ArrowDownUp,
+	},
+	{
+		label: 'Address',
+		url: '/user/address',
+		icon: BookUser,
+	},
+	{
+		label: 'Profile',
+		url: '/user/Profile',
 		icon: CircleUser,
 	},
 ];

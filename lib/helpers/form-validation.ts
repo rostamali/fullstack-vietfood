@@ -229,12 +229,21 @@ export const ShipClassSchema = z.object({
 		.string()
 		.max(150, { message: 'Description must not exceed 150 characters' }),
 });
+const ZoneObject = z.object({
+	name: z.string({
+		required_error: 'Name is required',
+	}),
+	id: z.string({
+		required_error: 'Name is required',
+	}),
+});
 export const ShipZoneSchema = z.object({
 	name: z
 		.string()
 		.min(1, { message: 'Name is required' })
 		.max(30, { message: 'Name must not exceed 30 characters' }),
 	regions: z.array(ShipZoneTypeSchema).nullable(),
+	methods: z.array(ZoneObject).nullable(),
 });
 export const FlatMethodSchema = z.object({
 	name: z

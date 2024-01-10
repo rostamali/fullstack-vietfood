@@ -4,7 +4,7 @@ import { createSlug, handleResponse } from '../helpers/formater';
 import { isAuthenticatedAdmin } from './auth.action';
 import prisma from '../prisma';
 import { revalidatePath } from 'next/cache';
-import { MethodType, TaxStatus } from '@prisma/client';
+import { LocationType, MethodType, TaxStatus } from '@prisma/client';
 
 /* ================================== */
 // Shipping class actions
@@ -264,5 +264,141 @@ export const deleteMethodByAdmin = async (params: { id: string }) => {
 		return handleResponse(true, `Method deleted successfully`);
 	} catch (error) {
 		return handleResponse(false, `Method delete action failed`);
+	}
+};
+export const fetchMethodListByAdmin = async () => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return;
+
+		const methods = await prisma.shippingMethod.findMany({
+			where: {
+				active: true,
+			},
+			select: {
+				id: true,
+				name: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+		});
+
+		return methods;
+	} catch (error) {
+		return;
+	}
+};
+export const fetchMethDetailsByAdmin = async (params: {
+	id: string;
+	type: shipMethodType;
+}) => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return;
+
+		const method = await prisma.shippingMethod.findUnique({
+			where: {
+				id: params.id,
+				type: params.type,
+			},
+			select: {
+				id: true,
+				name: true,
+				taxStatus: true,
+				options: {
+					select: {
+						value: true,
+					},
+				},
+			},
+		});
+		if (!method) return;
+		return {
+			name: method.name,
+			taxtStatus: method.taxStatus,
+			options: JSON.parse(method.options?.value as string),
+		};
+	} catch (error) {
+		return;
+	}
+};
+
+/* ================================== */
+// Shipping zone actions
+/* ================================== */
+export const createZoneByAdmin = async (params: ShipZoneForm) => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin)
+			return handleResponse(false, `You don't have a permission`);
+
+		const { name, regions, methods } = params;
+		const slug = await createSlug(name);
+		const slugExist = await prisma.shippingZone.findFirst({
+			where: {
+				slug,
+			},
+			select: {
+				id: true,
+				slug: true,
+			},
+		});
+		if (slugExist) return handleResponse(false, `Use different zone name`);
+
+		await prisma.shippingZone.create({
+			data: {
+				name,
+				slug,
+				...(regions && {
+					regions: {
+						create: regions.map((region) => ({
+							locationCode: region.isoCode,
+							locationType: region.type as LocationType,
+						})),
+					},
+				}),
+			},
+		});
+		revalidatePath('/admin/shipping/methods');
+		return handleResponse(true, `Zone created successfullt`);
+	} catch (error) {
+		return handleResponse(false, `Zone creation failed`);
+	}
+};
+export const fetchZoneByAdmin = async (params: {
+	pageSize: number;
+	page: number;
+}) => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return;
+
+		const { page = 1, pageSize = 10 } = params;
+		const zones = await prisma.shippingZone.findMany({
+			select: {
+				id: true,
+				name: true,
+				regions: {
+					select: {
+						id: true,
+					},
+				},
+				createdAt: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+			skip: (Number(page) - 1) * Number(pageSize),
+			take: pageSize,
+		});
+
+		const countZone = await prisma.shippingZone.count();
+		return {
+			zones,
+			pages: Math.ceil(countZone / pageSize),
+		};
+	} catch (error) {
+		return;
 	}
 };

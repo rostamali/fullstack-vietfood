@@ -133,7 +133,6 @@ model Product {
   slug          String
   label         String?
   isFeatured    Boolean  @default(false)
-  collection    String?
   description   String?
   excerpt       String?
   thumbnail     File?
@@ -202,6 +201,7 @@ model ShippingZone {
   name    String
   slug    String                 @unique
   regions ShippingZoneLocation[]
+  methods ShippingMethod[]
 
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -215,9 +215,11 @@ model ShippingMethod {
   active    Boolean    @default(false)
   order     Int        @default(1)
   options   Options?
-
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  zone         ShippingZone @relation(fields: [zoneId], references: [id])
+  zoneId       String
 }
 
 model ShippingZoneLocation {

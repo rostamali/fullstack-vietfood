@@ -54,7 +54,16 @@ const ShipMethodModal = () => {
 				</DialogHeader>
 				{method === 'FLAT_RATE' && <FlatMethodForm />}
 				{method === 'FREE_SHIPPING' && <FreeMethodForm />}
-				{method === 'LOCAL_PICKUP' && <LocalPickupForm />}
+				{method === 'LOCAL_PICKUP' && (
+					<LocalPickupForm
+						defaultValues={{
+							name: '',
+							taxStatus: undefined,
+							cost: 0,
+						}}
+						type={'CREATE'}
+					/>
+				)}
 			</DialogContent>
 		</Dialog>
 	);

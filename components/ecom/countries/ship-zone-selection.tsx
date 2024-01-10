@@ -65,7 +65,9 @@ const ShipZoneSelection = ({
 					role="combobox"
 					className={`w-full justify-between focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-opacity-60 ${triggerClass}`}
 				>
-					Select
+					<div className="flex gap-1 flex-wrap text-base-2">
+						Select zone...
+					</div>
 					<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>

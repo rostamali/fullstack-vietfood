@@ -174,6 +174,34 @@ interface ShipMethodsForm {
 	name: string;
 	taxStatus: string;
 }
+type regions = {
+	isoCode: string;
+	type: string;
+};
+interface ZoneMethods {
+	id: string;
+	name: string;
+}
+interface ShipZoneForm {
+	name: string;
+	regions: regions[] | null;
+	methods: ZoneMethods | null;
+}
+
+interface ShipZoneList {
+	id: string;
+	name: string;
+	createdAt: Date;
+	regions: {
+		id: string;
+	}[];
+}
+
+interface LocalUpdateForm {
+	id: string;
+	name: string;
+	taxStatus: taxStatusType;
+}
 
 /* ============================== */
 //  CSV file types

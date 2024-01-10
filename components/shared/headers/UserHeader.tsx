@@ -1,10 +1,9 @@
-import { Bell, Mail } from 'lucide-react';
-import Profile from '../menus/profile';
-import Logo from '../ui/logo';
 import MobileNavbar from '../drawers/mobile-navbar';
+import Profile from '../menus/profile';
 import DashboardLink from '../ui/dashboard-link';
+import Logo from '../ui/logo';
 
-const AdminHeader = () => {
+const UserHeader = () => {
 	return (
 		<header className="admin-header bg-white">
 			<div className="dashboard-container">
@@ -24,12 +23,6 @@ const AdminHeader = () => {
 					</div>
 					<div className="max-lg:hidden">Global Search</div>
 					<div className="flex-center gap-[10px]">
-						<div className="circle-icon-wrap max-md:hidden">
-							<Mail className="circle-icon" />
-						</div>
-						<div className="circle-icon-wrap max-md:hidden">
-							<Bell className="circle-icon" />
-						</div>
 						<Profile />
 						<MobileNavbar
 							trigger={undefined}
@@ -39,7 +32,7 @@ const AdminHeader = () => {
 										link={'/'}
 										logoClass={'w-[100px] h-[45px]'}
 									/>
-									<DashboardLink type={'ADMIN'} />
+									<DashboardLink type={'USER'} />
 								</>
 							}
 						/>
@@ -50,4 +43,4 @@ const AdminHeader = () => {
 	);
 };
 
-export default AdminHeader;
+export default UserHeader;
