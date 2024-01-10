@@ -182,3 +182,144 @@ export const BrandFormSchema = z.object({
 		.string()
 		.max(150, { message: 'Description must not exceed 150 characters' }),
 });
+
+/* ================================== */
+// Shipping Schemaa
+/* ================================== */
+const Zones = ['COUNTRY', 'STATE'];
+const TaxStatus = ['TAXABLE', 'NONE'];
+const freeShipCondition = ['MINI_ORDER_AMOUNT', 'COUPON'];
+
+const ShipClassCost = z.object({
+	classId: z.string().min(1, { message: 'Class ID is required' }),
+	className: z.string().min(1, { message: 'Class name is required' }),
+	cost: z.coerce
+		.string({
+			invalid_type_error: 'Class cost must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+});
+const ShipZoneTypeSchema = z.object({
+	type: z
+		.string({
+			required_error: 'Zone type is required',
+		})
+		.refine((value) => Zones.includes(value), {
+			message:
+				'Zone type must be one of the options: ' + Zones.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Zone type is required',
+			},
+		),
+	isoCode: z
+		.string()
+		.max(150, { message: 'Description must not exceed 150 characters' }),
+});
+export const ShipClassSchema = z.object({
+	name: z
+		.string()
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	description: z
+		.string()
+		.max(150, { message: 'Description must not exceed 150 characters' }),
+});
+export const ShipZoneSchema = z.object({
+	name: z
+		.string()
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	regions: z.array(ShipZoneTypeSchema).nullable(),
+});
+export const FlatMethodSchema = z.object({
+	name: z
+		.string({
+			required_error: 'Name is required',
+		})
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	taxStatus: z.string().min(1, { message: 'Tax status is required' }),
+	cost: z.coerce
+		.number({
+			invalid_type_error: 'Cost must be a number',
+		})
+		.refine((value) => !isNaN(value) && value >= 0, {
+			message: 'Cost must be a non-negative number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? 0 : Number(value),
+		),
+	noClassCost: z.coerce
+		.string({
+			invalid_type_error: 'No Shipping class cost must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+	classList: z.array(ShipClassCost),
+});
+export const FreeShipMethodSchema = z.object({
+	name: z
+		.string({
+			required_error: 'Name is required',
+		})
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	required: z
+		.string({
+			required_error: 'Condition is required',
+		})
+		.refine((value) => freeShipCondition.includes(value), {
+			message:
+				'Condition must be one of the options: ' +
+				freeShipCondition.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Condition is required',
+			},
+		),
+	miniOrderAmount: z.coerce
+		.string({
+			invalid_type_error: 'Minimum order amount must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+});
+export const LocalPickupMethodSchema = z.object({
+	name: z
+		.string({
+			required_error: 'Name is required',
+		})
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	taxStatus: z
+		.string({
+			required_error: 'Tax status is required',
+		})
+		.refine((value) => TaxStatus.includes(value), {
+			message:
+				'Tax status must be one of the options: ' +
+				TaxStatus.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Tax status is required',
+			},
+		),
+	cost: z.coerce
+		.string({
+			invalid_type_error: 'Cost amount must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+});

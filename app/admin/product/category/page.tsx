@@ -20,7 +20,11 @@ const CategoryPage = async ({ searchParams }: SearchParams) => {
 	return (
 		<div className="dashboard-col-space">
 			<div className="flex items-center justify-between gap-[40px]">
-				<DashboardPageTitle title={'Categories'} links={[]} />
+				<DashboardPageTitle
+					title={'Categories'}
+					links={[]}
+					params={null}
+				/>
 				<div className="flex items-center gap-[15px]">
 					<div className="max-xm:hidden">
 						<NewCategory />

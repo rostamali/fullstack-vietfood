@@ -1,5 +1,6 @@
 'use server';
 import { revalidatePath } from 'next/cache';
+import sharp from 'sharp';
 import { fileSizeFormat, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
 import { isAuthenticatedAdmin, isAuthenticatedCheck } from './auth.action';
@@ -256,20 +257,24 @@ export const uploadProfilePicture = async (formData: FormData) => {
 				},
 			});
 		}
-		const buffer = Buffer.from(await file.arrayBuffer());
 		const fileName = `upload-${Date.now()}-${
 			Math.random() * (999 - 1) + 1
 		}.${file.type.split('/')[1]}`;
 
+		const resizeAvatar = await sharp(await file.arrayBuffer())
+			.resize(200, 200)
+			.withMetadata()
+			.jpeg({ quality: 80 })
+			.toBuffer();
 		const uploadPath = join('./public/uploads', 'avatar/', fileName);
-		await writeFile(uploadPath, buffer);
-		const filesize = fileSizeFormat(file.size);
+		const compressSize = fileSizeFormat(resizeAvatar.length);
 
+		await writeFile(uploadPath, resizeAvatar);
 		await prisma.avatar.create({
 			data: {
 				fileName: fileName,
 				url: fileName,
-				size: filesize,
+				size: compressSize,
 				user: {
 					connect: {
 						id: isAuth.id,
@@ -277,7 +282,6 @@ export const uploadProfilePicture = async (formData: FormData) => {
 				},
 			},
 		});
-
 		revalidatePath('/admin/files', 'page');
 
 		return handleResponse(true, 'Profile picture uploaded');

@@ -138,6 +138,20 @@ export const loginUser = async (params: LoginUser) => {
 		return handleResponse(false, 'Account login failed');
 	}
 };
+export const logoutUser = async () => {
+	try {
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth)
+			return handleResponse(false, `You don't have a permission`);
+
+		cookies().delete('vietfood_access_token');
+		cookies().delete('vietfood_refresh_token');
+		revalidatePath('/', 'page');
+		return handleResponse(true, `Logged out successfully`);
+	} catch (error) {
+		return handleResponse(false, `Logout action failed`);
+	}
+};
 export const importUsersFromCSV = async (params: CSVUser[]) => {
 	try {
 		const isAdmin = await isAuthenticatedAdmin();
@@ -397,6 +411,11 @@ export const fetchProfileMenu = async () => {
 				lastName: true,
 				email: true,
 				role: true,
+				avatar: {
+					select: {
+						url: true,
+					},
+				},
 			},
 		});
 		if (!userExist) return;
@@ -440,6 +459,7 @@ export const fetchAdminProfile = async () => {
 		return;
 	}
 };
+
 /* ================================== */
 // Check user authentications
 /* ================================== */

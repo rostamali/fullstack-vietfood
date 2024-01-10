@@ -20,7 +20,7 @@ const BrandPage = async ({ searchParams }: SearchParams) => {
 	return (
 		<div className="dashboard-col-space">
 			<div className="flex items-center justify-between gap-[40px]">
-				<DashboardPageTitle title={'Brands'} links={[]} />
+				<DashboardPageTitle title={'Brands'} links={[]} params={null} />
 				<div className="flex items-center gap-[15px]">
 					<NewBrand />
 					<UploadCSV type={'BRAND'} />

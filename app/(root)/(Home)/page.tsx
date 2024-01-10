@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ import {
 
 import { invoices } from '@/constants';
 import LocalSearch from '@/components/shared/filters/local-search';
+import { useState } from 'react';
 
 export default function Home() {
 	return (

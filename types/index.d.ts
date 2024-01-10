@@ -101,7 +101,6 @@ interface CategoryTable {
 	name: string;
 	slug: string;
 	isActive: boolean;
-	createdAt: Date;
 	thumbnail: {
 		id: string;
 		title: string;
@@ -145,6 +144,35 @@ interface BrandTable {
 	contactEmail: string | null;
 	contactPhone: string | null;
 	contactWebsite: string | null;
+}
+
+/* ============================== */
+//  Shipping Types
+/* ============================== */
+type taxStatusType = 'TAXABLE' | 'NONE';
+type shipMethodType = 'FLAT_RATE' | 'FREE_SHIPPING' | 'LOCAL_PICKUP';
+interface ShipClassForm {
+	name: string;
+	description: string;
+}
+interface ShipClassList {
+	id: string;
+	name: string;
+	slug: string;
+	description: string | null;
+	createdAt: Date;
+}
+
+interface ShipMethodList {
+	id: string;
+	name: string;
+	type: shipMethodType;
+	taxStatus: taxStatusType;
+	active: boolean;
+}
+interface ShipMethodsForm {
+	name: string;
+	taxStatus: string;
 }
 
 /* ============================== */

@@ -107,6 +107,15 @@ export const isFileSelected = (
 };
 
 // Data formater
+export const ShipMethodFormat: Record<shipMethodType, string> = {
+	FLAT_RATE: 'Flat Rate',
+	FREE_SHIPPING: 'Free Shipping',
+	LOCAL_PICKUP: 'Local Pickup',
+};
+export const TaxStatusFormat: Record<taxStatusType, string> = {
+	TAXABLE: 'Taxable',
+	NONE: 'None',
+};
 export const UserStatusFormat: Record<UserStatus, string> = {
 	ACTIVE: 'Active',
 	INACTIVE: 'Inactive',

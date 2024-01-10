@@ -308,18 +308,16 @@ const BrandList: FC<BrandProps> = ({ data, pages }) => {
 				<div className="text-base-1">
 					{selectedItems ? selectedItems?.length : 0} row(s) selected.
 				</div>
-				<div className="">
-					<Pagination
-						pages={pages}
-						containerClass={''}
-						prevBtnClass={''}
-						nextBtnClass={''}
-						paginateBtnClass={''}
-						paginateActiveClass={
-							'bg-black-dark bg-opacity-10 text-black-dark'
-						}
-					/>
-				</div>
+				<Pagination
+					pages={pages}
+					containerClass={''}
+					prevBtnClass={''}
+					nextBtnClass={''}
+					paginateBtnClass={''}
+					paginateActiveClass={
+						'bg-black-dark bg-opacity-10 text-black-dark'
+					}
+				/>
 			</div>
 		</div>
 	);

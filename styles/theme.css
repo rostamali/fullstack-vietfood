@@ -6,8 +6,8 @@
 	tbody tr:first-child td > div {
 		margin-top: 15px;
 	}
-	.otp-input-field::-webkit-outer-spin-button,
-	.otp-input-field::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']::-webkit-inner-spin-button,
 	.otp-input-field {
 		-webkit-appearance: none;
 		margin: 0;

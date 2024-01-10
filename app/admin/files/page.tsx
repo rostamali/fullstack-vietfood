@@ -20,7 +20,7 @@ const FilesPage = async ({ searchParams }: SearchParams) => {
 	return (
 		<div className="dashboard-col-space">
 			<div className="flex items-center justify-between gap-[40px]">
-				<DashboardPageTitle title={'Files'} links={[]} />
+				<DashboardPageTitle title={'Files'} links={[]} params={null} />
 				<UploadFile />
 			</div>
 			<FileLibrary

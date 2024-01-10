@@ -210,7 +210,7 @@ export const fetchCategoryByAdmin = async (params: {
 			skip: (Number(page) - 1) * Number(pageSize),
 			take: pageSize,
 		});
-		const countFiles = await prisma.productCategory.count({
+		const countCategory = await prisma.productCategory.count({
 			where: {
 				...(query && {
 					OR: [
@@ -222,7 +222,7 @@ export const fetchCategoryByAdmin = async (params: {
 		});
 		return {
 			categories,
-			pages: Math.ceil(countFiles / pageSize),
+			pages: Math.ceil(countCategory / pageSize),
 		};
 	} catch (error) {
 		return;

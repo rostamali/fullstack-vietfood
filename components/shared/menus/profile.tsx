@@ -10,6 +10,7 @@ import {
 import { fetchProfileMenu } from '@/lib/actions/auth.action';
 import { UserRoleFormat } from '@/lib/helpers/formater';
 import Image from 'next/image';
+import LogoutAction from '../ui/logout-action';
 
 const Profile = async () => {
 	const result = await fetchProfileMenu();
@@ -20,7 +21,11 @@ const Profile = async () => {
 					<MenubarTrigger asChild>
 						<Button className="flex items-center justify-center gap-[10px] cursor-pointer !p-0">
 							<Image
-								src={'/assets/placeholder.svg'}
+								src={
+									result.avatar
+										? `/uploads/avatar/${result.avatar.url}`
+										: '/assets/placeholder.svg'
+								}
 								alt={'Placeholder'}
 								width={100}
 								height={100}
@@ -30,7 +35,7 @@ const Profile = async () => {
 								<h5 className="heading-6">
 									{result.firstName}
 								</h5>
-								<span className="text-base-2">
+								<span className="font-poppins text-[12px] font-normal text-black-dark">
 									{UserRoleFormat[result.role]}
 								</span>
 							</div>
@@ -46,9 +51,15 @@ const Profile = async () => {
 						<MenubarItem className="menubar-item">
 							Share
 						</MenubarItem>
-						<MenubarItem className="menubar-item">
-							Print
-						</MenubarItem>
+
+						<LogoutAction
+							trigger={
+								<MenubarItem className="menubar-item w-full cursor-pointer">
+									Logout
+								</MenubarItem>
+							}
+							btnClass={'w-full'}
+						/>
 					</MenubarContent>
 				</MenubarMenu>
 			)}

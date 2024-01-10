@@ -1,0 +1,38 @@
+export const CountriesList = [
+	{
+		name: 'New Zealand',
+		isoCode: 'NZ',
+		flag: 'https://www.worldometers.info/img/flags/nz-flag.gif',
+		phonecode: '64',
+		currency: 'NZD',
+		latitude: '-41.00000000',
+		longitude: '174.00000000',
+	},
+	{
+		name: 'Australia',
+		isoCode: 'AU',
+		flag: 'https://www.worldometers.info/img/flags/as-flag.gif',
+		phonecode: '61',
+		currency: 'AUD',
+		latitude: '-27.00000000',
+		longitude: '133.00000000',
+	},
+	{
+		name: 'Canada',
+		isoCode: 'CA',
+		flag: 'https://www.worldometers.info/img/flags/ca-flag.gif',
+		phonecode: '1',
+		currency: 'CAD',
+		latitude: '60.00000000',
+		longitude: '-95.00000000',
+	},
+	{
+		name: 'Japan',
+		isoCode: 'JP',
+		flag: 'https://www.worldometers.info/img/flags/ja-flag.gif',
+		phonecode: '81',
+		currency: 'JPY',
+		latitude: '36.00000000',
+		longitude: '138.00000000',
+	},
+];

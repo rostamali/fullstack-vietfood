@@ -7,6 +7,8 @@ import {
 	CircleUser,
 	Component,
 	Command,
+	Truck,
+	LayoutList,
 } from 'lucide-react';
 
 export const AdminNavlinks = [
@@ -39,6 +41,16 @@ export const AdminNavlinks = [
 		label: 'Orders',
 		url: '/dashboard/customers',
 		icon: ShoppingCart,
+	},
+	{
+		label: 'Tax',
+		url: '/admin/tax',
+		icon: LayoutList,
+	},
+	{
+		label: 'Shipping',
+		url: '/admin/shipping',
+		icon: Truck,
 	},
 	{
 		label: 'Users',
@@ -103,6 +115,64 @@ export const UserPages = [
 	{
 		label: 'Trash',
 		url: '/admin/user/trash',
+	},
+];
+export const ProductPageLinks = [
+	{
+		label: 'Publish',
+		url: '/admin/product?status=publish',
+	},
+	{
+		label: 'Trash',
+		url: '/admin/product?status=trash',
+	},
+];
+export const ShipPageLinks = [
+	{
+		label: 'Shipping Zones',
+		url: '/admin/shipping',
+	},
+	{
+		label: 'Shipping Methods',
+		url: '/admin/shipping/methods',
+	},
+	{
+		label: 'Shipping Class',
+		url: '/admin/shipping/class',
+	},
+];
+export const ShipMethodList = [
+	{
+		label: 'Flat Method',
+		value: 'FLAT_RATE',
+	},
+	{
+		label: 'Free Shipping',
+		value: 'FREE_SHIPPING',
+	},
+	{
+		label: 'Locak Pickup',
+		value: 'LOCAL_PICKUP',
+	},
+];
+export const TaxStatusList = [
+	{
+		label: 'Taxable',
+		value: 'TAXABLE',
+	},
+	{
+		label: 'None',
+		value: 'NONE',
+	},
+];
+export const FreeShipRequired = [
+	{
+		label: 'A minimum order amount',
+		value: 'MINI_ORDER_AMOUNT',
+	},
+	{
+		label: 'A valid free coupon',
+		value: 'COUPON',
 	},
 ];
 

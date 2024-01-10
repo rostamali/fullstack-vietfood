@@ -190,6 +190,7 @@ const NewUser = () => {
 												onChange={(val) => {
 													field.onChange(val);
 												}}
+												value={field.value}
 											/>
 										</FormControl>
 										<FormMessage className="form-error" />
