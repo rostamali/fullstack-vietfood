@@ -19,7 +19,7 @@ import PasswordField from '../ui/password-field';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import Spinner from '../ui/spinner';
-import { useCreateUser, useUpdateUser } from '@/lib/react-query/hooks/useAuth';
+import { useCreateUser, useUpdateUser } from '@/lib/hooks/useAuth';
 type UserFormProps = {
 	defaultValues: z.infer<typeof UserFormSchema>;
 	id: string;
@@ -43,7 +43,6 @@ const UserForm: FC<UserFormProps> = ({ defaultValues, id }) => {
 			updateUser(data);
 		}
 	};
-	console.log(form.formState.errors);
 
 	return (
 		<Form {...form}>

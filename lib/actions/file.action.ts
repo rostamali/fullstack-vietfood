@@ -221,6 +221,48 @@ export const updateFilesByAdmin = async (params: {
 		return handleResponse(false, 'File update failed');
 	}
 };
+export const deleteFilesByAdmin = async (params: { fileId: string[] }) => {
+	try {
+		const { fileId } = params;
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin)
+			return handleResponse(false, `You don't have a permission`);
+
+		const filesToDelete = await prisma.file.findMany({
+			where: {
+				id: { in: fileId },
+			},
+			select: {
+				id: true,
+				fileName: true,
+			},
+		});
+		if (!filesToDelete.length)
+			return handleResponse(false, `File does not exist`);
+
+		for (const file of filesToDelete) {
+			const filePath = join('./public/uploads', 'files/', file.fileName);
+			try {
+				await unlink(filePath);
+				await prisma.file.delete({
+					where: {
+						id: file.id,
+					},
+				});
+			} catch (error) {
+				return handleResponse(
+					false,
+					`Error deleting file: ${filePath}`,
+				);
+			}
+		}
+
+		revalidatePath('/admin/files', 'page');
+		return handleResponse(true, 'File deleted successfully');
+	} catch (error) {
+		return handleResponse(false, 'File delete action failed');
+	}
+};
 
 // Avatar Actions
 export const uploadProfilePicture = async (formData: FormData) => {
@@ -323,48 +365,5 @@ export const deleteProfilePicture = async (params: { refreshLink: string }) => {
 		return handleResponse(true, 'Profile picture deleted');
 	} catch (error) {
 		return handleResponse(false, 'Profile picture deletion failed');
-	}
-};
-
-export const deleteFilesByAdmin = async (params: { fileId: string[] }) => {
-	try {
-		const { fileId } = params;
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
-			return handleResponse(false, `You don't have a permission`);
-
-		const filesToDelete = await prisma.file.findMany({
-			where: {
-				id: { in: fileId },
-			},
-			select: {
-				id: true,
-				fileName: true,
-			},
-		});
-		if (!filesToDelete.length)
-			return handleResponse(false, `File does not exist`);
-
-		for (const file of filesToDelete) {
-			const filePath = join('./public/files', 'uploads/', file.fileName);
-			try {
-				await unlink(filePath);
-				await prisma.file.delete({
-					where: {
-						id: file.id,
-					},
-				});
-			} catch (error) {
-				return handleResponse(
-					false,
-					`Error deleting file: ${filePath}`,
-				);
-			}
-		}
-
-		revalidatePath('/admin/files', 'page');
-		return handleResponse(true, 'File deleted successfully');
-	} catch (error) {
-		return handleResponse(false, 'File deletion failed');
 	}
 };

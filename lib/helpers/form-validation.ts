@@ -152,6 +152,19 @@ export const CategoryFormSchema = z.object({
 		.min(1, { message: 'Name is required' })
 		.max(30, { message: 'Name must not exceed 30 characters' }),
 	thumbnail: z.array(FileSchema).nullable(),
+	type: z
+		.string({
+			required_error: 'Type is required',
+		})
+		.refine((value) => FormTypes.includes(value), {
+			message: 'Type must be one of the options: ' + FormTypes.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Type is required',
+			},
+		),
 	parent: z.string().nullable(),
 	description: z
 		.string()
@@ -323,4 +336,123 @@ export const LocalPickupMethodSchema = z.object({
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
+});
+
+/* ================================== */
+// Product form
+/* ================================== */
+export const ProductFormSchema = z.object({
+	type: z
+		.string({
+			required_error: 'Type is required',
+		})
+		.refine((value) => FormTypes.includes(value), {
+			message: 'Type must be one of the options: ' + FormTypes.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Type is required',
+			},
+		),
+	name: z
+		.string({
+			required_error: 'Product name is required',
+		})
+		.min(1, { message: 'Product name is required' }),
+	excerpt: z.string(),
+	description: z.string(),
+
+	// Images
+	thumbnail: z.array(FileSchema).nullable(),
+	gallery: z.array(FileSchema).nullable(),
+
+	// Prices
+	label: z.string(),
+	retailPrice: z.coerce
+		.string({
+			invalid_type_error: 'Retail price must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+	regularPrice: z.coerce
+		.string({
+			invalid_type_error: 'Regular price must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+	salePrice: z.coerce
+		.string({
+			invalid_type_error: 'Sale price must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+
+	// Taxes
+	taxStatus: z
+		.string({
+			required_error: 'Tax status is required',
+		})
+		.refine((value) => TaxStatus.includes(value), {
+			message:
+				'Tax status must be one of the options: ' +
+				TaxStatus.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Tax status is required',
+			},
+		),
+	taxClass: z.string(),
+
+	// Inventory
+	sku: z.string(),
+	stockQty: z.coerce
+		.string({
+			invalid_type_error: 'QTY must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+	stockStatus: z.boolean(),
+	threshold: z.coerce
+		.string({
+			invalid_type_error: 'Threshold must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+	soldIndividual: z.boolean(),
+
+	// Shipping
+	weight: z.coerce
+		.string({
+			invalid_type_error: 'Weight must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+	shipClass: z.string(),
+
+	// Terms
+	status: z
+		.string({
+			required_error: 'Status is required',
+		})
+		.refine((value) => UserStatus.includes(value), {
+			message:
+				'Status must be one of the options: ' + UserStatus.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Status is required',
+			},
+		),
+	category: z.string().nullable(),
+	brand: z.string().nullable(),
 });

@@ -1,6 +1,7 @@
 import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
 import {
 	createAccountByAdmin,
+	deleteUserByAdmin,
 	fetchUserProfileById,
 	updateUserProfileByAdmin,
 } from '@/lib/actions/auth.action';
@@ -71,3 +72,33 @@ export const useUserDetails = (id: string) => {
 		queryFn: async () => await fetchUserProfileById({ id }),
 	});
 };
+export const useDeleteAccount = () => {
+	return useMutation({
+		mutationFn: async (data: {
+			ids: string[];
+			actionType: 'DEACTIVE' | 'DELETE';
+		}) => {
+			return await deleteUserByAdmin({
+				ids: data.ids,
+				actionType: data.actionType,
+			});
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+//

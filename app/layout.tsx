@@ -3,7 +3,7 @@ import { Poppins } from 'next/font/google';
 import './globals.css';
 import '../styles/theme.css';
 import { Toaster } from '@/components/ui/sonner';
-import Provider from '@/lib/react-query/provider';
+import Provider from '@/lib/provider';
 
 export const fontPoppins = Poppins({
 	weight: ['300', '400', '500', '600', '700'],
@@ -24,7 +24,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<body className={fontPoppins.variable}>
+			<body className={`${fontPoppins.variable} scrollbar-body`}>
 				<Provider>{children}</Provider>
 				<Toaster richColors className="font-poppins" />
 			</body>

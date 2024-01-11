@@ -8,7 +8,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { UserStatus } from '@/constants';
+import { UserAction, UserStatus } from '@/constants';
 import SelectFilter from '../filters/select-filter';
 import { Button } from '@/components/ui/button';
 import LocalSearch from '../filters/local-search';
@@ -29,6 +29,10 @@ import {
 import ActionMenu from '../ui/action-menu';
 import { MenubarItem } from '@/components/ui/menubar';
 import UpdateUser from '../modals/update-user';
+import { useDeleteAccount } from '@/lib/hooks/useAuth';
+import SelectField from '../ui/select-field';
+import { toast } from 'sonner';
+import { ToastError } from '../ui/custom-toast';
 type UserListProps = {
 	data: UserList[];
 	pages: number;
@@ -37,20 +41,44 @@ type UserListProps = {
 const UserList: FC<UserListProps> = ({ data, pages }) => {
 	const [selectedItems, setSelectedItems] = useState<string[] | null>(null);
 	const [selectId, setSelectId] = useState<string | null>(null);
+	const [actionType, setActionType] = useState<string | null>();
+	const { mutate: deleteAccount, isPending } = useDeleteAccount();
+	const handleUserAction = () => {
+		if (selectedItems) {
+			deleteAccount({
+				ids: selectedItems,
+				actionType: actionType as 'DEACTIVE' | 'DELETE',
+			});
+			setSelectedItems(null);
+			setActionType(null);
+		} else {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={`Select user first`} />
+			));
+		}
+	};
 
 	return (
 		<div className="user-table dashboard-col-space">
 			<div className="table-header">
 				<div className="grid lg:grid-cols-5 grid-cols-1 lg:gap-[40px] gap-[20px]">
 					<div className="lg:col-span-2 flex items-center gap-[15px]">
-						<SelectFilter
-							filterKey={'status'}
-							placeholder={'Filter by status'}
+						<SelectField
 							triggerClass={'input-field-lg bg-white'}
-							contentClass={'bg-white'}
-							options={UserStatus}
+							placeholder={'Select action'}
+							defaultValue={actionType ? actionType : ''}
+							onChange={setActionType}
+							options={UserAction}
 						/>
-						<Button className="btn-primary-lg">Apply</Button>
+						<Button
+							className="btn-primary-lg"
+							disabled={
+								isPending ? true : actionType ? false : true
+							}
+							onClick={handleUserAction}
+						>
+							Apply
+						</Button>
 					</div>
 					<div className="lg:col-span-3 w-full xm:flex xm:items-center xm:justify-between xm:gap-[15px]">
 						<div className="flex-1 grid grid-cols-5 items-center gap-[15px]">
@@ -245,7 +273,7 @@ const UserList: FC<UserListProps> = ({ data, pages }) => {
 				<div className="text-base-1">
 					{selectedItems ? selectedItems?.length : 0} row(s) selected.
 				</div>
-				<div className="">
+				<div>
 					<Pagination
 						pages={pages}
 						containerClass={''}

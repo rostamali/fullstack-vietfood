@@ -1,47 +1,49 @@
 import { FC, useEffect, useState } from 'react';
 import FileLibraryModal from '../file-library-modal';
 import Image from 'next/image';
+import { Image as IconImage } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
-interface SetThumbnailProps {
+type SetThumbnailProps = {
 	trigger: React.ReactNode;
 	modalTitle: string;
-	gallery: boolean;
 	onChange: React.Dispatch<React.SetStateAction<FileSelection[] | null>>;
-	heightWidth: string;
-	borderRadius: string;
+	frameClass: string;
+	thumbClass?: string;
+	iconClass?: string;
 	selected: FileSelection[] | null;
-}
+};
 
 const SetThumbnail: FC<SetThumbnailProps> = ({
 	onChange,
 	trigger,
-	heightWidth,
+	frameClass,
 	modalTitle,
-	borderRadius,
 	selected,
+	thumbClass,
+	iconClass,
 }) => {
 	const [thumbnail, setThumbnail] = useState<null | FileSelection[]>(null);
 	useEffect(() => {
 		setThumbnail(selected);
 	}, [selected]);
 	return (
-		<div className="thumbnail-selection">
+		<div className="thumbnail-selection font-poppins">
 			<div
-				className={`relative ${heightWidth} ${borderRadius} bg-[#EFF1F3]`}
+				className={`border border-primary-gray border-opacity-15 relative ${frameClass}`}
 			>
 				{thumbnail ? (
-					<div
-						className={`group overflow-hidden relative ${borderRadius}`}
-					>
+					<div className="w-full h-full relative group overflow-hidden">
 						<Image
 							src={`/uploads/files/${thumbnail[0].url}`}
 							alt={thumbnail[0].title}
 							width={500}
 							height={500}
-							className={`${heightWidth} object-cover`}
+							className={`h-full w-full object-cover ${thumbClass}`}
 						/>
-						<div className="absolute duration-150 opacity-0 top-0 left-0 w-full h-full bg-black-dark bg-opacity-40 group-hover:opacity-[1] flex-center">
+						<div
+							className={`absolute duration-150 opacity-0 top-0 backdrop-blur-[2px] left-0 w-full h-full bg-black-dark bg-opacity-40 group-hover:opacity-[1] flex-center ${thumbClass}`}
+						>
 							<Button
 								className="text-white p-0"
 								onClick={() => {
@@ -54,13 +56,9 @@ const SetThumbnail: FC<SetThumbnailProps> = ({
 						</div>
 					</div>
 				) : (
-					<Image
-						src={'/assets/placeholder.svg'}
-						alt={'Placeholder'}
-						width={200}
-						height={200}
-						className={`${heightWidth} ${borderRadius}`}
-					/>
+					<div className="w-full h-full flex items-center justify-center">
+						<IconImage size={50} className={iconClass} />
+					</div>
 				)}
 				<FileLibraryModal
 					trigger={trigger}

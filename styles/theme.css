@@ -47,6 +47,17 @@
 	.scrollbar-sm::-webkit-scrollbar-thumb {
 		@apply bg-black-dark bg-opacity-15 rounded;
 	}
+
+	.scrollbar-body {
+		@apply overflow-y-scroll;
+	}
+	.scrollbar-body::-webkit-scrollbar,
+	.scrollbar-body::-webkit-scrollbar-track {
+		@apply w-[14px] bg-black-dark bg-opacity-10;
+	}
+	.scrollbar-body::-webkit-scrollbar-thumb {
+		@apply bg-black-dark rounded-lg;
+	}
 }
 
 @layer utilities {
@@ -78,7 +89,7 @@
 
 	/* Links Typography */
 	.menubar-item {
-		@apply text-[13px] font-poppins text-black-dark font-normal hover:bg-black-dark hover:bg-opacity-5;
+		@apply text-[13px] font-poppins text-black-dark font-normal hover:bg-black-dark hover:bg-opacity-5 cursor-pointer;
 	}
 	.btn-navlink {
 		@apply p-[12px] flex rounded-md items-center gap-[8px] font-poppins text-[14px] font-normal w-full;
@@ -117,6 +128,9 @@
 	}
 	.form-error {
 		@apply text-[12px] font-poppins font-normal text-action-danger;
+	}
+	.border-light {
+		@apply border border-primary-gray border-opacity-15;
 	}
 
 	/* Buttons */

@@ -1,4 +1,4 @@
-import NewCategory from '@/components/shared/modals/new-category';
+import CreateCategory from '@/components/shared/modals/create-category';
 import UploadCSV from '@/components/shared/modals/upload-csv';
 import CategoryList from '@/components/shared/tables/category-list';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';
@@ -27,7 +27,7 @@ const CategoryPage = async ({ searchParams }: SearchParams) => {
 				/>
 				<div className="flex items-center gap-[15px]">
 					<div className="max-xm:hidden">
-						<NewCategory />
+						<CreateCategory />
 					</div>
 					<UploadCSV type={'CATEGORY'} />
 				</div>

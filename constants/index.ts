@@ -110,6 +110,16 @@ export const UserRoles = [
 		value: 'USER',
 	},
 ];
+export const UserAction = [
+	{
+		label: 'Deactive User',
+		value: 'DEACTIVE',
+	},
+	{
+		label: 'Delete User',
+		value: 'DELETE',
+	},
+];
 export const FileTypes = [
 	{
 		label: 'Images',
@@ -199,48 +209,23 @@ export const FreeShipRequired = [
 		value: 'COUPON',
 	},
 ];
-
-export const invoices = [
+export const ProductStatus = [
 	{
-		invoice: 'INV001',
-		paymentStatus: 'Paid',
-		totalAmount: '$250.00',
-		paymentMethod: 'Credit Card',
+		label: 'Publish',
+		value: 'ACTIVE',
 	},
 	{
-		invoice: 'INV002',
-		paymentStatus: 'Pending',
-		totalAmount: '$150.00',
-		paymentMethod: 'PayPal',
+		label: 'Draft',
+		value: 'INACTIVE',
+	},
+];
+export const StockStatus = [
+	{
+		label: 'In Stock',
+		value: 'true',
 	},
 	{
-		invoice: 'INV003',
-		paymentStatus: 'Unpaid',
-		totalAmount: '$350.00',
-		paymentMethod: 'Bank Transfer',
-	},
-	{
-		invoice: 'INV004',
-		paymentStatus: 'Paid',
-		totalAmount: '$450.00',
-		paymentMethod: 'Credit Card',
-	},
-	{
-		invoice: 'INV005',
-		paymentStatus: 'Paid',
-		totalAmount: '$550.00',
-		paymentMethod: 'PayPal',
-	},
-	{
-		invoice: 'INV006',
-		paymentStatus: 'Pending',
-		totalAmount: '$200.00',
-		paymentMethod: 'Bank Transfer',
-	},
-	{
-		invoice: 'INV007',
-		paymentStatus: 'Unpaid',
-		totalAmount: '$300.00',
-		paymentMethod: 'Credit Card',
+		label: 'Ouf of Stock',
+		value: 'false',
 	},
 ];

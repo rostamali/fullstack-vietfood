@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/popover';
 import { ChevronsUpDown } from 'lucide-react';
 import { FC } from 'react';
-import { useCategoryList } from '@/lib/hooks/useCategory';
+import { useBrandList } from '@/lib/hooks/useBrand';
 type CategoryProps = {
 	trigger: string;
 	placeholder: string;
@@ -21,13 +21,13 @@ type CategoryProps = {
 	onChange: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-const SelectCategory: FC<CategoryProps> = ({
+const SelectBrand: FC<CategoryProps> = ({
 	trigger,
 	placeholder,
 	value,
 	onChange,
 }) => {
-	const { data, isLoading } = useCategoryList();
+	const { data, isLoading } = useBrandList();
 
 	return (
 		<Popover>
@@ -37,7 +37,7 @@ const SelectCategory: FC<CategoryProps> = ({
 				>
 					{value
 						? data &&
-						  data.categories.find((cat) => cat.slug === value)
+						  data.brands.find((brand) => brand.slug === value)
 								?.name
 						: placeholder}
 					<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
@@ -62,13 +62,13 @@ const SelectCategory: FC<CategoryProps> = ({
 								<span>No Parent</span>
 							</CommandItem>
 						) : (
-							data.categories?.map((cat, index) => (
+							data.brands?.map((brand, index) => (
 								<CommandItem
 									className="menubar-item"
 									key={index}
-									onSelect={() => onChange(cat.slug)}
+									onSelect={() => onChange(brand.slug)}
 								>
-									<span>{cat.name}</span>
+									<span>{brand.name}</span>
 								</CommandItem>
 							))
 						)}
@@ -79,4 +79,4 @@ const SelectCategory: FC<CategoryProps> = ({
 	);
 };
 
-export default SelectCategory;
+export default SelectBrand;

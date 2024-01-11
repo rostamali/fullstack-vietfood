@@ -468,7 +468,42 @@ export const fetchAdminProfile = async () => {
 		return;
 	}
 };
+export const deleteUserByAdmin = async (params: {
+	ids: string[];
+	actionType: 'DEACTIVE' | 'DELETE';
+}) => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return handleResponse(false, `You don't have permission`);
 
+		if (params.actionType === 'DELETE') {
+			await prisma.user.deleteMany({
+				where: {
+					id: {
+						in: params.ids,
+					},
+				},
+			});
+			revalidatePath('/admin/user');
+			return handleResponse(true, `Account deleted successfully`);
+		} else {
+			await prisma.user.updateMany({
+				where: {
+					id: {
+						in: params.ids,
+					},
+				},
+				data: {
+					status: 'INACTIVE',
+				},
+			});
+			revalidatePath('/admin/user');
+			return handleResponse(true, `Account deactivated successfully`);
+		}
+	} catch (error) {
+		return handleResponse(false, `Account action failed`);
+	}
+};
 /* ================================== */
 // Check user authentications
 /* ================================== */

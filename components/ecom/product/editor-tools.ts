@@ -1,8 +1,6 @@
 // @ts-ignore
-import CheckList from '@editorjs/checklist'; // @ts-ignore
 import Code from '@editorjs/code'; // @ts-ignore
 import Embed from '@editorjs/embed'; // @ts-ignore
-import Image from '@editorjs/image'; // @ts-ignore
 import InlineCode from '@editorjs/inline-code'; // @ts-ignore
 import Link from '@editorjs/link'; // @ts-ignore
 import List from '@editorjs/list'; // @ts-ignore
@@ -21,7 +19,6 @@ export const EDITOR_TOOLS = {
 		},
 	},
 	paragraph: Paragraph,
-	checklist: CheckList,
 	embed: Embed,
 	image: Image,
 	inlineCode: InlineCode,

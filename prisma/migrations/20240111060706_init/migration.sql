@@ -121,24 +121,41 @@ CREATE TABLE `Product` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
+    `excerpt` VARCHAR(191) NULL,
+    `description` VARCHAR(191) NULL,
+    `status` ENUM('INACTIVE', 'ACTIVE') NOT NULL DEFAULT 'INACTIVE',
     `label` VARCHAR(191) NULL,
     `isFeatured` BOOLEAN NOT NULL DEFAULT false,
-    `collection` VARCHAR(191) NULL,
-    `description` VARCHAR(191) NULL,
-    `excerpt` VARCHAR(191) NULL,
-    `retailPrice` VARCHAR(191) NULL,
-    `regularPrice` VARCHAR(191) NULL,
-    `salePrice` VARCHAR(191) NULL,
     `taxClass` VARCHAR(191) NULL,
-    `weight` VARCHAR(191) NULL,
-    `shippingClass` VARCHAR(191) NULL,
-    `notice` VARCHAR(191) NULL,
+    `taxStatus` ENUM('TAXABLE', 'NONE') NOT NULL DEFAULT 'NONE',
+    `weight` DOUBLE NULL,
+    `brandId` VARCHAR(191) NULL,
+    `shipClassId` VARCHAR(191) NOT NULL,
     `isActive` BOOLEAN NOT NULL DEFAULT true,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
-    `brandId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Product_id_key`(`id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ProductInventory` (
+    `id` VARCHAR(191) NOT NULL,
+    `productId` VARCHAR(191) NOT NULL,
+    `retailPrice` DOUBLE NULL,
+    `regularPrice` DOUBLE NULL,
+    `salePrice` DOUBLE NULL,
+    `sku` VARCHAR(191) NOT NULL,
+    `stockQTY` INTEGER NOT NULL,
+    `soldQTY` INTEGER NOT NULL DEFAULT 0,
+    `inStock` BOOLEAN NOT NULL DEFAULT false,
+    `threshold` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `ProductInventory_id_key`(`id`),
+    UNIQUE INDEX `ProductInventory_productId_key`(`productId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -198,6 +215,7 @@ CREATE TABLE `ShippingMethod` (
     `order` INTEGER NOT NULL DEFAULT 1,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `zoneId` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `ShippingMethod_id_key`(`id`),
     PRIMARY KEY (`id`)
@@ -261,6 +279,15 @@ ALTER TABLE `CategoriesOnProduct` ADD CONSTRAINT `CategoriesOnProduct_categoryId
 
 -- AddForeignKey
 ALTER TABLE `Product` ADD CONSTRAINT `Product_brandId_fkey` FOREIGN KEY (`brandId`) REFERENCES `Brand`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Product` ADD CONSTRAINT `Product_shipClassId_fkey` FOREIGN KEY (`shipClassId`) REFERENCES `ShippingClass`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ProductInventory` ADD CONSTRAINT `ProductInventory_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShippingMethod` ADD CONSTRAINT `ShippingMethod_zoneId_fkey` FOREIGN KEY (`zoneId`) REFERENCES `ShippingZone`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ShippingZoneLocation` ADD CONSTRAINT `ShippingZoneLocation_zoneId_fkey` FOREIGN KEY (`zoneId`) REFERENCES `ShippingZone`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

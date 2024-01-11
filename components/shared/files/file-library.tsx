@@ -14,22 +14,31 @@ import { FileTypes } from '@/constants';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { isChecked, toggleSelectList } from '@/lib/helpers/formater';
+import { useDeleteFiles } from '@/lib/hooks/useFile';
 
 const FileLibrary: FC<FileListProps> = ({ files, pages }) => {
 	const [selectedItems, setSelectedItems] = useState<string[] | null>(null);
+	const { mutate: deleteFiles, isPending } = useDeleteFiles();
+
 	return (
 		<div className="file-library dashboard-col-space">
 			<div className="library-header">
 				<div className="grid lg:grid-cols-5 grid-cols-1 lg:gap-[40px] gap-[20px]">
 					<div className="lg:col-span-2 flex items-center gap-[15px]">
-						<SelectFilter
-							filterKey={'status'}
-							placeholder={'Filter by status'}
-							triggerClass={'input-field-lg bg-white'}
-							contentClass={'bg-white'}
-							options={FileTypes}
-						/>
-						<Button className="btn-primary-lg">Apply</Button>
+						<Button
+							className="btn-primary-lg"
+							disabled={
+								isPending ? true : selectedItems ? false : true
+							}
+							onClick={() => {
+								if (selectedItems) {
+									deleteFiles(selectedItems);
+									setSelectedItems(null);
+								}
+							}}
+						>
+							Delete Selected
+						</Button>
 					</div>
 					<div className="lg:col-span-3 w-full xm:flex xm:items-center xm:justify-between xm:gap-[15px]">
 						<div className="flex-1 grid grid-cols-5 items-center gap-[15px]">
@@ -91,7 +100,7 @@ const FileLibrary: FC<FileListProps> = ({ files, pages }) => {
 			</Dialog>
 			<div className="flex items-center justify-between max-sm:flex-col max-sm:items-start gap-[15px]">
 				<div className="text-base-1">
-					{selectedItems ? selectedItems.length : 0} row(s) selected.
+					{selectedItems ? selectedItems.length : 0} file(s) selected.
 				</div>
 				<div className="">
 					<Pagination

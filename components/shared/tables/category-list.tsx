@@ -21,17 +21,14 @@ import {
 	toggleSelectAll,
 	toggleSelectList,
 } from '@/lib/helpers/formater';
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import ActionMenu from '../ui/action-menu';
 import { MenubarItem } from '@/components/ui/menubar';
 import EmptyError from '../ui/empty-error';
 import Pagination from '../filters/pagination';
 import Image from 'next/image';
-import Category from '../forms/category';
+import UpdateCategory from '../modals/update-category';
+import { useDeleteCategory } from '@/lib/hooks/useCategory';
+
 type CategoryProps = {
 	data: CategoryTable[];
 	pages: number;
@@ -39,38 +36,28 @@ type CategoryProps = {
 
 const CategoryList: FC<CategoryProps> = ({ data, pages }) => {
 	const [selectedItems, setSelectedItems] = useState<string[] | null>(null);
-	const [details, setDetails] = useState<{
-		id: string | null;
-		data: CategoryForm | null;
-	}>({
-		id: null,
-		data: null,
-	});
-	const handleSingleData = (cat: CategoryTable) => {
-		setDetails({
-			id: cat.id,
-			data: {
-				name: cat.name,
-				description: cat.description || '',
-				parent: cat.parentCategory ? cat.parentCategory?.slug : null,
-				thumbnail: cat.thumbnail ? [cat.thumbnail] : null,
-			},
-		});
-	};
+	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const { mutate: deleteCategory, isPending } = useDeleteCategory();
 
 	return (
 		<div className="category-table dashboard-col-space">
 			<div className="table-header">
 				<div className="grid lg:grid-cols-5 grid-cols-1 lg:gap-[40px] gap-[20px]">
 					<div className="lg:col-span-2 flex items-center gap-[15px]">
-						<SelectFilter
-							filterKey={'status'}
-							placeholder={'Filter by status'}
-							triggerClass={'input-field-lg bg-white'}
-							contentClass={'bg-white'}
-							options={UserStatus}
-						/>
-						<Button className="btn-primary-lg">Apply</Button>
+						<Button
+							className="btn-primary-lg"
+							disabled={
+								isPending ? true : selectedItems ? false : true
+							}
+							onClick={() => {
+								if (selectedItems) {
+									deleteCategory(selectedItems);
+									setSelectedItems(null);
+								}
+							}}
+						>
+							Delete Selected
+						</Button>
 					</div>
 					<div className="lg:col-span-3 w-full xm:flex xm:items-center xm:justify-between xm:gap-[15px]">
 						<div className="flex-1 grid grid-cols-5 items-center gap-[15px]">
@@ -153,142 +140,107 @@ const CategoryList: FC<CategoryProps> = ({ data, pages }) => {
 					</TableHeader>
 					<TableBody className="border-t-0">
 						{data.map((category, index) => (
-							<Collapsible key={index} asChild>
-								<>
-									<TableRow className="border-b-0 border-t-0">
-										<TableCell className="p-0">
-											<div className="table-cell-start min-h-[80px]">
-												<div className="flex items-center gap-[10px] min-w-[316px]">
-													<Checkbox
-														className="checkbox-sm"
+							<TableRow
+								className="border-b-0 border-t-0"
+								key={index}
+							>
+								<TableCell className="p-0">
+									<div className="table-cell-start min-h-[80px]">
+										<div className="flex items-center gap-[10px] min-w-[316px]">
+											<Checkbox
+												className="checkbox-sm"
+												onClick={() =>
+													toggleSelectList(
+														selectedItems,
+														setSelectedItems,
+														category.id,
+													)
+												}
+												checked={isChecked(
+													selectedItems,
+													category.id,
+												)}
+											/>
+											<div className="flex items-center gap-[5px]">
+												<Image
+													src={
+														category.thumbnail
+															? `/uploads/files/${category.thumbnail.url}`
+															: `/assets/placeholder.svg`
+													}
+													alt={''}
+													width={150}
+													height={150}
+													className="h-[50px] w-[50px] rounded-md object-cover max-md:hidden"
+												/>
+												<div className="flex flex-col gap-[5px]">
+													<span className="text-base-2">
+														{category?.name}
+													</span>
+													<span className="text-base-2 !text-[13px] !text-primary-green">
+														{category?.slug}
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px] min-w-[250px]">
+										{category?.description
+											? category.description
+											: '--'}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{category.isActive ? (
+											<span className="badge-success">
+												Active
+											</span>
+										) : (
+											<span className="badge-danger">
+												Inactive
+											</span>
+										)}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{category.parentCategory
+											? category.parentCategory.name
+											: '--'}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										--
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-end min-h-[80px]">
+										<ActionMenu
+											content={
+												<>
+													<MenubarItem
+														className="menubar-item"
 														onClick={() =>
-															toggleSelectList(
-																selectedItems,
-																setSelectedItems,
+															setSelectedId(
 																category.id,
 															)
 														}
-														checked={isChecked(
-															selectedItems,
-															category.id,
-														)}
-													/>
-													<div className="flex items-center gap-[5px]">
-														<Image
-															src={
-																category.thumbnail
-																	? `/uploads/files/${category.thumbnail.url}`
-																	: `/assets/placeholder.svg`
-															}
-															alt={''}
-															width={150}
-															height={150}
-															className="h-[50px] w-[50px] rounded-md object-cover max-md:hidden"
-														/>
-														<div className="flex flex-col gap-[5px]">
-															<span className="text-base-2">
-																{category?.name}
-															</span>
-															<span className="text-base-2 !text-[13px] !text-primary-green">
-																{category?.slug}
-															</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px] min-w-[250px]">
-												{category?.description
-													? category.description
-													: '--'}
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												{category.isActive ? (
-													<span className="badge-success">
-														Active
-													</span>
-												) : (
-													<span className="badge-danger">
-														Inactive
-													</span>
-												)}
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												{category.parentCategory
-													? category.parentCategory
-															.name
-													: '--'}
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												--
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-end min-h-[80px]">
-												<ActionMenu
-													content={
-														<>
-															<MenubarItem className="menubar-item">
-																<CollapsibleTrigger
-																	className="w-full text-left"
-																	onClick={() =>
-																		handleSingleData(
-																			category,
-																		)
-																	}
-																>
-																	Edit Now
-																</CollapsibleTrigger>
-															</MenubarItem>
-															<MenubarItem className="menubar-item">
-																Delete Now
-															</MenubarItem>
-														</>
-													}
-												/>
-											</div>
-										</TableCell>
-									</TableRow>
-									<CollapsibleContent
-										asChild
-										className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
-									>
-										<>
-											<TableRow className="border-b-0 border-t-0">
-												<TableCell
-													colSpan={6}
-													className="p-0"
-												>
-													<div className="table-cell-data rounded-md table-cell-data-start table-cell-data-end w-full">
-														<div className="w-full">
-															{details && (
-																<Category
-																	value={
-																		details.data as CategoryForm
-																	}
-																	id={
-																		details.id
-																	}
-																	type={
-																		'UPDATE'
-																	}
-																/>
-															)}
-														</div>
-													</div>
-												</TableCell>
-											</TableRow>
-										</>
-									</CollapsibleContent>
-								</>
-							</Collapsible>
+													>
+														Edit Now
+													</MenubarItem>
+													<MenubarItem className="menubar-item">
+														Delete Now
+													</MenubarItem>
+												</>
+											}
+										/>
+									</div>
+								</TableCell>
+							</TableRow>
 						))}
 					</TableBody>
 				</Table>
@@ -316,7 +268,7 @@ const CategoryList: FC<CategoryProps> = ({ data, pages }) => {
 				<div className="text-base-1">
 					{selectedItems ? selectedItems?.length : 0} row(s) selected.
 				</div>
-				<div className="">
+				<div>
 					<Pagination
 						pages={pages}
 						containerClass={''}
@@ -329,6 +281,9 @@ const CategoryList: FC<CategoryProps> = ({ data, pages }) => {
 					/>
 				</div>
 			</div>
+			{selectedId && (
+				<UpdateCategory id={selectedId} onChange={setSelectedId} />
+			)}
 		</div>
 	);
 };

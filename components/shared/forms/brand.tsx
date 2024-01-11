@@ -126,8 +126,9 @@ const Brand: FC<BrandFormProps> = ({ value, type, id }) => {
 								modalTitle={'Select thumbnail'}
 								gallery={false}
 								onChange={field.onChange}
-								heightWidth={'h-[100px] w-[100px]'}
-								borderRadius={'rounded-md'}
+								frameClass={'w-[100px] h-[100px] rounded-md'}
+								iconClass="text-primary-gray text-opacity-80"
+								thumbClass="rounded-md"
 								selected={field.value ? field.value : null}
 							/>
 							<FormMessage className="form-error" />

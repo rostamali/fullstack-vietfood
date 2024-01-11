@@ -1,5 +1,5 @@
 'use client';
-import { useState, FC } from 'react';
+import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,93 +19,27 @@ import { Textarea } from '@/components/ui/textarea';
 import SelectCategory from '../ui/select-category';
 import SetThumbnail from '../files/set-thumbnail';
 import { Pencil } from 'lucide-react';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
-import {
-	createCategoryByAdmin,
-	updateCategoryByAdmin,
-} from '@/lib/actions/category.action';
+import { useCreateCategory, useUpdateCategory } from '@/lib/hooks/useCategory';
 type CategoryFormProps = {
-	value: CategoryForm;
-	id: string | null;
-	type: 'CREATE' | 'UPDATE';
+	defaultValues: z.infer<typeof CategoryFormSchema>;
+	id?: string;
 };
 
-const Category: FC<CategoryFormProps> = ({ value, type, id }) => {
-	const [isPending, setIsPending] = useState(false);
+const CategoryForm: FC<CategoryFormProps> = ({ defaultValues, id }) => {
 	const form = useForm<z.infer<typeof CategoryFormSchema>>({
 		resolver: zodResolver(CategoryFormSchema),
-		defaultValues: value,
+		defaultValues,
 	});
+	const { mutate: createCategory, isPending: isCreate } = useCreateCategory();
+	const { mutate: updateCategory, isPending: isUpdate } = useUpdateCategory();
 	const handleCategory = async (data: z.infer<typeof CategoryFormSchema>) => {
-		setIsPending(true);
-		if (type === 'CREATE') {
-			try {
-				const result = await createCategoryByAdmin(data);
-				setIsPending(false);
-				if (result.success) {
-					toast.custom((t) => (
-						<ToastSuccess
-							toastNumber={t}
-							content={result.message}
-						/>
-					));
-					form.reset();
-				} else {
-					toast.custom((t) => (
-						<ToastError toastNumber={t} content={result.message} />
-					));
-				}
-			} catch (error) {
-				setIsPending(false);
-				toast.custom((t) => (
-					<ToastError
-						toastNumber={t}
-						content={`Category creation failed`}
-					/>
-				));
-			}
+		if (form.watch('type') === 'CREATE') {
+			createCategory(data);
 		} else {
-			try {
-				if (id) {
-					const result = await updateCategoryByAdmin({
-						data,
-						id,
-					});
-					setIsPending(false);
-					if (result.success) {
-						toast.custom((t) => (
-							<ToastSuccess
-								toastNumber={t}
-								content={result.message}
-							/>
-						));
-					} else {
-						toast.custom((t) => (
-							<ToastError
-								toastNumber={t}
-								content={result.message}
-							/>
-						));
-					}
-				} else {
-					setIsPending(false);
-					toast.custom((t) => (
-						<ToastError
-							toastNumber={t}
-							content={`Category ID is required`}
-						/>
-					));
-				}
-			} catch (error) {
-				setIsPending(false);
-				toast.custom((t) => (
-					<ToastError
-						toastNumber={t}
-						content={`Category update failed`}
-					/>
-				));
-			}
+			updateCategory({
+				id: id as string,
+				values: data,
+			});
 		}
 	};
 
@@ -127,11 +61,11 @@ const Category: FC<CategoryFormProps> = ({ value, type, id }) => {
 									</div>
 								}
 								modalTitle={'Select thumbnail'}
-								gallery={false}
 								onChange={field.onChange}
-								heightWidth={'h-[100px] w-[100px]'}
-								borderRadius={'rounded-md'}
 								selected={field.value ? field.value : null}
+								frameClass={'w-[100px] h-[100px] rounded-md'}
+								iconClass="text-primary-gray text-opacity-80"
+								thumbClass="rounded-md"
 							/>
 							<FormMessage className="form-error" />
 						</FormItem>
@@ -192,15 +126,24 @@ const Category: FC<CategoryFormProps> = ({ value, type, id }) => {
 					)}
 				/>
 
-				<Button className="btn-primary-sm" disabled={isPending}>
-					{isPending && (
-						<Spinner className={'btn-spinner-sm mr-[5px]'} />
-					)}
-					{type === 'CREATE' ? 'Create Category' : 'Update Category'}
-				</Button>
+				{form.watch('type') === 'CREATE' ? (
+					<Button className="btn-primary-sm" disabled={isCreate}>
+						{isCreate && (
+							<Spinner className={'btn-spinner-sm mr-[5px]'} />
+						)}
+						Create Category
+					</Button>
+				) : (
+					<Button className="btn-primary-sm" disabled={isUpdate}>
+						{isUpdate && (
+							<Spinner className={'btn-spinner-sm mr-[5px]'} />
+						)}
+						Save Changes
+					</Button>
+				)}
 			</form>
 		</Form>
 	);
 };
 
-export default Category;
+export default CategoryForm;

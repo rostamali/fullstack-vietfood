@@ -240,14 +240,67 @@ export const fetchCategoryList = async () => {
 				createdAt: 'desc',
 			},
 		});
-
 		return {
-			data: categories,
+			categories,
 		};
 	} catch (error) {
+		return;
+	}
+};
+export const fetchCategoryDetails = async (params: { id: string }) => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return;
+
+		const category = await prisma.productCategory.findUnique({
+			where: {
+				id: params.id,
+			},
+			select: {
+				id: true,
+				name: true,
+				description: true,
+				thumbnail: {
+					select: {
+						id: true,
+						url: true,
+						title: true,
+						fileType: true,
+						fileName: true,
+						description: true,
+					},
+				},
+				parentCategory: {
+					select: {
+						name: true,
+						slug: true,
+					},
+				},
+			},
+		});
+		if (!category) return;
 		return {
-			error: error,
+			...category,
 		};
+	} catch (error) {
+		return;
+	}
+};
+export const deleteCategoryByAdmin = async (params: { catIds: string[] }) => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+
+		await prisma.productCategory.deleteMany({
+			where: {
+				id: { in: params.catIds },
+			},
+		});
+
+		revalidatePath('/admin/product/category', 'page');
+		return handleResponse(true, 'Category deleted successfully');
+	} catch (error) {
+		return handleResponse(false, 'Category action failed');
 	}
 };
 export const importCategoryFromCSV = async (params: CSVCategory[]) => {

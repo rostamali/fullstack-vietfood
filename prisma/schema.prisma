@@ -128,29 +128,54 @@ model CategoriesOnProduct {
 }
 
 model Product {
-  id            String   @id @unique @default(uuid())
-  name          String
-  slug          String
-  label         String?
-  isFeatured    Boolean  @default(false)
-  description   String?
-  excerpt       String?
-  thumbnail     File?
-  gallery       Gallery?
-  retailPrice   String?
-  regularPrice  String?
-  salePrice     String?
-  taxClass      String?
-  weight        String?
-  shippingClass String?
-  notice        String?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String        @id @unique @default(uuid())
+  name        String
+  slug        String
+  excerpt     String?
+  description String?
+  status      AccountStatus @default(INACTIVE)
+
+  label      String?
+  isFeatured Boolean @default(false)
+
+  thumbnail File?
+  gallery   Gallery?
+
+  taxClass  String?
+  taxStatus TaxStatus @default(NONE)
+  weight    Float?
 
   brand      Brand?                @relation(fields: [brandId], references: [id])
   brandId    String?
   categories CategoriesOnProduct[]
+  inventory  ProductInventory?
+
+  shipClass   ShippingClass @relation(fields: [shipClassId], references: [id])
+  shipClassId String
+
+  reviewStatus Boolean @default(false)
+  purchaseNote String?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductInventory {
+  id           String  @id @unique @default(uuid())
+  product      Product @relation(fields: [productId], references: [id])
+  productId    String  @unique
+  retailPrice  Float?
+  regularPrice Float?
+  salePrice    Float?
+  sku          String
+  stockQTY     Int
+  soldQTY      Int     @default(0)
+  inStock      Boolean @default(false)
+  threshold    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Brand {
@@ -192,8 +217,10 @@ model ShippingClass {
   slug        String
   description String?
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
 }
 
 model ShippingZone {
@@ -203,8 +230,8 @@ model ShippingZone {
   regions ShippingZoneLocation[]
   methods ShippingMethod[]
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ShippingMethod {
@@ -215,11 +242,11 @@ model ShippingMethod {
   active    Boolean    @default(false)
   order     Int        @default(1)
   options   Options?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
-  zone         ShippingZone @relation(fields: [zoneId], references: [id])
-  zoneId       String
+  zone   ShippingZone @relation(fields: [zoneId], references: [id])
+  zoneId String
 }
 
 model ShippingZoneLocation {
@@ -229,8 +256,8 @@ model ShippingZoneLocation {
   zone         ShippingZone @relation(fields: [zoneId], references: [id])
   zoneId       String
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Site Options
@@ -240,6 +267,6 @@ model Options {
   method   ShippingMethod @relation(fields: [methodId], references: [id])
   methodId String         @unique
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

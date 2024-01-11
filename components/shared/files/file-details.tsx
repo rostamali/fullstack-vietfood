@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { dateFormat } from '@/lib/helpers/formater';
 import FileDetailScreen from '@/components/loading/file-details-screen';
 import FileView from './file-view';
-import { useFileDetails } from '@/lib/react-query/hooks/useFile';
+import { useFileDetails } from '@/lib/hooks/useFile';
 
 const FileDetails = () => {
 	const searchParams = useSearchParams();

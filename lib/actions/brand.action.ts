@@ -247,3 +247,22 @@ export const importBrandFromCSV = async (params: CSVBrand[]) => {
 		return handleResponse(false, 'Brand upload failed');
 	}
 };
+export const fetchBrandList = async () => {
+	try {
+		const brands = await prisma.brand.findMany({
+			select: {
+				id: true,
+				name: true,
+				slug: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+		});
+		return {
+			brands,
+		};
+	} catch (error) {
+		return;
+	}
+};

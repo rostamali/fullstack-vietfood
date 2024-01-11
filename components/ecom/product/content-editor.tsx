@@ -24,7 +24,6 @@ const ContentEditor = () => {
 				placeholder: 'Type here to write details...',
 				inlineToolbar: true,
 				data: { blocks: [] },
-				tools: EDITOR_TOOLS,
 			});
 		}
 	}, []);

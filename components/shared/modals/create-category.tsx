@@ -1,4 +1,3 @@
-'use client';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -8,9 +7,9 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
-import Category from '../forms/category';
+import CategoryForm from '../forms/category-form';
 
-const NewCategory = () => {
+const CreateCategory = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -19,27 +18,24 @@ const NewCategory = () => {
 			<DialogContent className="bg-white md:max-w-[450px] max-w-[85%]">
 				<DialogHeader>
 					<DialogTitle className="heading-4">
-						Create New User
+						Create Category
 					</DialogTitle>
 					<DialogDescription className="text-base-2">
-						Create a brand new user and add them to this site.
+						Create a brand new category and add them to this site.
 					</DialogDescription>
 				</DialogHeader>
-				<div className="mt">
-					<Category
-						value={{
-							name: '',
-							parent: null,
-							description: '',
-							thumbnail: null,
-						}}
-						id={null}
-						type={'CREATE'}
-					/>
-				</div>
+				<CategoryForm
+					defaultValues={{
+						name: '',
+						type: 'CREATE',
+						thumbnail: null,
+						parent: null,
+						description: '',
+					}}
+				/>
 			</DialogContent>
 		</Dialog>
 	);
 };
 
-export default NewCategory;
+export default CreateCategory;

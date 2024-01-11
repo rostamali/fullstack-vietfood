@@ -14,7 +14,7 @@ const ProductList = () => {
 					params={'status'}
 				/>
 				<div className="flex items-center gap-[15px]">
-					<Link href={`/admin/product/edit?type=create`}>
+					<Link href={`/admin/product/create`}>
 						<Button className="btn-primary-lg">New Product</Button>
 					</Link>
 					<UploadCSV type={'BRAND'} />
