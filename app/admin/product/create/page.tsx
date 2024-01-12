@@ -13,13 +13,13 @@ const ProductActionPage = () => {
 					retailPrice: undefined,
 					regularPrice: undefined,
 					salePrice: undefined,
-					taxStatus: 'NONE',
-					taxClass: '',
 					sku: '',
 					stockQty: undefined,
 					stockStatus: false,
 					threshold: undefined,
 					soldIndividual: false,
+					taxStatus: 'NONE',
+					taxClass: '',
 					weight: undefined,
 					shipClass: '',
 					status: '',
@@ -27,6 +27,7 @@ const ProductActionPage = () => {
 					brand: null,
 					label: '',
 				}}
+				pageTitle={'Create Product'}
 			/>
 		</div>
 	);

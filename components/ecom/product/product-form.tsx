@@ -19,21 +19,31 @@ import ProductTabFields from './product-tab-fields';
 import ProductSidebarFields from './product-sidebar-fields';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';
 import ContentEditor from '../../shared/ui/content-editor';
-import { useCreateProduct } from '@/lib/hooks/useProduct';
+import { useCreateProduct, useUpdateProduct } from '@/lib/hooks/useProduct';
 import Spinner from '@/components/shared/ui/spinner';
 type formProps = {
 	defaultValues: z.infer<typeof ProductFormSchema>;
+	pageTitle: string;
+	id?: string;
 };
 
-const ProductForm: FC<formProps> = ({ defaultValues }) => {
+const ProductForm: FC<formProps> = ({ defaultValues, pageTitle, id }) => {
 	const form = useForm<z.infer<typeof ProductFormSchema>>({
 		resolver: zodResolver(ProductFormSchema),
 		defaultValues,
 	});
 	const { mutate: createProduct, isPending: isCreate } = useCreateProduct();
+	const { mutate: updateproduct, isPending: isUpdate } = useUpdateProduct();
 	const handleCategory = async (data: z.infer<typeof ProductFormSchema>) => {
 		if (form.watch('type') === 'CREATE') {
 			createProduct(data);
+		} else {
+			if (id) {
+				updateproduct({
+					values: data,
+					id,
+				});
+			}
 		}
 	};
 
@@ -46,22 +56,40 @@ const ProductForm: FC<formProps> = ({ defaultValues }) => {
 				>
 					<div className="flex sm:items-center justify-between max-sm:flex-col gap-[40px]">
 						<DashboardPageTitle
-							title={'Products'}
+							title={pageTitle}
 							links={[]}
 							params={null}
 						/>
 						<div className="flex items-center gap-[15px]">
-							<Button
-								className="btn-primary-sm"
-								disabled={isCreate}
-							>
-								{isCreate && (
-									<Spinner
-										className={'btn-spinner-sm mr-[5px]'}
-									/>
-								)}
-								Save Changes
-							</Button>
+							{form.watch('type') === 'CREATE' ? (
+								<Button
+									className="btn-primary-sm"
+									disabled={isCreate}
+								>
+									{isCreate && (
+										<Spinner
+											className={
+												'btn-spinner-sm mr-[5px]'
+											}
+										/>
+									)}
+									Save Changes
+								</Button>
+							) : (
+								<Button
+									className="btn-primary-sm"
+									disabled={isUpdate}
+								>
+									{isUpdate && (
+										<Spinner
+											className={
+												'btn-spinner-sm mr-[5px]'
+											}
+										/>
+									)}
+									Save Changes
+								</Button>
+							)}
 						</div>
 					</div>
 					<div className="grid lg:grid-cols-[1fr,300px] gap-[25px]">

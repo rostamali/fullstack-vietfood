@@ -217,6 +217,27 @@ interface LocalUpdateForm {
 }
 
 /* ============================== */
+//  Product Types
+/* ============================== */
+interface ProductList {
+	id: string;
+	name: string;
+	thumbnail: {
+		title: string;
+		id: string;
+		url: string;
+		fileType: string;
+	} | null;
+	slug: string;
+	status: UserStatus;
+	createdAt: Date;
+	inventory: {
+		regularPrice: number | null;
+		salePrice: number | null;
+		inStock: boolean;
+	} | null;
+}
+/* ============================== */
 //  CSV file types
 /* ============================== */
 interface CSVUser {
