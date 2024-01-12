@@ -361,7 +361,7 @@ export const ProductFormSchema = z.object({
 		})
 		.min(1, { message: 'Product name is required' }),
 	excerpt: z.string(),
-	description: z.string(),
+	description: z.any(),
 
 	// Images
 	thumbnail: z.array(FileSchema).nullable(),

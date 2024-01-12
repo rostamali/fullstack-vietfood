@@ -130,7 +130,9 @@ CREATE TABLE `Product` (
     `taxStatus` ENUM('TAXABLE', 'NONE') NOT NULL DEFAULT 'NONE',
     `weight` DOUBLE NULL,
     `brandId` VARCHAR(191) NULL,
-    `shipClassId` VARCHAR(191) NOT NULL,
+    `shipClassId` VARCHAR(191) NULL,
+    `reviewStatus` BOOLEAN NOT NULL DEFAULT false,
+    `purchaseNote` VARCHAR(191) NULL,
     `isActive` BOOLEAN NOT NULL DEFAULT true,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -147,10 +149,11 @@ CREATE TABLE `ProductInventory` (
     `regularPrice` DOUBLE NULL,
     `salePrice` DOUBLE NULL,
     `sku` VARCHAR(191) NOT NULL,
-    `stockQTY` INTEGER NOT NULL,
+    `stockQTY` INTEGER NOT NULL DEFAULT 0,
     `soldQTY` INTEGER NOT NULL DEFAULT 0,
     `inStock` BOOLEAN NOT NULL DEFAULT false,
     `threshold` INTEGER NOT NULL,
+    `soldIndividual` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -281,7 +284,7 @@ ALTER TABLE `CategoriesOnProduct` ADD CONSTRAINT `CategoriesOnProduct_categoryId
 ALTER TABLE `Product` ADD CONSTRAINT `Product_brandId_fkey` FOREIGN KEY (`brandId`) REFERENCES `Brand`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Product` ADD CONSTRAINT `Product_shipClassId_fkey` FOREIGN KEY (`shipClassId`) REFERENCES `ShippingClass`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Product` ADD CONSTRAINT `Product_shipClassId_fkey` FOREIGN KEY (`shipClassId`) REFERENCES `ShippingClass`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ProductInventory` ADD CONSTRAINT `ProductInventory_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

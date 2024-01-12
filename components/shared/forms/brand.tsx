@@ -124,7 +124,6 @@ const Brand: FC<BrandFormProps> = ({ value, type, id }) => {
 									</div>
 								}
 								modalTitle={'Select thumbnail'}
-								gallery={false}
 								onChange={field.onChange}
 								frameClass={'w-[100px] h-[100px] rounded-md'}
 								iconClass="text-primary-gray text-opacity-80"

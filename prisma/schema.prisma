@@ -150,8 +150,8 @@ model Product {
   categories CategoriesOnProduct[]
   inventory  ProductInventory?
 
-  shipClass   ShippingClass @relation(fields: [shipClassId], references: [id])
-  shipClassId String
+  shipClass   ShippingClass? @relation(fields: [shipClassId], references: [id])
+  shipClassId String?
 
   reviewStatus Boolean @default(false)
   purchaseNote String?
@@ -169,10 +169,11 @@ model ProductInventory {
   regularPrice Float?
   salePrice    Float?
   sku          String
-  stockQTY     Int
+  stockQTY     Int @default(0)
   soldQTY      Int     @default(0)
   inStock      Boolean @default(false)
   threshold    Int
+  soldIndividual Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

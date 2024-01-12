@@ -18,6 +18,9 @@ import { Button } from '@/components/ui/button';
 import ProductTabFields from './product-tab-fields';
 import ProductSidebarFields from './product-sidebar-fields';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import ContentEditor from '../../shared/ui/content-editor';
+import { useCreateProduct } from '@/lib/hooks/useProduct';
+import Spinner from '@/components/shared/ui/spinner';
 type formProps = {
 	defaultValues: z.infer<typeof ProductFormSchema>;
 };
@@ -27,9 +30,13 @@ const ProductForm: FC<formProps> = ({ defaultValues }) => {
 		resolver: zodResolver(ProductFormSchema),
 		defaultValues,
 	});
+	const { mutate: createProduct, isPending: isCreate } = useCreateProduct();
 	const handleCategory = async (data: z.infer<typeof ProductFormSchema>) => {
-		console.log(data);
+		if (form.watch('type') === 'CREATE') {
+			createProduct(data);
+		}
 	};
+
 	return (
 		<div className="product-form">
 			<Form {...form}>
@@ -44,7 +51,15 @@ const ProductForm: FC<formProps> = ({ defaultValues }) => {
 							params={null}
 						/>
 						<div className="flex items-center gap-[15px]">
-							<Button className="btn-primary-sm">
+							<Button
+								className="btn-primary-sm"
+								disabled={isCreate}
+							>
+								{isCreate && (
+									<Spinner
+										className={'btn-spinner-sm mr-[5px]'}
+									/>
+								)}
 								Save Changes
 							</Button>
 						</div>
@@ -97,6 +112,24 @@ const ProductForm: FC<formProps> = ({ defaultValues }) => {
 							<ProductSidebarFields form={form} />
 						</div>
 					</div>
+					<FormField
+						control={form.control}
+						name="description"
+						render={({ field }) => (
+							<FormItem className="max-lg:mt-[30px]">
+								<FormLabel className="field-label-sm">
+									Description
+								</FormLabel>
+								<FormControl>
+									<ContentEditor
+										value={field.value}
+										onChange={field.onChange}
+									/>
+								</FormControl>
+								<FormMessage className="form-error" />
+							</FormItem>
+						)}
+					/>
 				</form>
 			</Form>
 		</div>
