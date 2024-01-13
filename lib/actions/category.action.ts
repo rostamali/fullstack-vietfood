@@ -3,13 +3,12 @@ import { revalidatePath } from 'next/cache';
 import { createSlug, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
 import { isAuthenticatedAdmin } from './auth.action';
+import { CategoryFormSchema } from '../helpers/form-validation';
+import * as z from 'zod';
 
-export const createCategoryByAdmin = async (params: {
-	name: string;
-	description: string;
-	parent: string | null;
-	thumbnail: FileSelection[] | null;
-}) => {
+export const createCategoryByAdmin = async (
+	params: z.infer<typeof CategoryFormSchema>,
+) => {
 	try {
 		const isAdmin = await isAuthenticatedAdmin();
 		if (!isAdmin) return handleResponse(false, `You don't have permission`);
@@ -28,23 +27,6 @@ export const createCategoryByAdmin = async (params: {
 		if (categoryExist)
 			return handleResponse(false, 'Category already exist');
 
-		let parentCategoryId: string | null = null;
-		if (parent) {
-			const parentCategory = await prisma.productCategory.findFirst({
-				where: {
-					slug: parent,
-				},
-				select: {
-					id: true,
-				},
-			});
-
-			if (!parentCategory) {
-				return handleResponse(false, 'Parent category not found');
-			}
-			parentCategoryId = parentCategory.id;
-		}
-
 		await prisma.productCategory.create({
 			data: {
 				name,
@@ -58,9 +40,9 @@ export const createCategoryByAdmin = async (params: {
 							},
 						},
 					}),
-				...(parentCategoryId && {
+				...(parent && {
 					parentCategory: {
-						connect: { id: parentCategoryId },
+						connect: { id: parent.id },
 					},
 				}),
 			},
@@ -73,7 +55,7 @@ export const createCategoryByAdmin = async (params: {
 	}
 };
 export const updateCategoryByAdmin = async (params: {
-	data: CategoryForm;
+	data: z.infer<typeof CategoryFormSchema>;
 	id: string;
 }) => {
 	try {
@@ -104,23 +86,6 @@ export const updateCategoryByAdmin = async (params: {
 		if (slugExist)
 			return handleResponse(false, `Category name already exist`);
 
-		let parentCategoryId: string | null = null;
-		if (parent) {
-			const parentCategory = await prisma.productCategory.findFirst({
-				where: {
-					slug: parent,
-				},
-				select: {
-					id: true,
-				},
-			});
-
-			if (!parentCategory) {
-				return handleResponse(false, 'Parent category not found');
-			}
-			parentCategoryId = parentCategory.id;
-		}
-
 		await prisma.productCategory.update({
 			where: {
 				id: categoryExist.id,
@@ -142,11 +107,11 @@ export const updateCategoryByAdmin = async (params: {
 								disconnect: true,
 							},
 					  }),
-				...(parentCategoryId
+				...(parent
 					? {
 							parentCategory: {
 								connect: {
-									id: parentCategoryId,
+									id: parent.id,
 								},
 							},
 					  }
@@ -272,7 +237,7 @@ export const fetchCategoryDetails = async (params: { id: string }) => {
 				},
 				parentCategory: {
 					select: {
-						name: true,
+						id: true,
 						slug: true,
 					},
 				},

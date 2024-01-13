@@ -1,5 +1,7 @@
 import ProductForm from '@/components/ecom/product/product-form';
+import EmptyError from '@/components/shared/ui/empty-error';
 import { fetchProductById } from '@/lib/actions/product.action';
+import Link from 'next/link';
 
 type SearchParams = {
 	searchParams: {
@@ -18,15 +20,13 @@ const UpdateProduct = async ({ searchParams }: SearchParams) => {
 						type: 'UPDATE',
 						name: result.name,
 						excerpt: result.excerpt ? result.excerpt : '',
-						description: result.description
-							? result.description
-							: '',
+						description: null,
 						thumbnail: result.thumbnail ? [result.thumbnail] : null,
 						gallery: result?.gallery
 							? result?.gallery?.files
 								? result?.gallery.files
-								: []
-							: [],
+								: null
+							: null,
 						retailPrice: result.inventory?.retailPrice || undefined,
 						regularPrice:
 							result.inventory?.regularPrice || undefined,
@@ -34,7 +34,7 @@ const UpdateProduct = async ({ searchParams }: SearchParams) => {
 						taxStatus: result.taxStatus,
 						taxClass: result.taxClass || '',
 						sku: result.inventory?.sku || '',
-						stockQty: result.inventory?.stockQTY || undefined,
+						stockQTY: result.inventory?.stockQTY || undefined,
 						stockStatus: result.inventory?.inStock || false,
 						threshold: result.inventory?.threshold || undefined,
 						soldIndividual:
@@ -42,18 +42,29 @@ const UpdateProduct = async ({ searchParams }: SearchParams) => {
 						weight: result.weight || undefined,
 						shipClass: '',
 						status: result.status,
-						category:
-							result.categories?.length > 0
-								? result?.categories[0]?.category.slug
-								: null,
-						brand: null,
+						category: result.category ? result.category : null,
+						brand: result.brand ? result.brand : null,
 						label: result.label || '',
 					}}
 					pageTitle={'Update Product'}
 					id={result.id}
 				/>
 			) : (
-				'Empty'
+				<EmptyError
+					contentClass={
+						'sm:max-w-[450px] justify-center mx-auto text-center items-center py-[60px]'
+					}
+					title={'No products found'}
+					description={`Oops! The product with the specified ID could not be found. 🚫 Please double-check the ID or explore other areas of our product catalog 🌟`}
+					Links={
+						<Link
+							href="/admin/product"
+							className="btn-navlink btn-navlink-active !w-auto"
+						>
+							Go to Products
+						</Link>
+					}
+				/>
 			)}
 		</div>
 	);

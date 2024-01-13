@@ -238,6 +238,20 @@ interface ProductList {
 	} | null;
 }
 /* ============================== */
+//  Tax Rate Types
+/* ============================== */
+interface TaxList {
+	name: string;
+	country: string | null;
+	state: string | null;
+	taxRate: number;
+	priority: number;
+	id: string;
+	taxLocations: {
+		locationCode: string;
+	}[];
+}
+/* ============================== */
 //  CSV file types
 /* ============================== */
 interface CSVUser {

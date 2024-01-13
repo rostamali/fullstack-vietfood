@@ -34,12 +34,10 @@ const ProductAdminPage = async ({ searchParams }: SearchParams) => {
 					<UploadCSV type={'BRAND'} />
 				</div>
 			</div>
-			{result && (
-				<ProductList
-					data={result.products ? result.products : []}
-					pages={result.pages ? result.pages : 0}
-				/>
-			)}
+			<ProductList
+				data={result ? result.products : []}
+				pages={result ? result.pages : 0}
+			/>
 		</div>
 	);
 };

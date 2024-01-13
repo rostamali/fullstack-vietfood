@@ -24,10 +24,10 @@ model User {
   lastName   String?
   email      String        @unique
   password   String
+  bio        String?
   avatar     Avatar?
   isVerified Boolean       @default(false)
   role       Role          @default(USER)
-  totalSpend Float?
   status     AccountStatus @default(INACTIVE)
   files      File[]
 
@@ -101,15 +101,16 @@ model Gallery {
 
 // Products related models
 model ProductCategory {
-  id             String                @id @unique @default(uuid())
-  name           String
-  slug           String                @unique
-  thumbnail      File?
-  description    String?
-  products       CategoriesOnProduct[]
+  id          String    @id @unique @default(uuid())
+  name        String
+  slug        String    @unique
+  thumbnail   File?
+  description String?
+  products    Product[]
+
   parentId       String?
-  parentCategory ProductCategory?      @relation("subCategories", fields: [parentId], references: [id])
-  subCategories  ProductCategory[]     @relation("subCategories")
+  parentCategory ProductCategory?  @relation("subCategories", fields: [parentId], references: [id])
+  subCategories  ProductCategory[] @relation("subCategories")
 
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -118,21 +119,12 @@ model ProductCategory {
   @@map("category")
 }
 
-model CategoriesOnProduct {
-  product    Product         @relation(fields: [productId], references: [id])
-  productId  String
-  category   ProductCategory @relation(fields: [categoryId], references: [id])
-  categoryId String
-
-  @@id([productId, categoryId])
-}
-
 model Product {
   id          String        @id @unique @default(uuid())
   name        String
   slug        String
-  excerpt     String?
-  description String?
+  excerpt     String?       @db.VarChar(300)
+  description Bytes?
   status      AccountStatus @default(INACTIVE)
 
   label      String?
@@ -145,10 +137,12 @@ model Product {
   taxStatus TaxStatus @default(NONE)
   weight    Float?
 
-  brand      Brand?                @relation(fields: [brandId], references: [id])
+  brand      Brand?           @relation(fields: [brandId], references: [id])
   brandId    String?
-  categories CategoriesOnProduct[]
-  inventory  ProductInventory?
+  category   ProductCategory? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+
+  inventory ProductInventory?
 
   shipClass   ShippingClass? @relation(fields: [shipClassId], references: [id])
   shipClassId String?
@@ -162,17 +156,17 @@ model Product {
 }
 
 model ProductInventory {
-  id           String  @id @unique @default(uuid())
-  product      Product @relation(fields: [productId], references: [id])
-  productId    String  @unique
-  retailPrice  Float?
-  regularPrice Float?
-  salePrice    Float?
-  sku          String
-  stockQTY     Int @default(0)
-  soldQTY      Int     @default(0)
-  inStock      Boolean @default(false)
-  threshold    Int
+  id             String  @id @unique @default(uuid())
+  product        Product @relation(fields: [productId], references: [id])
+  productId      String  @unique
+  retailPrice    Float?
+  regularPrice   Float?
+  salePrice      Float?
+  sku            String?
+  stockQTY       Int     @default(0)
+  soldQTY        Int     @default(0)
+  inStock        Boolean @default(false)
+  threshold      Int
   soldIndividual Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -205,6 +199,7 @@ enum MethodType {
 enum LocationType {
   COUNTRY
   STATE
+  ZIPCODE
 }
 
 enum TaxStatus {
@@ -259,6 +254,27 @@ model ShippingZoneLocation {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Tax Models
+model TaxRate {
+  id           String            @id @unique @default(uuid())
+  name         String
+  slug         String            @unique
+  country      String?
+  state        String?
+  taxRate      Float             @default(0)
+  priority     Int               @default(1)
+  taxLocations TaxRateLocation[]
+}
+
+model TaxRateLocation {
+  id           String       @id @unique @default(uuid())
+  locationCode String
+  locationType LocationType @default(ZIPCODE)
+
+  tax   TaxRate @relation(fields: [taxId], references: [id])
+  taxId String
 }
 
 // Site Options

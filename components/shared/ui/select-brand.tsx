@@ -14,14 +14,19 @@ import {
 import { ChevronsUpDown } from 'lucide-react';
 import { FC } from 'react';
 import { useBrandList } from '@/lib/hooks/useBrand';
-type CategoryProps = {
+import { Skeleton } from '@/components/ui/skeleton';
+type Selected = {
+	id: string;
+	slug: string;
+};
+type BrandProps = {
 	trigger: string;
 	placeholder: string;
-	value: string | null;
-	onChange: React.Dispatch<React.SetStateAction<string | null>>;
+	value: Selected | null;
+	onChange: React.Dispatch<React.SetStateAction<Selected | null>>;
 };
 
-const SelectBrand: FC<CategoryProps> = ({
+const SelectBrand: FC<BrandProps> = ({
 	trigger,
 	placeholder,
 	value,
@@ -32,16 +37,21 @@ const SelectBrand: FC<CategoryProps> = ({
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button
-					className={`w-full ${trigger} justify-between focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-opacity-60`}
-				>
-					{value
-						? data &&
-						  data.brands.find((brand) => brand.slug === value)
-								?.name
-						: placeholder}
-					<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-				</Button>
+				{isLoading ? (
+					<Skeleton className="h-[45px] w-full rounded-md bg-white" />
+				) : (
+					<Button
+						className={`w-full ${trigger} justify-between focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-opacity-60`}
+					>
+						{value
+							? data &&
+							  data.brands.find(
+									(brand) => brand.slug === value.slug,
+							  )?.name
+							: placeholder}
+						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+					</Button>
+				)}
 			</PopoverTrigger>
 			<PopoverContent className="PopoverContent bg-white p-0">
 				<Command>
@@ -59,14 +69,19 @@ const SelectBrand: FC<CategoryProps> = ({
 								onSelect={() => onChange(null)}
 								value="null"
 							>
-								<span>No Parent</span>
+								<span>No Item</span>
 							</CommandItem>
 						) : (
 							data.brands?.map((brand, index) => (
 								<CommandItem
 									className="menubar-item"
 									key={index}
-									onSelect={() => onChange(brand.slug)}
+									onSelect={() =>
+										onChange({
+											id: brand.id,
+											slug: brand.slug,
+										})
+									}
 								>
 									<span>{brand.name}</span>
 								</CommandItem>

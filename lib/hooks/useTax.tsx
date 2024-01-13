@@ -1,22 +1,19 @@
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
-import {
-	createAccountByAdmin,
-	deleteUserByAdmin,
-	fetchUserProfileById,
-	updateUserProfileByAdmin,
-} from '@/lib/actions/auth.action';
-import { UserFormSchema } from '@/lib/helpers/form-validation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import * as z from 'zod';
-
-export const useCreateUser = () => {
+import { TaxFormSchema } from '../helpers/form-validation';
+import {
+	createTaxRateByAdmin,
+	deleteTaxRateByIds,
+	fetchTaxDetailsById,
+	updateTaxRateByAdmin,
+} from '../actions/tax.action';
+import { toast } from 'sonner';
+import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+// createTaxRateByAdmin
+export const useCreateTax = () => {
 	return useMutation({
-		mutationFn: async (data: z.infer<typeof UserFormSchema>) => {
-			return await createAccountByAdmin({
-				...data,
-				password: data.password as string,
-			});
+		mutationFn: async (data: z.infer<typeof TaxFormSchema>) => {
+			return await createTaxRateByAdmin(data);
 		},
 		onSuccess: (result) => {
 			if (result.success) {
@@ -36,19 +33,15 @@ export const useCreateUser = () => {
 		},
 	});
 };
-export const useUpdateUser = () => {
+export const useUpdateTax = () => {
 	return useMutation({
 		mutationFn: async (data: {
-			id: string;
-			values: z.infer<typeof UserFormSchema>;
+			values: z.infer<typeof TaxFormSchema>;
+			id: string | null;
 		}) => {
-			return await updateUserProfileByAdmin({
+			return await updateTaxRateByAdmin({
+				data: data.values,
 				id: data.id,
-				data: {
-					...data.values,
-					role: data.values.role as UserRole,
-					status: data.values.status as UserStatus,
-				},
 			});
 		},
 		onSuccess: (result) => {
@@ -69,21 +62,11 @@ export const useUpdateUser = () => {
 		},
 	});
 };
-export const useUserDetails = (id: string) => {
-	return useQuery({
-		queryKey: ['userDetails', id],
-		queryFn: async () => await fetchUserProfileById({ id }),
-	});
-};
-export const useDeleteAccount = () => {
+export const useDeleteTax = () => {
 	return useMutation({
-		mutationFn: async (data: {
-			ids: string[];
-			actionType: 'DEACTIVE' | 'DELETE';
-		}) => {
-			return await deleteUserByAdmin({
-				ids: data.ids,
-				actionType: data.actionType,
+		mutationFn: async (data: { id: string }) => {
+			return await deleteTaxRateByIds({
+				id: data.id,
 			});
 		},
 		onSuccess: (result) => {
@@ -104,4 +87,9 @@ export const useDeleteAccount = () => {
 		},
 	});
 };
-//
+export const useTaxDetailsById = (id: string) => {
+	return useQuery({
+		queryKey: ['taxDetails', id],
+		queryFn: async () => await fetchTaxDetailsById({ id }),
+	});
+};

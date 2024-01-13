@@ -22,7 +22,7 @@ export const createProductByAdmin = async (params: {
 			taxStatus,
 			taxClass,
 			sku,
-			stockQty,
+			stockQTY,
 			stockStatus,
 			threshold,
 			soldIndividual,
@@ -47,19 +47,6 @@ export const createProductByAdmin = async (params: {
 				id: null,
 				message: `User different product name`,
 			};
-		let categoryId: null | string = null;
-		if (category) {
-			const catExist = await prisma.productCategory.findFirst({
-				where: {
-					slug: category,
-				},
-				select: {
-					id: true,
-					slug: true,
-				},
-			});
-			categoryId = catExist ? catExist.id : null;
-		}
 		const newProduct = await prisma.product.create({
 			data: {
 				name,
@@ -95,19 +82,20 @@ export const createProductByAdmin = async (params: {
 						regularPrice,
 						salePrice,
 						sku,
-						stockQTY: stockQty ? stockQty : 0,
+						stockQTY: stockQTY ? stockQTY : 0,
 						inStock: stockStatus,
 						threshold: threshold ? threshold : 2,
 						soldIndividual,
 					},
 				},
-				...(categoryId && {
-					categories: {
-						create: {
-							category: {
-								connect: { id: categoryId },
-							},
-						},
+				...(category && {
+					category: {
+						connect: { id: category.id },
+					},
+				}),
+				...(brand && {
+					brand: {
+						connect: { id: brand.id },
 					},
 				}),
 			},
@@ -117,7 +105,6 @@ export const createProductByAdmin = async (params: {
 			message: `Product created successfully`,
 		};
 	} catch (error) {
-		console.log(error);
 		return {
 			id: null,
 			message: `Product action failed`,
@@ -177,17 +164,19 @@ export const fetchProductById = async (params: { id: string }) => {
 				weight: true,
 				shipClass: true,
 				status: true,
-				brand: true,
-				label: true,
-				categories: {
+				category: {
 					select: {
-						category: {
-							select: {
-								slug: true,
-							},
-						},
+						id: true,
+						slug: true,
 					},
 				},
+				brand: {
+					select: {
+						id: true,
+						slug: true,
+					},
+				},
+				label: true,
 			},
 		});
 		if (!product) return;
@@ -204,8 +193,6 @@ export const updateProductByAdmin = async (params: {
 	id: string;
 }) => {
 	try {
-		console.log(params.data.category);
-		console.log(params.data.brand);
 		const {
 			name,
 			excerpt,
@@ -218,7 +205,7 @@ export const updateProductByAdmin = async (params: {
 			taxStatus,
 			taxClass,
 			sku,
-			stockQty,
+			stockQTY,
 			stockStatus,
 			threshold,
 			soldIndividual,
@@ -243,20 +230,6 @@ export const updateProductByAdmin = async (params: {
 		});
 		if (productExist)
 			return handleResponse(false, `Product name already exist`);
-
-		let categoryId: null | string = null;
-		if (category) {
-			const catExist = await prisma.productCategory.findFirst({
-				where: {
-					slug: category,
-				},
-				select: {
-					id: true,
-					slug: true,
-				},
-			});
-			categoryId = catExist ? catExist.id : null;
-		}
 
 		await prisma.product.update({
 			where: {
@@ -325,17 +298,26 @@ export const updateProductByAdmin = async (params: {
 						regularPrice,
 						salePrice,
 						sku,
-						stockQTY: stockQty ? stockQty : 0,
+						stockQTY: stockQTY ? stockQTY : 0,
 						inStock: stockStatus,
 						threshold: threshold ? threshold : 2,
 						soldIndividual,
 					},
 				},
+				...(category && {
+					category: {
+						connect: { id: category.id },
+					},
+				}),
+				...(brand && {
+					brand: {
+						connect: { id: brand.id },
+					},
+				}),
 			},
 		});
 		return handleResponse(true, `Save changes done`);
 	} catch (error) {
-		console.log(error);
 		return handleResponse(false, `Product update failed`);
 	}
 };

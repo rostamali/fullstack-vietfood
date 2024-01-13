@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { isChecked, toggleSelectList } from '@/lib/helpers/formater';
 import { useDeleteFiles } from '@/lib/hooks/useFile';
+import EmptyError from '../ui/empty-error';
 
 const FileLibrary: FC<FileListProps> = ({ files, pages }) => {
 	const [selectedItems, setSelectedItems] = useState<string[] | null>(null);
@@ -66,34 +67,47 @@ const FileLibrary: FC<FileListProps> = ({ files, pages }) => {
 				</div>
 			</div>
 			<Dialog>
-				<div className="grid lg:grid-cols-3 xm:grid-cols-2 grid-cols-1 gap-[25px]">
-					{files?.length > 0
-						? files.map((file, index) => (
-								<div
-									className="single-card relative"
-									key={index}
-								>
-									<FileTrigger file={file} />
-									<div className="bg-white absolute top-3 right-3 h-[28px] w-[28px] flex-center rounded-full">
-										<Checkbox
-											className="checkbox-sm !rounded-full"
-											onClick={() =>
-												toggleSelectList(
-													selectedItems,
-													setSelectedItems,
-													file.id,
-												)
-											}
-											checked={isChecked(
+				{files.length > 0 ? (
+					<div className="grid lg:grid-cols-3 xm:grid-cols-2 grid-cols-1 gap-[25px]">
+						{files.map((file, index) => (
+							<div className="single-card relative" key={index}>
+								<FileTrigger file={file} />
+								<div className="bg-white absolute top-3 right-3 h-[28px] w-[28px] flex-center rounded-full">
+									<Checkbox
+										className="checkbox-sm !rounded-full"
+										onClick={() =>
+											toggleSelectList(
 												selectedItems,
+												setSelectedItems,
 												file.id,
-											)}
-										/>
-									</div>
+											)
+										}
+										checked={isChecked(
+											selectedItems,
+											file.id,
+										)}
+									/>
 								</div>
-						  ))
-						: 'Empty'}
-				</div>
+							</div>
+						))}
+					</div>
+				) : (
+					<EmptyError
+						contentClass={
+							'sm:max-w-[450px] justify-center mx-auto text-center items-center py-[60px]'
+						}
+						title={'There are no files to show'}
+						description={`Whoa! It looks like the files directory is currently empty. 📂 No files are present in this location.`}
+						Links={
+							<a
+								href="/admin/files"
+								className="btn-navlink btn-navlink-active !w-auto"
+							>
+								Reload
+							</a>
+						}
+					/>
+				)}
 				<DialogContent className="bg-white max-w-[650px] max-md:w-[95%] max-md:h-[500px] max-md:overflow-y-scroll">
 					<FileDetails />
 				</DialogContent>

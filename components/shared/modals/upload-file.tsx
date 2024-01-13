@@ -8,7 +8,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
-import { Upload } from 'lucide-react';
 import Uploader from '../ui/uploader';
 import { useState } from 'react';
 import { uploadFilesByAdmin } from '@/lib/actions/file.action';

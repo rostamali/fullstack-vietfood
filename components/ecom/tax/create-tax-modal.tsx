@@ -7,39 +7,37 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
-import UserForm from '../forms/user-form';
+import TaxForm from './tax-form';
 
-const CreateUser = () => {
+const CreateTaxModal = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className="btn-primary-lg">Add User</Button>
+				<Button className="btn-primary-lg">Insert Rate</Button>
 			</DialogTrigger>
 			<DialogContent className="bg-white md:max-w-[450px] max-w-[85%]">
 				<DialogHeader>
 					<DialogTitle className="heading-4">
-						Create New User
+						Create Tax Rate
 					</DialogTitle>
 					<DialogDescription className="text-base-2">
-						Create a brand new user and add them to this site.
+						Create a new tax rates for specific location.
 					</DialogDescription>
 				</DialogHeader>
-				<UserForm
+				<TaxForm
 					defaultValues={{
-						firstName: '',
-						lastName: '',
-						email: '',
-						role: '',
-						password: '',
-						status: '',
 						type: 'CREATE',
-						sendMessage: false,
+						name: '',
+						country: null,
+						state: null,
+						zipCode: '',
+						taxRate: 0,
+						priority: 1,
 					}}
-					id={''}
 				/>
 			</DialogContent>
 		</Dialog>
 	);
 };
 
-export default CreateUser;
+export default CreateTaxModal;

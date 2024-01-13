@@ -14,7 +14,7 @@ const ProductActionPage = () => {
 					regularPrice: undefined,
 					salePrice: undefined,
 					sku: '',
-					stockQty: undefined,
+					stockQTY: undefined,
 					stockStatus: false,
 					threshold: undefined,
 					soldIndividual: false,

@@ -40,6 +40,14 @@
 		@apply absolute bottom-2 -right-2 h-[45px] w-[45px] bg-primary-green rounded-full text-white flex-center z-[2] cursor-pointer;
 	}
 
+	/* Empty Icon */
+	.empty-bubble {
+		@apply bg-white rounded-lg h-[66px] max-xm:h-[60px] w-[70%] absolute md:p-2.5 p-1.5 shadow;
+	}
+	.empty-bubble__icon {
+		@apply flex-center h-full w-[50px] bg-primary-green rounded-lg text-white;
+	}
+
 	/* Scrollbar */
 	.scrollbar-sm::-webkit-scrollbar {
 		@apply w-[6px] bg-transparent;

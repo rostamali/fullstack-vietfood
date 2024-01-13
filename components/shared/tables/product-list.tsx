@@ -14,7 +14,14 @@ import ActionMenu from '../ui/action-menu';
 import { MenubarItem } from '@/components/ui/menubar';
 import Link from 'next/link';
 import EmptyError from '../ui/empty-error';
-import { UserStatusFormat, dateFormat } from '@/lib/helpers/formater';
+import { dateFormat } from '@/lib/helpers/formater';
+import LocalSearch from '../filters/local-search';
+import SelectFilter from '../filters/select-filter';
+import { UserAction, UserStatus } from '@/constants';
+import SelectField from '../ui/select-field';
+import { Button } from '@/components/ui/button';
+import SmallTooltip from '../ui/small-tooltip';
+import { Download } from 'lucide-react';
 type ProductListProps = {
 	data: ProductList[];
 	pages: number;
@@ -23,6 +30,53 @@ type ProductListProps = {
 const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 	return (
 		<div className="product-table dashboard-col-space">
+			<div className="table-header">
+				<div className="grid lg:grid-cols-5 grid-cols-1 lg:gap-[40px] gap-[20px]">
+					<div className="lg:col-span-2 flex items-center gap-[15px]">
+						<SelectField
+							triggerClass={'input-field-lg bg-white'}
+							placeholder={'Select action'}
+							defaultValue={''}
+							onChange={() => {}}
+							options={UserAction}
+						/>
+						<Button className="btn-primary-lg">Apply</Button>
+					</div>
+					<div className="lg:col-span-3 w-full xm:flex xm:items-center xm:justify-between xm:gap-[15px]">
+						<div className="flex-1 grid grid-cols-5 items-center gap-[15px]">
+							<LocalSearch
+								route={'/admin/product'}
+								iconPosition={'left'}
+								placeholder={''}
+								containerClass={
+									'bg-white border border-primary-gray border-opacity-15 col-span-3'
+								}
+								inputClass={'h-[50px]'}
+								iconClass={''}
+							/>
+							<div className="col-span-2">
+								<SelectFilter
+									filterKey={'status'}
+									placeholder={'Filter by status'}
+									triggerClass={'input-field-lg bg-white'}
+									contentClass={'bg-white'}
+									options={UserStatus}
+								/>
+							</div>
+						</div>
+						<div className="max-xm:hidden">
+							<SmallTooltip
+								trigger={
+									<Button className="btn-ghost-lg">
+										<Download strokeWidth={1.5} size={20} />
+									</Button>
+								}
+								content={'Export Data'}
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
 			{data.length > 0 ? (
 				<Table>
 					<TableHeader className="[&_tr]:border-b-0">
@@ -150,21 +204,18 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 				</Table>
 			) : (
 				<EmptyError
-					containerClass={
+					contentClass={
 						'sm:max-w-[450px] justify-center mx-auto text-center items-center py-[60px]'
 					}
-					thumbnailClass={'sm:w-[70%] w-[80%]'}
-					title={'No user found to show'}
-					titleClass={''}
-					description={`Oops! Currently, there are no users to display. 🏷️ It seems this space is awaiting your creative touch 🌟`}
-					descriptionClass={''}
+					title={'No products available'}
+					description={`Oops! It looks like there are no products available right now. 🛍️ Add new products to keep your catalog vibrant and exciting! 🌟`}
 					Links={
-						<a
-							href="/admin/user"
+						<Link
+							href="/admin/product/create"
 							className="btn-navlink btn-navlink-active !w-auto"
 						>
-							Reload
-						</a>
+							Create Product
+						</Link>
 					}
 				/>
 			)}

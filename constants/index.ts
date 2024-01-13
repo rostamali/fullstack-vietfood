@@ -31,27 +31,27 @@ export const AdminNavlinks = [
 	},
 	{
 		label: 'Brands',
-		url: '/admin/product/brand',
+		url: '/admin/store/brand',
 		icon: Framer,
 	},
 	{
 		label: 'Categories',
-		url: '/admin/product/category',
+		url: '/admin/store/category',
 		icon: Bookmark,
 	},
 	{
 		label: 'Orders',
-		url: '/dashboard/customers',
+		url: '/admin/store/order',
 		icon: ShoppingCart,
 	},
 	{
 		label: 'Tax',
-		url: '/admin/tax',
+		url: '/admin/store/tax',
 		icon: LayoutList,
 	},
 	{
 		label: 'Shipping',
-		url: '/admin/shipping',
+		url: '/admin/store/shipping',
 		icon: Truck,
 	},
 	{

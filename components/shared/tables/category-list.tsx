@@ -246,17 +246,14 @@ const CategoryList: FC<CategoryProps> = ({ data, pages }) => {
 				</Table>
 			) : (
 				<EmptyError
-					containerClass={
+					contentClass={
 						'sm:max-w-[450px] justify-center mx-auto text-center items-center py-[60px]'
 					}
-					thumbnailClass={'sm:w-[70%] w-[80%]'}
-					title={'No user found to show'}
-					titleClass={''}
-					description={`Oops! Currently, there are no users to display. 🏷️ It seems this space is awaiting your creative touch 🌟`}
-					descriptionClass={''}
+					title={'No category found to show'}
+					description={`Oops! Currently, there are no category to display. 🏷️ It seems this space is awaiting your creative touch 🌟`}
 					Links={
 						<a
-							href="/admin/user"
+							href="/admin/store/category"
 							className="btn-navlink btn-navlink-active !w-auto"
 						>
 							Reload

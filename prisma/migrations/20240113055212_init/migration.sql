@@ -5,9 +5,9 @@ CREATE TABLE `User` (
     `lastName` VARCHAR(191) NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
+    `bio` VARCHAR(191) NULL,
     `isVerified` BOOLEAN NOT NULL DEFAULT false,
     `role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
-    `totalSpend` DOUBLE NULL,
     `status` ENUM('INACTIVE', 'ACTIVE') NOT NULL DEFAULT 'INACTIVE',
     `lastLogin` DATETIME(3) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -109,20 +109,12 @@ CREATE TABLE `category` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `CategoriesOnProduct` (
-    `productId` VARCHAR(191) NOT NULL,
-    `categoryId` VARCHAR(191) NOT NULL,
-
-    PRIMARY KEY (`productId`, `categoryId`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Product` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
-    `excerpt` VARCHAR(191) NULL,
-    `description` VARCHAR(191) NULL,
+    `excerpt` VARCHAR(300) NULL,
+    `description` LONGBLOB NULL,
     `status` ENUM('INACTIVE', 'ACTIVE') NOT NULL DEFAULT 'INACTIVE',
     `label` VARCHAR(191) NULL,
     `isFeatured` BOOLEAN NOT NULL DEFAULT false,
@@ -130,6 +122,7 @@ CREATE TABLE `Product` (
     `taxStatus` ENUM('TAXABLE', 'NONE') NOT NULL DEFAULT 'NONE',
     `weight` DOUBLE NULL,
     `brandId` VARCHAR(191) NULL,
+    `categoryId` VARCHAR(191) NULL,
     `shipClassId` VARCHAR(191) NULL,
     `reviewStatus` BOOLEAN NOT NULL DEFAULT false,
     `purchaseNote` VARCHAR(191) NULL,
@@ -148,7 +141,7 @@ CREATE TABLE `ProductInventory` (
     `retailPrice` DOUBLE NULL,
     `regularPrice` DOUBLE NULL,
     `salePrice` DOUBLE NULL,
-    `sku` VARCHAR(191) NOT NULL,
+    `sku` VARCHAR(191) NULL,
     `stockQTY` INTEGER NOT NULL DEFAULT 0,
     `soldQTY` INTEGER NOT NULL DEFAULT 0,
     `inStock` BOOLEAN NOT NULL DEFAULT false,
@@ -228,12 +221,38 @@ CREATE TABLE `ShippingMethod` (
 CREATE TABLE `ShippingZoneLocation` (
     `id` VARCHAR(191) NOT NULL,
     `locationCode` VARCHAR(191) NOT NULL,
-    `locationType` ENUM('COUNTRY', 'STATE') NOT NULL,
+    `locationType` ENUM('COUNTRY', 'STATE', 'ZIPCODE') NOT NULL,
     `zoneId` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `ShippingZoneLocation_id_key`(`id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `TaxRate` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `slug` VARCHAR(191) NOT NULL,
+    `country` VARCHAR(191) NULL,
+    `state` VARCHAR(191) NULL,
+    `taxRate` DOUBLE NOT NULL DEFAULT 0,
+    `priority` INTEGER NOT NULL DEFAULT 1,
+
+    UNIQUE INDEX `TaxRate_id_key`(`id`),
+    UNIQUE INDEX `TaxRate_slug_key`(`slug`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `TaxRateLocation` (
+    `id` VARCHAR(191) NOT NULL,
+    `locationCode` VARCHAR(191) NOT NULL,
+    `locationType` ENUM('COUNTRY', 'STATE', 'ZIPCODE') NOT NULL DEFAULT 'ZIPCODE',
+    `taxId` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `TaxRateLocation_id_key`(`id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -275,13 +294,10 @@ ALTER TABLE `Gallery` ADD CONSTRAINT `Gallery_productId_fkey` FOREIGN KEY (`prod
 ALTER TABLE `category` ADD CONSTRAINT `category_parentId_fkey` FOREIGN KEY (`parentId`) REFERENCES `category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CategoriesOnProduct` ADD CONSTRAINT `CategoriesOnProduct_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `CategoriesOnProduct` ADD CONSTRAINT `CategoriesOnProduct_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Product` ADD CONSTRAINT `Product_brandId_fkey` FOREIGN KEY (`brandId`) REFERENCES `Brand`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Product` ADD CONSTRAINT `Product_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Product` ADD CONSTRAINT `Product_shipClassId_fkey` FOREIGN KEY (`shipClassId`) REFERENCES `ShippingClass`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -294,6 +310,9 @@ ALTER TABLE `ShippingMethod` ADD CONSTRAINT `ShippingMethod_zoneId_fkey` FOREIGN
 
 -- AddForeignKey
 ALTER TABLE `ShippingZoneLocation` ADD CONSTRAINT `ShippingZoneLocation_zoneId_fkey` FOREIGN KEY (`zoneId`) REFERENCES `ShippingZone`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `TaxRateLocation` ADD CONSTRAINT `TaxRateLocation_taxId_fkey` FOREIGN KEY (`taxId`) REFERENCES `TaxRate`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Options` ADD CONSTRAINT `Options_methodId_fkey` FOREIGN KEY (`methodId`) REFERENCES `ShippingMethod`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

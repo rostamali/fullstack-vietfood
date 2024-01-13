@@ -165,7 +165,12 @@ export const CategoryFormSchema = z.object({
 				message: 'Type is required',
 			},
 		),
-	parent: z.string().nullable(),
+	parent: z
+		.object({
+			id: z.string(),
+			slug: z.string(),
+		})
+		.nullable(),
 	description: z
 		.string()
 		.max(150, { message: 'Description must not exceed 150 characters' }),
@@ -370,21 +375,21 @@ export const ProductFormSchema = z.object({
 	// Prices
 	label: z.string(),
 	retailPrice: z.coerce
-		.string({
+		.number({
 			invalid_type_error: 'Retail price must be a number',
 		})
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
 	regularPrice: z.coerce
-		.string({
+		.number({
 			invalid_type_error: 'Regular price must be a number',
 		})
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
 	salePrice: z.coerce
-		.string({
+		.number({
 			invalid_type_error: 'Sale price must be a number',
 		})
 		.transform((value) =>
@@ -411,7 +416,7 @@ export const ProductFormSchema = z.object({
 
 	// Inventory
 	sku: z.string(),
-	stockQty: z.coerce
+	stockQTY: z.coerce
 		.string({
 			invalid_type_error: 'QTY must be a number',
 		})
@@ -453,6 +458,56 @@ export const ProductFormSchema = z.object({
 				message: 'Status is required',
 			},
 		),
-	category: z.string().nullable(),
-	brand: z.string().nullable(),
+	category: z
+		.object({
+			id: z.string(),
+			slug: z.string(),
+		})
+		.nullable(),
+	brand: z
+		.object({
+			id: z.string(),
+			slug: z.string(),
+		})
+		.nullable(),
+});
+/* ================================== */
+// Tax Rates
+/* ================================== */
+export const TaxFormSchema = z.object({
+	type: z
+		.string({
+			required_error: 'Type is required',
+		})
+		.refine((value) => FormTypes.includes(value), {
+			message: 'Type must be one of the options: ' + FormTypes.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Type is required',
+			},
+		),
+	name: z
+		.string({
+			required_error: 'Name is required',
+		})
+		.min(1, { message: 'Name is required' }),
+	country: z.string().nullable(),
+	state: z.string().nullable(),
+	zipCode: z.string(),
+	taxRate: z.coerce
+		.number({
+			invalid_type_error: 'Rate must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+	priority: z.coerce
+		.number({
+			invalid_type_error: 'Priority must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
 });

@@ -19,38 +19,25 @@ const NewBrand = () => {
 			<DialogContent className="bg-white md:max-w-[550px] max-w-[85%]">
 				<DialogHeader>
 					<DialogTitle className="heading-4">
-						Create New User
+						Create New Brand
 					</DialogTitle>
 					<DialogDescription className="text-base-2">
 						Create a brand new user and add them to this site.
 					</DialogDescription>
 				</DialogHeader>
-				<div className="mt">
-					{/* <Category
-						value={{
-							id: null,
-							name: '',
-							parent: null,
-							description: null,
-							thumbnail: null,
-						}}
-						id={null}
-						type={'CREATE'}
-					/> */}
-					<Brand
-						value={{
-							name: '',
-							thumbnail: null,
-							contactName: undefined,
-							contactEmail: undefined,
-							contactPhone: undefined,
-							contactWebsite: undefined,
-							description: '',
-						}}
-						id={null}
-						type={'CREATE'}
-					/>
-				</div>
+				<Brand
+					value={{
+						name: '',
+						thumbnail: null,
+						contactName: undefined,
+						contactEmail: undefined,
+						contactPhone: undefined,
+						contactWebsite: undefined,
+						description: '',
+					}}
+					id={null}
+					type={'CREATE'}
+				/>
 			</DialogContent>
 		</Dialog>
 	);

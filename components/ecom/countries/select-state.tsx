@@ -13,47 +13,38 @@ import {
 } from '@/components/ui/popover';
 import { ChevronsUpDown } from 'lucide-react';
 import { FC } from 'react';
-import { useCategoryList } from '@/lib/hooks/useCategory';
-import { Skeleton } from '@/components/ui/skeleton';
-type Selected = {
-	id: string;
-	slug: string;
-};
-type CategoryProps = {
+import { useStateByCountry } from '@/lib/hooks/useCountry';
+type StateProps = {
 	trigger: string;
 	placeholder: string;
-	value: Selected | null;
-	onChange: React.Dispatch<React.SetStateAction<Selected | null>>;
+	value: string | null;
+	countryCode: string | null;
+	onChange: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-const SelectCategory: FC<CategoryProps> = ({
+const SelectState: FC<StateProps> = ({
 	trigger,
 	placeholder,
 	value,
 	onChange,
+	countryCode,
 }) => {
-	const { data, isLoading } = useCategoryList();
+	const { data } = useStateByCountry(countryCode);
 
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				{isLoading ? (
-					<Skeleton className="h-[45px] w-full rounded-md bg-white" />
-				) : (
-					<Button
-						className={`w-full ${trigger} justify-between focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-opacity-60`}
-					>
-						<span>
-							{value
-								? data &&
-								  data.categories.find(
-										(cat) => cat.slug === value.slug,
-								  )?.name
-								: placeholder}
-						</span>
-						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-					</Button>
-				)}
+				<Button
+					className={`w-full ${trigger} justify-between focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-opacity-60`}
+				>
+					<span>
+						{value && data
+							? data.find((item) => item.isoCode === value)
+									?.isoCode
+							: placeholder}
+					</span>
+					<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="PopoverContent bg-white p-0">
 				<Command>
@@ -70,21 +61,16 @@ const SelectCategory: FC<CategoryProps> = ({
 							onSelect={() => onChange(null)}
 							value="null"
 						>
-							<span>No Parent</span>
+							<span>Select None</span>
 						</CommandItem>
 						{data &&
-							data.categories?.map((cat, index) => (
+							data?.map((item, index) => (
 								<CommandItem
 									className="menubar-item"
 									key={index}
-									onSelect={() =>
-										onChange({
-											id: cat.id,
-											slug: cat.slug,
-										})
-									}
+									onSelect={() => onChange(item.isoCode)}
 								>
-									<span>{cat.name}</span>
+									<span>{item.name}</span>
 								</CommandItem>
 							))}
 					</CommandGroup>
@@ -94,4 +80,4 @@ const SelectCategory: FC<CategoryProps> = ({
 	);
 };
 
-export default SelectCategory;
+export default SelectState;

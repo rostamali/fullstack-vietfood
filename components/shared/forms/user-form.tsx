@@ -22,7 +22,7 @@ import Spinner from '../ui/spinner';
 import { useCreateUser, useUpdateUser } from '@/lib/hooks/useAuth';
 type UserFormProps = {
 	defaultValues: z.infer<typeof UserFormSchema>;
-	id: string;
+	id?: string;
 };
 
 const UserForm: FC<UserFormProps> = ({ defaultValues, id }) => {
@@ -31,7 +31,7 @@ const UserForm: FC<UserFormProps> = ({ defaultValues, id }) => {
 		defaultValues,
 	});
 	const { mutate: createNewUser, isPending } = useCreateUser();
-	const { mutate: updateUser, isPending: isUpdating } = useUpdateUser(id);
+	const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 	const handleUserForm = async (data: z.infer<typeof UserFormSchema>) => {
 		if (form.watch('type') === 'CREATE') {
 			createNewUser(data, {
@@ -40,7 +40,10 @@ const UserForm: FC<UserFormProps> = ({ defaultValues, id }) => {
 				},
 			});
 		} else {
-			updateUser(data);
+			updateUser({
+				id: id as string,
+				values: data,
+			});
 		}
 	};
 

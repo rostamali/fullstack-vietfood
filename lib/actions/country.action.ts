@@ -10,7 +10,6 @@ export const fetchCountryStates = () => {
 	}));
 	return countriesWithStates;
 };
-
 export const countryStateList = () => {
 	const countriesWithStates = CountriesList.map((country) => {
 		const { name, isoCode, flag } = country;
@@ -31,4 +30,25 @@ export const countryStateList = () => {
 	});
 
 	return countriesWithStates;
+};
+
+export const fetchCountryList = () => {
+	const countries = CountriesList.map((country) => {
+		const { name, isoCode, flag } = country;
+		return {
+			name,
+			isoCode,
+			flag,
+		};
+	});
+
+	return countries;
+};
+export const stateByCountry = (countryCode: string | null) => {
+	return StatesList.filter((state) => state.countryCode === countryCode).map(
+		({ name, isoCode }) => ({
+			name,
+			isoCode,
+		}),
+	);
 };

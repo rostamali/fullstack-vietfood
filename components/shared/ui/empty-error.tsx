@@ -1,39 +1,23 @@
-import Image from 'next/image';
+import EmptyIcon from './empty-icon';
 type EmptyErrorProps = {
-	containerClass: string;
-	thumbnailClass: string;
-	title: string;
-	titleClass: string;
-	description: string;
-	descriptionClass: string;
+	title: React.ReactNode;
+	description: React.ReactNode;
 	Links: React.ReactNode;
+	contentClass: string;
 };
-
 const EmptyError: React.FC<EmptyErrorProps> = ({
-	containerClass,
-	thumbnailClass,
 	Links,
 	title,
-	titleClass,
 	description,
-	descriptionClass,
+	contentClass,
 }) => {
 	return (
 		<div
-			className={`flex flex-col gap-[20px] ${
-				containerClass?.length > 0 ? containerClass : 'items-center'
-			}`}
+			className={`flex flex-col gap-[20px] items-center ${contentClass}`}
 		>
-			<Image
-				src={'/assets/error-message.png'}
-				alt={title}
-				width={384}
-				height={268}
-				priority={true}
-				className={`object-contain ${thumbnailClass}`}
-			/>
-			<h4 className={`heading-4 !font-medium ${titleClass}`}>{title}</h4>
-			<p className={`text-base-2 ${descriptionClass}`}>{description}</p>
+			<EmptyIcon />
+			<h4 className={`heading-4`}>{title}</h4>
+			<p className={`text-base-2`}>{description}</p>
 			{Links}
 		</div>
 	);

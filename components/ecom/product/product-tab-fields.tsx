@@ -186,7 +186,7 @@ const ProductTabFields: FC<TabProps> = ({ form }) => {
 						/>
 						<FormField
 							control={form.control}
-							name="stockQty"
+							name="stockQTY"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className="field-label-sm">

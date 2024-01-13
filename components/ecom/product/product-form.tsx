@@ -21,13 +21,17 @@ import DashboardPageTitle from '@/components/shared/ui/db-page-title';
 import ContentEditor from '../../shared/ui/content-editor';
 import { useCreateProduct, useUpdateProduct } from '@/lib/hooks/useProduct';
 import Spinner from '@/components/shared/ui/spinner';
-type formProps = {
+type productformProps = {
 	defaultValues: z.infer<typeof ProductFormSchema>;
 	pageTitle: string;
 	id?: string;
 };
 
-const ProductForm: FC<formProps> = ({ defaultValues, pageTitle, id }) => {
+const ProductForm: FC<productformProps> = ({
+	defaultValues,
+	pageTitle,
+	id,
+}) => {
 	const form = useForm<z.infer<typeof ProductFormSchema>>({
 		resolver: zodResolver(ProductFormSchema),
 		defaultValues,

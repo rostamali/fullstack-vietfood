@@ -6,16 +6,16 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import CategoryForm from '../forms/category-form';
-import { useCategoryDetails } from '@/lib/hooks/useCategory';
 import CatFormScreen from '@/components/loading/cat-form-screen';
-type UpdateCategory = {
+import TaxForm from './tax-form';
+import { useTaxDetailsById } from '@/lib/hooks/useTax';
+type UpdateTax = {
 	id: string;
 	onChange: (value: string | null) => void;
 };
 
-const UpdateCategory: FC<UpdateCategory> = ({ id, onChange }) => {
-	const { data, isLoading } = useCategoryDetails(id);
+const UpdateTaxModal: FC<UpdateTax> = ({ id, onChange }) => {
+	const { data, isLoading } = useTaxDetailsById(id);
 
 	return (
 		<Dialog open={id ? true : false} onOpenChange={() => onChange(null)}>
@@ -26,23 +26,23 @@ const UpdateCategory: FC<UpdateCategory> = ({ id, onChange }) => {
 					<>
 						<DialogHeader>
 							<DialogTitle className="heading-4">
-								Update Category
+								Update Rate
 							</DialogTitle>
 							<DialogDescription className="text-base-2">
 								Update category and add them to this site.
 							</DialogDescription>
 						</DialogHeader>
-						<CategoryForm
+						<TaxForm
 							defaultValues={{
-								name: data.name,
 								type: 'UPDATE',
-								thumbnail: data.thumbnail
-									? [data.thumbnail]
-									: null,
-								parent: data.parentCategory
-									? data.parentCategory
-									: null,
-								description: data?.description || '',
+								name: data.name,
+								country: data.country,
+								state: data.state,
+								zipCode: data.taxLocations
+									.map((item) => item.locationCode)
+									.join(';'),
+								taxRate: data.taxRate,
+								priority: data.priority,
 							}}
 							id={data.id}
 						/>
@@ -53,4 +53,4 @@ const UpdateCategory: FC<UpdateCategory> = ({ id, onChange }) => {
 	);
 };
 
-export default UpdateCategory;
+export default UpdateTaxModal;
