@@ -1,4 +1,4 @@
-import UploadFile from '@/components/shared/modals/upload-file';
+import UploadFile from '@/components/shared/modals/upload-files';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';
 import FileLibrary from '@/components/shared/files/file-library';
 import { fetchFilesByAdmin } from '@/lib/actions/file.action';

@@ -1,11 +1,14 @@
 'use server';
-
+import * as z from 'zod';
 import { revalidatePath } from 'next/cache';
 import { createSlug, handleResponse } from '../helpers/formater';
 import { isAuthenticatedAdmin } from './auth.action';
 import prisma from '../prisma';
+import { BrandFormSchema } from '../helpers/form-validation';
 
-export const createBrandByAdmin = async (params: BrandForm) => {
+export const createBrandByAdmin = async (
+	params: z.infer<typeof BrandFormSchema>,
+) => {
 	try {
 		const isAdmin = await isAuthenticatedAdmin();
 		if (!isAdmin) return handleResponse(false, `You don't have permission`);
@@ -59,7 +62,7 @@ export const createBrandByAdmin = async (params: BrandForm) => {
 	}
 };
 export const updateBrandByAdmin = async (params: {
-	data: BrandForm;
+	data: z.infer<typeof BrandFormSchema>;
 	id: string;
 }) => {
 	try {
@@ -186,6 +189,41 @@ export const fetchBrandByAdmin = async (params: {
 		return {
 			brands,
 			pages: Math.ceil(countBrand / pageSize),
+		};
+	} catch (error) {
+		return;
+	}
+};
+export const brandDetailsById = async (params: { id: string }) => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return;
+
+		const brand = await prisma.brand.findUnique({
+			where: {
+				id: params.id,
+			},
+			select: {
+				id: true,
+				name: true,
+				contactName: true,
+				contactEmail: true,
+				contactPhone: true,
+				contactWebsite: true,
+				description: true,
+				thumbnail: {
+					select: {
+						id: true,
+						url: true,
+						fileType: true,
+						title: true,
+					},
+				},
+			},
+		});
+		if (!brand) return;
+		return {
+			...brand,
 		};
 	} catch (error) {
 		return;

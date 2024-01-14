@@ -5,6 +5,7 @@ import { createSlug, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
 import { AccountStatus, TaxStatus } from '@prisma/client';
 import { isAuthenticatedAdmin } from './auth.action';
+import { revalidatePath } from 'next/cache';
 
 export const createProductByAdmin = async (params: {
 	data: z.infer<typeof ProductFormSchema>;
@@ -100,6 +101,7 @@ export const createProductByAdmin = async (params: {
 				}),
 			},
 		});
+		revalidatePath('/admin/product');
 		return {
 			id: newProduct.id,
 			message: `Product created successfully`,

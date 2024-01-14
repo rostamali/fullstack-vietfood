@@ -121,6 +121,32 @@ export const UserFormSchema = z
 
 		return true;
 	});
+export const ChangePasswordFormSchema = z
+	.object({
+		oldPassword: z
+			.string({ required_error: 'Password is required' })
+			.min(1, { message: 'Password is required' }),
+		newPassword: z
+			.string({ required_error: 'New password is required' })
+			.min(6, { message: 'New password must be atleast 6 characters' })
+			.max(12, { message: 'New password must be within 12 characters' }),
+		confirmPassword: z
+			.string({ required_error: 'Confirm password is required' })
+			.min(6, {
+				message: 'Confirm password must be atleast 6 characters',
+			})
+			.max(12, {
+				message: 'Confirm password must be within 12 characters',
+			}),
+	})
+	.refine((data) => data.newPassword === data.confirmPassword, {
+		message: `Passwords doesn't match`,
+		path: ['confirmPassword'],
+	})
+	.refine((data) => data.newPassword !== data.oldPassword, {
+		message: `Old & new password must be different`,
+		path: ['newPassword'],
+	});
 
 /* ================================== */
 // Files Schemas
@@ -179,6 +205,19 @@ export const CategoryFormSchema = z.object({
 // Brand Schema
 /* ================================== */
 export const BrandFormSchema = z.object({
+	type: z
+		.string({
+			required_error: 'Type is required',
+		})
+		.refine((value) => FormTypes.includes(value), {
+			message: 'Type must be one of the options: ' + FormTypes.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Type is required',
+			},
+		),
 	name: z
 		.string()
 		.min(1, { message: 'Name is required' })
@@ -375,21 +414,21 @@ export const ProductFormSchema = z.object({
 	// Prices
 	label: z.string(),
 	retailPrice: z.coerce
-		.number({
+		.string({
 			invalid_type_error: 'Retail price must be a number',
 		})
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
 	regularPrice: z.coerce
-		.number({
+		.string({
 			invalid_type_error: 'Regular price must be a number',
 		})
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
 	salePrice: z.coerce
-		.number({
+		.string({
 			invalid_type_error: 'Sale price must be a number',
 		})
 		.transform((value) =>

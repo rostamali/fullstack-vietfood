@@ -1,4 +1,5 @@
 'use server';
+import * as z from 'zod';
 import { cookies } from 'next/headers';
 import { handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
@@ -17,6 +18,7 @@ import sendMail from '../helpers/send-mail';
 import { verifyEmailTokenOptions } from '../helpers/cookie-options';
 import { revalidatePath } from 'next/cache';
 import { AccountStatus } from '@prisma/client';
+import { ChangePasswordFormSchema } from '../helpers/form-validation';
 
 export const registerUser = async (params: RegisterUser) => {
 	try {
@@ -175,7 +177,7 @@ export const importUsersFromCSV = async (params: CSVUser[]) => {
 			});
 		}
 
-		revalidatePath('/admin/user', 'page');
+		revalidatePath('/admin/user');
 		return handleResponse(true, 'User uploaded successfully');
 	} catch (error) {
 		return handleResponse(false, 'User CSV upload failed');
@@ -502,6 +504,52 @@ export const deleteUserByAdmin = async (params: {
 		}
 	} catch (error) {
 		return handleResponse(false, `Account action failed`);
+	}
+};
+export const updateAccountPassword = async (
+	params: z.infer<typeof ChangePasswordFormSchema>,
+) => {
+	try {
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth) return handleResponse(false, `You don't have permission`);
+
+		const { oldPassword, newPassword } = params;
+		const authExist = await prisma.user.findUnique({
+			where: {
+				id: isAuth.id,
+				status: 'ACTIVE',
+				isVerified: true,
+			},
+			select: {
+				id: true,
+				password: true,
+			},
+		});
+		if (!authExist) return handleResponse(false, `User doesn't exist`);
+
+		const isPasswordMatch = await comparePassword(
+			oldPassword,
+			authExist.password,
+		);
+		if (!isPasswordMatch)
+			return handleResponse(false, `Password is incorrect`);
+
+		const bcryptPass = await bcryptPassword(newPassword);
+		await prisma.user.update({
+			where: {
+				id: authExist.id,
+			},
+			data: {
+				password: bcryptPass,
+			},
+		});
+		cookies().delete('vietfood_access_token');
+		cookies().delete('vietfood_refresh_token');
+		revalidatePath('/auth/login');
+
+		return handleResponse(true, `Password changed successfully`);
+	} catch (error) {
+		return handleResponse(false, `Password update failed`);
 	}
 };
 /* ================================== */

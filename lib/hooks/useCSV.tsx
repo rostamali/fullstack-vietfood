@@ -1,27 +1,14 @@
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
-import {
-	deleteFilesByAdmin,
-	fetchFileDetailsbyAdmin,
-	updateFilesByAdmin,
-	uploadFilesByAdmin,
-} from '@/lib/actions/file.action';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { importUsersFromCSV } from '../actions/auth.action';
 import { toast } from 'sonner';
-import * as z from 'zod';
-import { FileUpdateFormSchema } from '../helpers/form-validation';
+import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import { importCategoryFromCSV } from '../actions/category.action';
+import { importBrandFromCSV } from '../actions/brand.action';
 
-export const useFileDetails = (id: string) => {
-	return useQuery({
-		queryKey: ['fileDetails', id],
-		queryFn: async () => await fetchFileDetailsbyAdmin({ id }),
-	});
-};
-export const useDeleteFiles = () => {
+export const useUploadUser = () => {
 	return useMutation({
-		mutationFn: async (data: string[]) => {
-			return await deleteFilesByAdmin({
-				fileId: data,
-			});
+		mutationFn: async (data: CSVUser[]) => {
+			return await importUsersFromCSV(data);
 		},
 		onSuccess: (result) => {
 			if (result.success) {
@@ -41,10 +28,10 @@ export const useDeleteFiles = () => {
 		},
 	});
 };
-export const useUploadFiles = () => {
+export const useUploadCategory = () => {
 	return useMutation({
-		mutationFn: async (data: FormData) => {
-			return await uploadFilesByAdmin(data);
+		mutationFn: async (data: CSVCategory[]) => {
+			return await importCategoryFromCSV(data);
 		},
 		onSuccess: (result) => {
 			if (result.success) {
@@ -64,16 +51,10 @@ export const useUploadFiles = () => {
 		},
 	});
 };
-export const useUpdateFiles = () => {
+export const useUploadBrand = () => {
 	return useMutation({
-		mutationFn: async (data: {
-			id: string;
-			file: z.infer<typeof FileUpdateFormSchema>;
-		}) => {
-			return await updateFilesByAdmin({
-				id: data.id,
-				file: data.file,
-			});
+		mutationFn: async (data: CSVBrand[]) => {
+			return await importBrandFromCSV(data);
 		},
 		onSuccess: (result) => {
 			if (result.success) {

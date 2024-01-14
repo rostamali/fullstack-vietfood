@@ -31,7 +31,8 @@ import { MenubarItem } from '@/components/ui/menubar';
 import EmptyError from '../ui/empty-error';
 import Pagination from '../filters/pagination';
 import Image from 'next/image';
-import Brand from '../forms/brand';
+import Brand from '../forms/brand-form';
+import UpdateBrand from '../modals/update-brand';
 type BrandProps = {
 	data: BrandTable[];
 	pages: number;
@@ -39,27 +40,8 @@ type BrandProps = {
 
 const BrandList: FC<BrandProps> = ({ data, pages }) => {
 	const [selectedItems, setSelectedItems] = useState<string[] | null>(null);
-	const [details, setDetails] = useState<{
-		id: string | null;
-		data: BrandForm | null;
-	}>({
-		id: null,
-		data: null,
-	});
-	const handleSingleData = (brand: BrandTable) => {
-		setDetails({
-			id: brand.id,
-			data: {
-				name: brand.name,
-				description: brand.description || '',
-				thumbnail: brand.thumbnail ? [brand.thumbnail] : null,
-				contactName: brand.contactName || undefined,
-				contactEmail: brand.contactEmail || undefined,
-				contactPhone: brand.contactPhone || undefined,
-				contactWebsite: brand.contactWebsite || undefined,
-			},
-		});
-	};
+	const [selectedId, setSelectedId] = useState<string | null>(null);
+
 	return (
 		<div className="brand-table dashboard-col-space">
 			<div className="table-header">
@@ -152,134 +134,100 @@ const BrandList: FC<BrandProps> = ({ data, pages }) => {
 					</TableHeader>
 					<TableBody className="border-t-0">
 						{data.map((brand, index) => (
-							<Collapsible key={index} asChild>
-								<>
-									<TableRow className="border-b-0 border-t-0">
-										<TableCell className="p-0">
-											<div className="table-cell-start min-h-[80px]">
-												<div className="flex items-center gap-[10px] min-w-[316px]">
-													<Checkbox
-														className="checkbox-sm"
+							<TableRow
+								className="border-b-0 border-t-0"
+								key={index}
+							>
+								<TableCell className="p-0">
+									<div className="table-cell-start min-h-[80px]">
+										<div className="flex items-center gap-[10px] min-w-[316px]">
+											<Checkbox
+												className="checkbox-sm"
+												onClick={() =>
+													toggleSelectList(
+														selectedItems,
+														setSelectedItems,
+														brand.id,
+													)
+												}
+												checked={isChecked(
+													selectedItems,
+													brand.id,
+												)}
+											/>
+											<div className="flex items-center gap-[5px]">
+												<Image
+													src={
+														brand.thumbnail
+															? `/uploads/files/${brand.thumbnail.url}`
+															: `/assets/placeholder.svg`
+													}
+													alt={''}
+													width={150}
+													height={150}
+													className="h-[50px] w-[50px] rounded-md object-cover max-md:hidden"
+												/>
+												<div className="flex flex-col gap-[5px]">
+													<span className="text-base-2">
+														{brand?.name}
+													</span>
+													<span className="text-base-2 !text-[13px] !text-primary-green">
+														{brand?.slug}
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{brand.description
+											? brand.description
+											: '--'}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{brand.isActive ? (
+											<span className="badge-success">
+												Active
+											</span>
+										) : (
+											<span className="badge-danger">
+												Inactive
+											</span>
+										)}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										--
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-end min-h-[80px]">
+										<ActionMenu
+											content={
+												<>
+													<MenubarItem
+														className="menubar-item"
 														onClick={() =>
-															toggleSelectList(
-																selectedItems,
-																setSelectedItems,
+															setSelectedId(
 																brand.id,
 															)
 														}
-														checked={isChecked(
-															selectedItems,
-															brand.id,
-														)}
-													/>
-													<div className="flex items-center gap-[5px]">
-														<Image
-															src={
-																brand.thumbnail
-																	? `/uploads/files/${brand.thumbnail.url}`
-																	: `/assets/placeholder.svg`
-															}
-															alt={''}
-															width={150}
-															height={150}
-															className="h-[50px] w-[50px] rounded-md object-cover max-md:hidden"
-														/>
-														<div className="flex flex-col gap-[5px]">
-															<span className="text-base-2">
-																{brand?.name}
-															</span>
-															<span className="text-base-2 !text-[13px] !text-primary-green">
-																{brand?.slug}
-															</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												{brand.description
-													? brand.description
-													: '--'}
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												{brand.isActive ? (
-													<span className="badge-success">
-														Active
-													</span>
-												) : (
-													<span className="badge-danger">
-														Inactive
-													</span>
-												)}
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-data min-h-[80px]">
-												--
-											</div>
-										</TableCell>
-										<TableCell className="p-0">
-											<div className="table-cell-end min-h-[80px]">
-												<ActionMenu
-													content={
-														<>
-															<MenubarItem className="menubar-item">
-																<CollapsibleTrigger
-																	className="w-full text-left"
-																	onClick={() =>
-																		handleSingleData(
-																			brand,
-																		)
-																	}
-																>
-																	Edit Now
-																</CollapsibleTrigger>
-															</MenubarItem>
-															<MenubarItem className="menubar-item">
-																Delete Now
-															</MenubarItem>
-														</>
-													}
-												/>
-											</div>
-										</TableCell>
-									</TableRow>
-									<CollapsibleContent
-										asChild
-										className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
-									>
-										<>
-											<TableRow className="border-b-0 border-t-0">
-												<TableCell
-													colSpan={6}
-													className="p-0"
-												>
-													<div className="table-cell-data rounded-md table-cell-data-start table-cell-data-end w-full">
-														<div className="w-full">
-															{details && (
-																<Brand
-																	value={
-																		details.data as BrandForm
-																	}
-																	id={
-																		details.id
-																	}
-																	type={
-																		'UPDATE'
-																	}
-																/>
-															)}
-														</div>
-													</div>
-												</TableCell>
-											</TableRow>
-										</>
-									</CollapsibleContent>
-								</>
-							</Collapsible>
+													>
+														Edit Now
+													</MenubarItem>
+													<MenubarItem className="menubar-item">
+														Delete Now
+													</MenubarItem>
+												</>
+											}
+										/>
+									</div>
+								</TableCell>
+							</TableRow>
 						))}
 					</TableBody>
 				</Table>
@@ -315,6 +263,9 @@ const BrandList: FC<BrandProps> = ({ data, pages }) => {
 					}
 				/>
 			</div>
+			{selectedId && (
+				<UpdateBrand id={selectedId} onChange={setSelectedId} />
+			)}
 		</div>
 	);
 };

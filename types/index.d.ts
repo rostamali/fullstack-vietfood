@@ -102,12 +102,6 @@ interface CategorySelectList {
 	name: string;
 	slug: string;
 }
-interface CategoryForm {
-	name: string;
-	description: string;
-	parent: string | null;
-	thumbnail: FileSelection[] | null;
-}
 interface CategoryTable {
 	id: string;
 	description: string | null;
@@ -131,15 +125,7 @@ interface CategoryTable {
 /* ============================== */
 //  Brand types
 /* ============================== */
-interface BrandForm {
-	name: string;
-	thumbnail: FileSelection[] | null;
-	contactName: string | undefined;
-	contactEmail: string | undefined;
-	contactPhone: string | undefined;
-	contactWebsite: string | undefined;
-	description: string;
-}
+
 interface BrandTable {
 	id: string;
 	name: string;

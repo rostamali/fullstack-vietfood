@@ -7,7 +7,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { useState, FC } from 'react';
+import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,92 +18,26 @@ import { Pencil } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import Spinner from '../ui/spinner';
-import {
-	createBrandByAdmin,
-	updateBrandByAdmin,
-} from '@/lib/actions/brand.action';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
+import { useCreateBrand, useUpdateBrand } from '@/lib/hooks/useBrand';
 type BrandFormProps = {
-	value: BrandForm;
-	id: string | null;
-	type: 'CREATE' | 'UPDATE';
+	value: z.infer<typeof BrandFormSchema>;
+	id?: string;
 };
-const Brand: FC<BrandFormProps> = ({ value, type, id }) => {
-	const [isPending, setIsPending] = useState(false);
+const BrandFrom: FC<BrandFormProps> = ({ value, id }) => {
+	const { mutate: createBrand, isPending: isCreate } = useCreateBrand();
+	const { mutate: updateBrand, isPending: isUpdate } = useUpdateBrand();
 	const form = useForm<z.infer<typeof BrandFormSchema>>({
 		resolver: zodResolver(BrandFormSchema),
 		defaultValues: value,
 	});
 	const handleBrand = async (data: z.infer<typeof BrandFormSchema>) => {
-		setIsPending(true);
-		if (type === 'CREATE') {
-			try {
-				const result = await createBrandByAdmin(data as BrandForm);
-				setIsPending(false);
-				if (result.success) {
-					toast.custom((t) => (
-						<ToastSuccess
-							toastNumber={t}
-							content={result.message}
-						/>
-					));
-					form.reset();
-				} else {
-					toast.custom((t) => (
-						<ToastError toastNumber={t} content={result.message} />
-					));
-				}
-			} catch (error) {
-				setIsPending(false);
-				toast.custom((t) => (
-					<ToastError
-						toastNumber={t}
-						content={`Category creation failed`}
-					/>
-				));
-			}
+		if (form.watch('type') === 'CREATE') {
+			createBrand(data);
 		} else {
-			try {
-				if (id) {
-					const result = await updateBrandByAdmin({
-						data: data as BrandForm,
-						id,
-					});
-					setIsPending(false);
-					if (result.success) {
-						toast.custom((t) => (
-							<ToastSuccess
-								toastNumber={t}
-								content={result.message}
-							/>
-						));
-					} else {
-						toast.custom((t) => (
-							<ToastError
-								toastNumber={t}
-								content={result.message}
-							/>
-						));
-					}
-				} else {
-					setIsPending(false);
-					toast.custom((t) => (
-						<ToastError
-							toastNumber={t}
-							content={`Category ID is required`}
-						/>
-					));
-				}
-			} catch (error) {
-				setIsPending(false);
-				toast.custom((t) => (
-					<ToastError
-						toastNumber={t}
-						content={`Category update failed`}
-					/>
-				));
-			}
+			updateBrand({
+				id: id as string,
+				values: data,
+			});
 		}
 	};
 	return (
@@ -244,15 +178,24 @@ const Brand: FC<BrandFormProps> = ({ value, type, id }) => {
 					)}
 				/>
 
-				<Button className="btn-primary-sm" disabled={isPending}>
-					{isPending && (
-						<Spinner className={'btn-spinner-sm mr-[5px]'} />
-					)}
-					{type === 'CREATE' ? 'Create Brand' : 'Update Brand'}
-				</Button>
+				{form.watch('type') === 'CREATE' ? (
+					<Button className="btn-primary-sm" disabled={isCreate}>
+						{isCreate && (
+							<Spinner className={'btn-spinner-sm mr-[5px]'} />
+						)}
+						Create Brand
+					</Button>
+				) : (
+					<Button className="btn-primary-sm" disabled={isUpdate}>
+						{isUpdate && (
+							<Spinner className={'btn-spinner-sm mr-[5px]'} />
+						)}
+						Update Brand
+					</Button>
+				)}
 			</form>
 		</Form>
 	);
 };
 
-export default Brand;
+export default BrandFrom;

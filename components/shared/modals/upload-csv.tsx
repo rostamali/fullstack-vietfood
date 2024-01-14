@@ -12,96 +12,53 @@ import {
 import Uploader from '../ui/uploader';
 import { FC, useState } from 'react';
 import { Upload } from 'lucide-react';
-import { importUsersFromCSV } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
-import { importCategoryFromCSV } from '@/lib/actions/category.action';
-import { importBrandFromCSV } from '@/lib/actions/brand.action';
+import { ToastError } from '../ui/custom-toast';
+import {
+	useUploadBrand,
+	useUploadCategory,
+	useUploadUser,
+} from '@/lib/hooks/useCSV';
 type CsvProps = {
 	type: 'USER' | 'BRAND' | 'CATEGORY';
 };
 
 const UploadCSV: FC<CsvProps> = ({ type }) => {
 	const [isPending, setIsPending] = useState(false);
+	const { mutate: uploadUser, isPending: isUser } = useUploadUser();
+	const { mutate: uploadBrand, isPending: isBrand } = useUploadBrand();
+	const { mutate: uploadCategory, isPending: isCategory } =
+		useUploadCategory();
 
-	const handleUploadFiles = (files: File[]) => {
+	const handleUploadCsv = (files: File[]) => {
 		setIsPending(true);
 		const csvFiles = files.find((file) => file.type === 'text/csv');
 		if (csvFiles) {
-			try {
-				Papa.parse(csvFiles, {
-					header: true,
-					skipEmptyLines: true,
-					complete: async function (value) {
-						if (type === 'USER') {
-							const result = await importUsersFromCSV(
-								value.data as CSVUser[],
-							);
-							setIsPending(false);
-							if (result.success) {
-								toast.custom((t) => (
-									<ToastSuccess
-										toastNumber={t}
-										content={result.message}
-									/>
-								));
-							} else {
-								toast.custom((t) => (
-									<ToastError
-										toastNumber={t}
-										content={result.message}
-									/>
-								));
-							}
-						} else if (type === 'CATEGORY') {
-							const result = await importCategoryFromCSV(
-								value.data as CSVCategory[],
-							);
-							setIsPending(false);
-							if (result.success) {
-								toast.custom((t) => (
-									<ToastSuccess
-										toastNumber={t}
-										content={result.message}
-									/>
-								));
-							} else {
-								toast.custom((t) => (
-									<ToastError
-										toastNumber={t}
-										content={result.message}
-									/>
-								));
-							}
-						} else if (type === 'BRAND') {
-							const result = await importBrandFromCSV(
-								value.data as CSVBrand[],
-							);
-							setIsPending(false);
-							if (result.success) {
-								toast.custom((t) => (
-									<ToastSuccess
-										toastNumber={t}
-										content={result.message}
-									/>
-								));
-							} else {
-								toast.custom((t) => (
-									<ToastError
-										toastNumber={t}
-										content={result.message}
-									/>
-								));
-							}
-						}
-					},
-				});
-			} catch (error: any) {
-				setIsPending(false);
-				toast.custom((t) => (
-					<ToastError toastNumber={t} content={error.message} />
-				));
-			}
+			Papa.parse(csvFiles, {
+				header: true,
+				skipEmptyLines: true,
+				complete: async function (value) {
+					if (type === 'USER') {
+						uploadUser(value.data as CSVUser[], {
+							onSuccess: () => {
+								setIsPending(false);
+							},
+						});
+					} else if (type === 'CATEGORY') {
+						uploadCategory(value.data as CSVCategory[], {
+							onSuccess: () => {
+								setIsPending(false);
+							},
+						});
+					} else if (type === 'BRAND') {
+						uploadBrand(value.data as CSVBrand[], {
+							onSuccess: () => {
+								setIsPending(false);
+							},
+						});
+					}
+				},
+			});
 		} else {
 			setIsPending(false);
 			toast.custom((t) => (
@@ -126,7 +83,7 @@ const UploadCSV: FC<CsvProps> = ({ type }) => {
 				</DialogHeader>
 				<Uploader
 					isUploading={isPending}
-					onChangeFile={(files) => handleUploadFiles(files)}
+					onChangeFile={(files) => handleUploadCsv(files)}
 					containerClass={'border h-[180px] rounded-md'}
 				/>
 			</DialogContent>

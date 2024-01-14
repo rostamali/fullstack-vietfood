@@ -9,37 +9,16 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import Uploader from '../ui/uploader';
-import { useState } from 'react';
-import { uploadFilesByAdmin } from '@/lib/actions/file.action';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
+import { useUploadFiles } from '@/lib/hooks/useFile';
 
-const UploadFile = () => {
-	const [isPending, setIsPending] = useState(false);
+const UploadFiles = () => {
+	const { mutate: uploadFiles, isPending } = useUploadFiles();
 	const handleUploadFiles = async (files: File[]) => {
-		setIsPending(true);
-		try {
-			const formData = new FormData();
-			files.forEach((file) => {
-				formData.append('files', file);
-			});
-			const result = await uploadFilesByAdmin(formData);
-			setIsPending(false);
-			if (result.success) {
-				toast.custom((t) => (
-					<ToastSuccess toastNumber={t} content={result.message} />
-				));
-			} else {
-				toast.custom((t) => (
-					<ToastError toastNumber={t} content={result.message} />
-				));
-			}
-		} catch (error) {
-			setIsPending(false);
-			toast.custom((t) => (
-				<ToastError toastNumber={t} content={`File upload failed`} />
-			));
-		}
+		const formData = new FormData();
+		files.forEach((file) => {
+			formData.append('files', file);
+		});
+		uploadFiles(formData);
 	};
 	return (
 		<Dialog>
@@ -68,4 +47,4 @@ const UploadFile = () => {
 	);
 };
 
-export default UploadFile;
+export default UploadFiles;

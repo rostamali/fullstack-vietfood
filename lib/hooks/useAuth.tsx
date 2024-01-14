@@ -3,10 +3,15 @@ import {
 	createAccountByAdmin,
 	deleteUserByAdmin,
 	fetchUserProfileById,
+	updateAccountPassword,
 	updateUserProfileByAdmin,
 } from '@/lib/actions/auth.action';
-import { UserFormSchema } from '@/lib/helpers/form-validation';
+import {
+	ChangePasswordFormSchema,
+	UserFormSchema,
+} from '@/lib/helpers/form-validation';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
@@ -23,6 +28,31 @@ export const useCreateUser = () => {
 				toast.custom((t) => (
 					<ToastSuccess toastNumber={t} content={result.message} />
 				));
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+export const useUpdatePassword = () => {
+	const router = useRouter();
+	return useMutation({
+		mutationFn: async (data: z.infer<typeof ChangePasswordFormSchema>) => {
+			return await updateAccountPassword(data);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+				router.push('/auth/login');
 			} else {
 				toast.custom((t) => (
 					<ToastError toastNumber={t} content={result.message} />

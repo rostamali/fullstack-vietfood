@@ -142,45 +142,27 @@ export const fetchFileDetailsbyAdmin = async (params: { id: string }) => {
 		return null;
 	}
 };
-export const fetchFilesOnModal = async (params: {
-	type: string;
-	page: number;
-	pageSize: number;
-}) => {
+export const fetchModalFiles = async ({ pageParam = 0 }) => {
 	try {
 		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		if (!isAdmin) return [];
 
-		const { type = 'all', page = 1, pageSize } = params;
 		const files = await prisma.file.findMany({
-			where: {
-				...(type && type !== 'all' && { fileType: { contains: type } }),
-			},
 			select: {
 				id: true,
 				title: true,
 				url: true,
 				fileType: true,
 			},
-			take: page * pageSize,
 			orderBy: {
 				createdAt: 'desc',
 			},
+			skip: Number(pageParam),
+			take: 8,
 		});
-
-		const totalFiles = await prisma.file.count({
-			where: {
-				...(type && type !== 'all' && { fileType: { contains: type } }),
-			},
-		});
-		const isNext = totalFiles > files?.length;
-
-		return {
-			files,
-			isNext,
-		};
+		return files;
 	} catch (error) {
-		return;
+		return [];
 	}
 };
 export const updateFilesByAdmin = async (params: {

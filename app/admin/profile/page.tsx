@@ -6,6 +6,7 @@ import { dateFormat } from '@/lib/helpers/formater';
 import { CalendarDays } from 'lucide-react';
 import Link from 'next/link';
 import ProfileLoading from './loading';
+import ChangePassword from '@/components/shared/modals/change-password';
 
 const AdminProfilePage = async () => {
 	const result = await fetchAdminProfile();
@@ -46,11 +47,7 @@ const AdminProfilePage = async () => {
 						</div>
 					</div>
 					<div className="flex xm:justify-end">
-						<Link href="/admin/files">
-							<Button className="btn-primary-lg">
-								Edit Password
-							</Button>
-						</Link>
+						<ChangePassword />
 					</div>
 				</div>
 			)}

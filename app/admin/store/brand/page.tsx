@@ -1,4 +1,4 @@
-import NewBrand from '@/components/shared/modals/new-brand';
+import NewBrand from '@/components/shared/modals/create-brand';
 import UploadCSV from '@/components/shared/modals/upload-csv';
 import BrandList from '@/components/shared/tables/brand-list';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';

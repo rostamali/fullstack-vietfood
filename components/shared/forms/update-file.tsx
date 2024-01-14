@@ -10,7 +10,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 
-import { useState, FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,14 +18,9 @@ import { FileUpdateFormSchema } from '@/lib/helpers/form-validation';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { UserRoleFormat } from '@/lib/helpers/formater';
-import { updateFilesByAdmin } from '@/lib/actions/file.action';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
+import { useUpdateFiles } from '@/lib/hooks/useFile';
 type FileUpdateForm = {
-	defaultValues: {
-		title: string;
-		description: string;
-	};
+	defaultValues: z.infer<typeof FileUpdateFormSchema>;
 	fileId: string;
 	author: {
 		name: string;
@@ -34,40 +29,18 @@ type FileUpdateForm = {
 };
 
 const UpdateFile: FC<FileUpdateForm> = ({ defaultValues, author, fileId }) => {
-	const [isPending, setIsPending] = useState(false);
+	const { mutate: updateFile, isPending } = useUpdateFiles();
 	const form = useForm<z.infer<typeof FileUpdateFormSchema>>({
 		resolver: zodResolver(FileUpdateFormSchema),
+		defaultValues,
 	});
-	useEffect(() => {
-		form.setValue('title', defaultValues.title);
-		form.setValue('description', defaultValues.description);
-	}, [fileId]);
-
 	const handleUpdateFile = async (
 		data: z.infer<typeof FileUpdateFormSchema>,
 	) => {
-		setIsPending(true);
-		try {
-			const result = await updateFilesByAdmin({
-				id: fileId,
-				file: data,
-			});
-			setIsPending(false);
-			if (result.success) {
-				toast.custom((t) => (
-					<ToastSuccess toastNumber={t} content={result.message} />
-				));
-			} else {
-				toast.custom((t) => (
-					<ToastError toastNumber={t} content={result.message} />
-				));
-			}
-		} catch (error) {
-			setIsPending(false);
-			toast.custom((t) => (
-				<ToastError toastNumber={t} content={`File update failed`} />
-			));
-		}
+		updateFile({
+			id: fileId,
+			file: data,
+		});
 	};
 
 	return (
@@ -80,7 +53,6 @@ const UpdateFile: FC<FileUpdateForm> = ({ defaultValues, author, fileId }) => {
 					<FormField
 						control={form.control}
 						name="title"
-						defaultValue=""
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="field-label-sm">
@@ -99,7 +71,6 @@ const UpdateFile: FC<FileUpdateForm> = ({ defaultValues, author, fileId }) => {
 					<FormField
 						control={form.control}
 						name="description"
-						defaultValue=""
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="field-label-sm">

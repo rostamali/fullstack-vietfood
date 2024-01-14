@@ -18,8 +18,8 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import LibraryFiles from './library-files';
-import { useModalList } from '@/lib/hooks/useFile';
 import ModalLibraryScreen from '@/components/loading/modal-library-screen';
+import { useLoadModalFiles } from '@/lib/hooks/useInfinity';
 
 const FileLibraryModal: FC<ModalLibraryProps> = ({
 	modalTitle,
@@ -28,25 +28,23 @@ const FileLibraryModal: FC<ModalLibraryProps> = ({
 	selected,
 	trigger,
 }) => {
-	const [filter, setFilter] = useState({
-		page: 1,
-		type: 'all',
-	});
-
+	const {
+		data: library,
+		isLoading,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useLoadModalFiles();
 	const [items, setItems] = useState<FileSelection[] | null>(null);
 	useEffect(() => {
 		setItems(selected);
 	}, [selected]);
-	const { data, isLoading, isFetching } = useModalList(
-		filter.type,
-		filter.page,
-	);
 
 	return (
 		<Dialog>
 			<DialogTrigger>{trigger}</DialogTrigger>
 			<DialogContent className="xl:max-w-[1200px] max-w-[95%] bg-white border-none">
-				{!isLoading && !isFetching && data ? (
+				{!isLoading && library ? (
 					<>
 						<DialogHeader>
 							<DialogTitle>
@@ -63,26 +61,29 @@ const FileLibraryModal: FC<ModalLibraryProps> = ({
 							</DialogDescription>
 						</DialogHeader>
 						<div className="modal-library-container my-[25px]">
-							<LibraryFiles
-								files={data ? data.files : []}
-								selected={items}
-								setItems={setItems}
-								gallery={gallery}
-							/>
+							<div className="flex flex-col gap-[25px]">
+								{library?.pages.map((files, index) => (
+									<LibraryFiles
+										files={files}
+										selected={items}
+										setItems={setItems}
+										gallery={gallery}
+										key={index}
+									/>
+								))}
+							</div>
 							<div className="flex-center mt-[15px]">
-								{data.isNext && (
-									<Button
-										className="p-0"
-										onClick={() => {
-											setFilter({
-												...filter,
-												page: filter.page + 1,
-											});
-										}}
-									>
-										Load More
-									</Button>
-								)}
+								<Button
+									className="btn-primary-sm"
+									onClick={() => fetchNextPage()}
+									disabled={hasNextPage ? false : true}
+								>
+									{isFetchingNextPage
+										? 'Loading more...'
+										: hasNextPage
+										? 'Load more'
+										: 'Nothing to load'}
+								</Button>
 							</div>
 						</div>
 						<div className="flex items-center justify-between gap-[15px]">

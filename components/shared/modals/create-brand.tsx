@@ -8,9 +8,9 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
-import Brand from '../forms/brand';
+import BrandForm from '../forms/brand-form';
 
-const NewBrand = () => {
+const CreateBrand = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -25,8 +25,9 @@ const NewBrand = () => {
 						Create a brand new user and add them to this site.
 					</DialogDescription>
 				</DialogHeader>
-				<Brand
+				<BrandForm
 					value={{
+						type: 'CREATE',
 						name: '',
 						thumbnail: null,
 						contactName: undefined,
@@ -35,12 +36,10 @@ const NewBrand = () => {
 						contactWebsite: undefined,
 						description: '',
 					}}
-					id={null}
-					type={'CREATE'}
 				/>
 			</DialogContent>
 		</Dialog>
 	);
 };
 
-export default NewBrand;
+export default CreateBrand;
