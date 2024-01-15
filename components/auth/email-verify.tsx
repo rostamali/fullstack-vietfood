@@ -13,7 +13,6 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import OtpField from '../shared/ui/otp-field';
 import { Button } from '@/components/ui/button';
-import OtpTimer from '../shared/ui/otp-timer';
 import { toast } from 'sonner';
 import { verifyUserEmail } from '@/lib/actions/auth.action';
 import { useRouter } from 'next/navigation';
@@ -82,7 +81,6 @@ const EmailVerify = () => {
 						</FormItem>
 					)}
 				/>
-				<OtpTimer />
 				<Button className="btn-primary-sm" disabled={isPending}>
 					{isPending && (
 						<Spinner className={'btn-spinner-sm mr-[5px]'} />

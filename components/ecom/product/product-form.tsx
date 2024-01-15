@@ -131,7 +131,7 @@ const ProductForm: FC<productformProps> = ({
 												{...field}
 											/>
 										</FormControl>
-										<span className="font-poppins text-[12px] !text-primary-gray">
+										<span className="form-note-sm">
 											Write a short description.
 										</span>
 										<FormMessage className="form-error" />

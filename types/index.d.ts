@@ -150,14 +150,9 @@ interface BrandTable {
 /* ============================== */
 type taxStatusType = 'TAXABLE' | 'NONE';
 type shipMethodType = 'FLAT_RATE' | 'FREE_SHIPPING' | 'LOCAL_PICKUP';
-interface ShipClassForm {
-	name: string;
-	description: string;
-}
 interface ShipClassList {
 	id: string;
 	name: string;
-	slug: string;
 	description: string | null;
 	createdAt: Date;
 }
@@ -190,9 +185,12 @@ interface ShipZoneForm {
 interface ShipZoneList {
 	id: string;
 	name: string;
-	createdAt: Date;
 	regions: {
-		id: string;
+		name: string;
+		locationType: string;
+	}[];
+	methods: {
+		name: string;
 	}[];
 }
 

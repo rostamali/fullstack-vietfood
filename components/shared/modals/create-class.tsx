@@ -1,3 +1,5 @@
+import ShipClassForm from '@/components/ecom/shipping/ship-class-form';
+import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogContent,
@@ -6,14 +8,12 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import ShipClassForm from './ship-class-form';
 
-const ShipClass = () => {
+const CreateClass = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className="btn-primary-lg">New Class</Button>
+				<Button className="btn-primary-lg">Create Class</Button>
 			</DialogTrigger>
 			<DialogContent className="bg-white md:max-w-[450px] max-w-[85%]">
 				<DialogHeader>
@@ -21,22 +21,20 @@ const ShipClass = () => {
 						Create New Class
 					</DialogTitle>
 					<DialogDescription className="text-base-2">
-						Create a brand new user and add them to this site.
+						Create a brand new class and add them to the shipping
+						zones.
 					</DialogDescription>
 				</DialogHeader>
-				<div className="mt">
-					<ShipClassForm
-						type={'CREATE'}
-						values={{
-							name: '',
-							description: '',
-						}}
-						id={null}
-					/>
-				</div>
+				<ShipClassForm
+					defaultValues={{
+						type: 'CREATE',
+						name: '',
+						description: '',
+					}}
+				/>
 			</DialogContent>
 		</Dialog>
 	);
 };
 
-export default ShipClass;
+export default CreateClass;

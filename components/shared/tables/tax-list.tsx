@@ -31,41 +31,6 @@ const TaxList: FC<TaxListProps> = ({ data, pages }) => {
 
 	return (
 		<div className="user-table dashboard-col-space">
-			<div className="table-header">
-				<div className="flex-between max-xm:flex-col max-xm:items-start gap-[25px]">
-					<LocalSearch
-						route={'/admin/store/tax'}
-						iconPosition={'left'}
-						placeholder={''}
-						containerClass={
-							'bg-white border border-primary-gray border-opacity-15 col-span-3 max-xm:w-full'
-						}
-						inputClass={'h-[50px]'}
-						iconClass={''}
-					/>
-					<div className="flex-center gap-[25px] max-xm:w-full">
-						<SelectFilter
-							filterKey={'status'}
-							placeholder={'Filter by status'}
-							triggerClass={
-								'input-field-lg bg-white min-w-[200px] max-xm:w-full'
-							}
-							contentClass={'bg-white'}
-							options={UserStatus}
-						/>
-						<div className="max-xm:hidden">
-							<SmallTooltip
-								trigger={
-									<Button className="btn-ghost-lg">
-										<Download strokeWidth={1.5} size={20} />
-									</Button>
-								}
-								content={'Export Data'}
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
 			{data.length > 0 ? (
 				<Table>
 					<TableHeader className="[&_tr]:border-b-0">
@@ -117,7 +82,7 @@ const TaxList: FC<TaxListProps> = ({ data, pages }) => {
 								</TableCell>
 								<TableCell className="p-0">
 									<div className="table-cell-data min-h-[80px]">
-										{item.taxRate}
+										{item.taxRate}%
 									</div>
 								</TableCell>
 								<TableCell className="p-0">

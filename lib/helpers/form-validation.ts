@@ -237,9 +237,32 @@ export const BrandFormSchema = z.object({
 /* ================================== */
 const Zones = ['COUNTRY', 'STATE'];
 const TaxStatus = ['TAXABLE', 'NONE'];
+const ShipMethods = ['FLAT', 'FREE', 'LOCAL_PICKUP'];
 const freeShipCondition = ['MINI_ORDER_AMOUNT', 'COUPON'];
 
-const ShipClassCost = z.object({
+export const ShipClassSchema = z.object({
+	type: z
+		.string({
+			required_error: 'Type is required',
+		})
+		.refine((value) => FormTypes.includes(value), {
+			message: 'Type must be one of the options: ' + FormTypes.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Type is required',
+			},
+		),
+	name: z
+		.string()
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	description: z
+		.string()
+		.max(150, { message: 'Description must not exceed 150 characters' }),
+});
+const ShipClassList = z.object({
 	classId: z.string().min(1, { message: 'Class ID is required' }),
 	className: z.string().min(1, { message: 'Class name is required' }),
 	cost: z.coerce
@@ -250,7 +273,7 @@ const ShipClassCost = z.object({
 			value === undefined || value === null ? undefined : Number(value),
 		),
 });
-const ShipZoneTypeSchema = z.object({
+const ShipZoneList = z.object({
 	type: z
 		.string({
 			required_error: 'Zone type is required',
@@ -269,32 +292,8 @@ const ShipZoneTypeSchema = z.object({
 		.string()
 		.max(150, { message: 'Description must not exceed 150 characters' }),
 });
-export const ShipClassSchema = z.object({
-	name: z
-		.string()
-		.min(1, { message: 'Name is required' })
-		.max(30, { message: 'Name must not exceed 30 characters' }),
-	description: z
-		.string()
-		.max(150, { message: 'Description must not exceed 150 characters' }),
-});
-const ZoneObject = z.object({
-	name: z.string({
-		required_error: 'Name is required',
-	}),
-	id: z.string({
-		required_error: 'Name is required',
-	}),
-});
-export const ShipZoneSchema = z.object({
-	name: z
-		.string()
-		.min(1, { message: 'Name is required' })
-		.max(30, { message: 'Name must not exceed 30 characters' }),
-	regions: z.array(ShipZoneTypeSchema).nullable(),
-	methods: z.array(ZoneObject).nullable(),
-});
-export const FlatMethodSchema = z.object({
+
+export const FlatMethod = z.object({
 	name: z
 		.string({
 			required_error: 'Name is required',
@@ -312,16 +311,9 @@ export const FlatMethodSchema = z.object({
 		.transform((value) =>
 			value === undefined || value === null ? 0 : Number(value),
 		),
-	noClassCost: z.coerce
-		.string({
-			invalid_type_error: 'No Shipping class cost must be a number',
-		})
-		.transform((value) =>
-			value === undefined || value === null ? undefined : Number(value),
-		),
-	classList: z.array(ShipClassCost),
+	classList: z.array(ShipClassList),
 });
-export const FreeShipMethodSchema = z.object({
+export const FreeMethod = z.object({
 	name: z
 		.string({
 			required_error: 'Name is required',
@@ -351,7 +343,7 @@ export const FreeShipMethodSchema = z.object({
 			value === undefined || value === null ? undefined : Number(value),
 		),
 });
-export const LocalPickupMethodSchema = z.object({
+export const PickupMethod = z.object({
 	name: z
 		.string({
 			required_error: 'Name is required',
@@ -380,6 +372,29 @@ export const LocalPickupMethodSchema = z.object({
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
+});
+export const ShipFormSchema = z.object({
+	type: z
+		.string({
+			required_error: 'Type is required',
+		})
+		.refine((value) => FormTypes.includes(value), {
+			message: 'Type must be one of the options: ' + FormTypes.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Type is required',
+			},
+		),
+	name: z
+		.string()
+		.min(1, { message: 'Zone name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	regions: z.array(ShipZoneList).nullable(),
+	flatMethod: z.array(FlatMethod).nullable(),
+	freeMethod: z.array(FreeMethod).nullable(),
+	pickupMethod: z.array(PickupMethod).nullable(),
 });
 
 /* ================================== */

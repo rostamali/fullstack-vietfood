@@ -66,6 +66,20 @@
 	.scrollbar-body::-webkit-scrollbar-thumb {
 		@apply bg-black-dark rounded-lg;
 	}
+
+	/* Accordion */
+	.method-ac {
+		@apply w-full bg-white border-light p-4 rounded-md font-poppins flex flex-col gap-2;
+	}
+	.method-ac__title {
+		@apply text-[14px] font-semibold px-3 text-black-dark flex items-center gap-1.5;
+	}
+	.method-ac__title h3 {
+		@apply w-full flex-1;
+	}
+	.method-ac__remove {
+		@apply h-[22px] w-[22px] border-light rounded-md text-primary-gray p-0 flex-center;
+	}
 }
 
 @layer utilities {
@@ -139,6 +153,9 @@
 	}
 	.border-light {
 		@apply border border-primary-gray border-opacity-15;
+	}
+	.form-note-sm {
+		@apply font-poppins text-[12px] text-primary-gray;
 	}
 
 	/* Buttons */

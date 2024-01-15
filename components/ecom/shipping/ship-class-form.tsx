@@ -14,86 +14,30 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useState, FC } from 'react';
+import { FC } from 'react';
 import Spinner from '@/components/shared/ui/spinner';
-import {
-	createShipClassByAdmin,
-	updateShipClassByAdmin,
-} from '@/lib/actions/ship.action';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import { useCreateShipClass, useUpdateShipClass } from '@/lib/hooks/useShip';
 type ShipcClassForm = {
-	type: 'CREATE' | 'UPDATE';
-	values: {
-		name: string;
-		description: string;
-	};
-	id: string | null;
+	defaultValues: z.infer<typeof ShipClassSchema>;
+	id?: string;
 };
 
-const ShipClassForm: FC<ShipcClassForm> = ({ type, values, id }) => {
-	const [isPending, setIsPending] = useState(false);
+const ShipClassForm: FC<ShipcClassForm> = ({ defaultValues, id }) => {
+	const { mutate: updateClass, isPending: isUpdate } = useUpdateShipClass();
+	const { mutate: createClass, isPending: isCreate } = useCreateShipClass();
 	const form = useForm<z.infer<typeof ShipClassSchema>>({
 		resolver: zodResolver(ShipClassSchema),
-		defaultValues: values,
+		defaultValues,
 	});
 	const handleShipClass = async (data: z.infer<typeof ShipClassSchema>) => {
-		setIsPending(true);
-		try {
-			if (type === 'CREATE') {
-				const result = await createShipClassByAdmin(data);
-				setIsPending(false);
-				if (result.success) {
-					toast.custom((t) => (
-						<ToastSuccess
-							toastNumber={t}
-							content={result.message}
-						/>
-					));
-					form.reset();
-				} else {
-					toast.custom((t) => (
-						<ToastError toastNumber={t} content={result.message} />
-					));
-				}
-			} else {
-				if (id) {
-					const result = await updateShipClassByAdmin({
-						data,
-						id,
-					});
-					setIsPending(false);
-					if (result.success) {
-						toast.custom((t) => (
-							<ToastSuccess
-								toastNumber={t}
-								content={result.message}
-							/>
-						));
-					} else {
-						toast.custom((t) => (
-							<ToastError
-								toastNumber={t}
-								content={result.message}
-							/>
-						));
-					}
-				} else {
-					setIsPending(false);
-					toast.custom((t) => (
-						<ToastError
-							toastNumber={t}
-							content={`Class id is required`}
-						/>
-					));
-				}
-			}
-		} catch (error) {
-			setIsPending(false);
-			toast.custom((t) => (
-				<ToastError toastNumber={t} content={`Class action failed`} />
-			));
+		if (form.watch('type') === 'CREATE') {
+			createClass(data);
 			form.reset();
+		} else {
+			updateClass({
+				id: id as string,
+				values: data,
+			});
 		}
 	};
 
@@ -136,12 +80,21 @@ const ShipClassForm: FC<ShipcClassForm> = ({ type, values, id }) => {
 						</FormItem>
 					)}
 				/>
-				<Button className="btn-primary-sm" disabled={isPending}>
-					{isPending && (
-						<Spinner className={'btn-spinner-sm mr-[5px]'} />
-					)}
-					{type === 'CREATE' ? 'Create Class' : 'Update Class'}
-				</Button>
+				{form.watch('type') === 'CREATE' ? (
+					<Button className="btn-primary-sm" disabled={isCreate}>
+						{isCreate && (
+							<Spinner className={'btn-spinner-sm mr-[5px]'} />
+						)}
+						Create New Class
+					</Button>
+				) : (
+					<Button className="btn-primary-sm" disabled={isUpdate}>
+						{isUpdate && (
+							<Spinner className={'btn-spinner-sm mr-[5px]'} />
+						)}
+						Save Changes
+					</Button>
+				)}
 			</form>
 		</Form>
 	);

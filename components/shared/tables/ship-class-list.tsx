@@ -1,11 +1,6 @@
 'use client';
 import { FC, useState } from 'react';
 import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import {
 	Table,
 	TableBody,
 	TableCell,
@@ -14,167 +9,138 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { dateFormat } from '@/lib/helpers/formater';
-import { Button } from '@/components/ui/button';
-import { Trash2, PenSquare } from 'lucide-react';
-import ShipClassForm from '@/components/ecom/shipping/ship-class-form';
 import Pagination from '../filters/pagination';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '../ui/custom-toast';
-import { deleteShipClassByAdmin } from '@/lib/actions/ship.action';
+import EmptyError from '../ui/empty-error';
+import Link from 'next/link';
+import ActionMenu from '../ui/action-menu';
+import { MenubarItem } from '@/components/ui/menubar';
+import UpdateClass from '../modals/update-class';
+import { useDeleteShipClass } from '@/lib/hooks/useShip';
 type ClassProps = {
 	data: ShipClassList[];
 	pages: number;
 };
+export interface ClassDetails {
+	id: string;
+	name: string;
+	description: string;
+}
 
 const ShipClassList: FC<ClassProps> = ({ data, pages }) => {
-	const [isPending, setIsPending] = useState(false);
-	const [details, setDetails] = useState<{
-		id: null | string;
-		data: ShipClassForm;
-	}>({
-		id: null,
-		data: {
-			name: '',
-			description: '',
-		},
-	});
+	const { mutate: deleteClass, isPending } = useDeleteShipClass();
+	const [details, setDetails] = useState<ClassDetails | null>(null);
 	const handleDeleteClass = async (ids: string[]) => {
-		setIsPending(true);
-		try {
-			const result = await deleteShipClassByAdmin({
-				classIds: ids,
-			});
-			setIsPending(false);
-			if (result.success) {
-				toast.custom((t) => (
-					<ToastSuccess toastNumber={t} content={result.message} />
-				));
-			} else {
-				toast.custom((t) => (
-					<ToastError toastNumber={t} content={result.message} />
-				));
-			}
-		} catch (error) {
-			setIsPending(false);
-			toast.custom((t) => (
-				<ToastError toastNumber={t} content={`Class id is required`} />
-			));
-		}
+		deleteClass(ids);
 	};
 
 	return (
 		<div className="ship-class-table dashboard-col-space">
-			<Table>
-				<TableHeader className="[&_tr]:border-b-0">
-					<TableRow className="border-b-0">
-						<TableHead className="p-0">
-							<div className="table-head-start">
-								<span>Class name</span>
-							</div>
-						</TableHead>
-						<TableHead className="p-0">
-							<div className="table-head-data">Description</div>
-						</TableHead>
-						<TableHead className="p-0">
-							<div className="table-head-data">Created AT</div>
-						</TableHead>
-						<TableHead className="p-0">
-							<div className="table-head-end">Action</div>
-						</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody className="border-t-0">
-					{data.map((item, index) => (
-						<Collapsible key={index} asChild>
-							<>
-								<TableRow className="border-b-0 border-t-0">
-									<TableCell className="p-0">
-										<div className="table-cell-start min-h-[80px]">
-											<div className="flex flex-col gap-[5px]">
-												<span className="text-base-2">
-													{item.name}
-												</span>
-												<span className="text-base-2 !text-[13px] !text-primary-green">
-													{item.slug}
-												</span>
-											</div>
-										</div>
-									</TableCell>
-									<TableCell className="p-0">
-										<div className="table-cell-data min-h-[80px]">
-											{item.description
-												? item.description
-												: '--'}
-										</div>
-									</TableCell>
-									<TableCell className="p-0">
-										<div className="table-cell-data min-h-[80px]">
-											{dateFormat(item.createdAt)}
-										</div>
-									</TableCell>
-									<TableCell className="p-0">
-										<div className="table-cell-end min-h-[80px] gap-[10px]">
-											<CollapsibleTrigger asChild>
-												<Button
-													className="badge-success"
-													onClick={() => {
-														setDetails({
-															id: item.id,
-															data: {
+			{data.length > 0 ? (
+				<Table>
+					<TableHeader className="[&_tr]:border-b-0">
+						<TableRow className="border-b-0">
+							<TableHead className="p-0">
+								<div className="table-head-start">
+									<span>Class name</span>
+								</div>
+							</TableHead>
+							<TableHead className="p-0">
+								<div className="table-head-data">
+									Description
+								</div>
+							</TableHead>
+							<TableHead className="p-0">
+								<div className="table-head-data">
+									Created AT
+								</div>
+							</TableHead>
+							<TableHead className="p-0">
+								<div className="table-head-end">Action</div>
+							</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody className="border-t-0">
+						{data.map((item, index) => (
+							<TableRow
+								className="border-b-0 border-t-0"
+								key={index}
+							>
+								<TableCell className="p-0">
+									<div className="table-cell-start min-h-[80px]">
+										<span className="text-base-2">
+											{item.name}
+										</span>
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{item.description
+											? item.description
+											: '--'}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-data min-h-[80px]">
+										{dateFormat(item.createdAt)}
+									</div>
+								</TableCell>
+								<TableCell className="p-0">
+									<div className="table-cell-end min-h-[80px] gap-[10px]">
+										<ActionMenu
+											content={
+												<>
+													<MenubarItem
+														className="menubar-item cursor-pointer"
+														onClick={() => {
+															setDetails({
+																id: item.id,
 																name: item.name,
 																description:
 																	item.description
 																		? item.description
 																		: '',
-															},
-														});
-													}}
-												>
-													<PenSquare size={16} />
-												</Button>
-											</CollapsibleTrigger>
-											<Button
-												className="badge-danger"
-												onClick={() =>
-													handleDeleteClass([item.id])
-												}
-												disabled={isPending}
-											>
-												<Trash2 size={16} />
-											</Button>
-										</div>
-									</TableCell>
-								</TableRow>
-								<CollapsibleContent
-									asChild
-									className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
-								>
-									<>
-										<TableRow className="border-b-0 border-t-0">
-											<TableCell
-												colSpan={4}
-												className="p-0"
-											>
-												<div className="table-cell-data rounded-md table-cell-data-start table-cell-data-end w-full">
-													{details && (
-														<ShipClassForm
-															type={'UPDATE'}
-															values={
-																details.data
-															}
-															id={details.id}
-														/>
-													)}
-												</div>
-											</TableCell>
-										</TableRow>
-									</>
-								</CollapsibleContent>
-							</>
-						</Collapsible>
-					))}
-				</TableBody>
-			</Table>
+															});
+														}}
+													>
+														Edit Class
+													</MenubarItem>
+													<MenubarItem
+														className="menubar-item"
+														disabled={isPending}
+														onClick={() =>
+															handleDeleteClass([
+																item.id,
+															])
+														}
+													>
+														Delete Class
+													</MenubarItem>
+												</>
+											}
+										/>
+									</div>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			) : (
+				<EmptyError
+					contentClass={
+						'sm:max-w-[450px] justify-center mx-auto text-center items-center py-[60px]'
+					}
+					title={'No class found to show'}
+					description={`Oops! It seems there are no shipping class available to display at the moment. 🚛 Feel free to add new zone to enhance this space 🌟`}
+					Links={
+						<Link
+							href="/admin/store/shipping/class"
+							className="btn-navlink btn-navlink-active !w-auto"
+						>
+							Reload
+						</Link>
+					}
+				/>
+			)}
 			<div className="flex items-center justify-between max-sm:flex-col max-sm:items-start gap-[15px]">
 				<div className="text-base-1">0 row(s) selected.</div>
 				<Pagination
@@ -188,6 +154,7 @@ const ShipClassList: FC<ClassProps> = ({ data, pages }) => {
 					}
 				/>
 			</div>
+			<UpdateClass defaultValues={details} setClose={setDetails} />
 		</div>
 	);
 };

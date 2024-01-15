@@ -1,4 +1,4 @@
-import ShipClass from '@/components/ecom/shipping/ship-class-modal';
+import CreateClass from '@/components/shared/modals/create-class';
 import ShipClassList from '@/components/shared/tables/ship-class-list';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';
 import { ShipPageLinks } from '@/constants';
@@ -24,7 +24,7 @@ const ShippingClass = async ({ searchParams }: SearchParams) => {
 					params={null}
 				/>
 				<div className="flex items-center gap-[15px]">
-					<ShipClass />
+					<CreateClass />
 				</div>
 			</div>
 			<ShipClassList

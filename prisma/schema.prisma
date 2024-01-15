@@ -210,19 +210,16 @@ enum TaxStatus {
 model ShippingClass {
   id          String  @id @unique @default(uuid())
   name        String
-  slug        String
   description String?
 
+  products Product[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  products Product[]
 }
 
 model ShippingZone {
   id      String                 @id @unique @default(uuid())
   name    String
-  slug    String                 @unique
   regions ShippingZoneLocation[]
   methods ShippingMethod[]
 
@@ -241,7 +238,7 @@ model ShippingMethod {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  zone   ShippingZone @relation(fields: [zoneId], references: [id])
+  zone   ShippingZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   zoneId String
 }
 
@@ -249,7 +246,7 @@ model ShippingZoneLocation {
   id           String       @id @unique @default(uuid())
   locationCode String
   locationType LocationType
-  zone         ShippingZone @relation(fields: [zoneId], references: [id])
+  zone         ShippingZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   zoneId       String
 
   createdAt DateTime @default(now())
@@ -267,7 +264,6 @@ model TaxRate {
   priority     Int               @default(1)
   taxLocations TaxRateLocation[]
 }
-
 model TaxRateLocation {
   id           String       @id @unique @default(uuid())
   locationCode String
@@ -280,8 +276,8 @@ model TaxRateLocation {
 // Site Options
 model Options {
   id       String         @id @unique @default(uuid())
-  value    String
-  method   ShippingMethod @relation(fields: [methodId], references: [id])
+  value    Bytes
+  method   ShippingMethod @relation(fields: [methodId], references: [id],onDelete: Cascade)
   methodId String         @unique
 
   createdAt DateTime @default(now())

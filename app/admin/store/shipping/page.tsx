@@ -1,15 +1,16 @@
-import ShipZoneModal from '@/components/ecom/shipping/ship-zone-modal';
 import ShipZoneList from '@/components/shared/tables/ship-zone-list';
 import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import { Button } from '@/components/ui/button';
 import { ShipPageLinks } from '@/constants';
-import { fetchZoneByAdmin } from '@/lib/actions/ship.action';
+import { fetchShipZoneByAdmin } from '@/lib/actions/ship.action';
+import Link from 'next/link';
 type SearchParams = {
 	searchParams: {
 		page: string;
 	};
 };
 const ShippingPage = async ({ searchParams }: SearchParams) => {
-	const result = await fetchZoneByAdmin({
+	const result = await fetchShipZoneByAdmin({
 		pageSize: 8,
 		page: searchParams.page ? parseInt(searchParams.page) : 1,
 	});
@@ -22,7 +23,9 @@ const ShippingPage = async ({ searchParams }: SearchParams) => {
 					params={null}
 				/>
 				<div className="flex items-center gap-[15px]">
-					<ShipZoneModal />
+					<Link href="/admin/store/shipping/create">
+						<Button className="btn-primary-sm">Create Zone</Button>
+					</Link>
 				</div>
 			</div>
 			<ShipZoneList

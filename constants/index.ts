@@ -164,15 +164,11 @@ export const ProductPageLinks = [
 export const ShipPageLinks = [
 	{
 		label: 'Shipping Zones',
-		url: '/admin/shipping',
-	},
-	{
-		label: 'Shipping Methods',
-		url: '/admin/shipping/methods',
+		url: '/admin/store/shipping',
 	},
 	{
 		label: 'Shipping Class',
-		url: '/admin/shipping/class',
+		url: '/admin/store/shipping/class',
 	},
 ];
 export const ShipMethodList = [

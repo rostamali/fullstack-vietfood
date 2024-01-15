@@ -57,6 +57,12 @@ const UserList: FC<UserListProps> = ({ data, pages }) => {
 			));
 		}
 	};
+	const banProfile = (ids: string[]) => {
+		deleteAccount({
+			ids,
+			actionType: 'DEACTIVE',
+		});
+	};
 
 	return (
 		<div className="user-table dashboard-col-space">
@@ -237,7 +243,15 @@ const UserList: FC<UserListProps> = ({ data, pages }) => {
 													>
 														Edit Profile
 													</MenubarItem>
-													<MenubarItem className="menubar-item">
+													<MenubarItem
+														disabled={isPending}
+														className="menubar-item"
+														onClick={() => {
+															banProfile([
+																user.id,
+															]);
+														}}
+													>
 														Ban Profile
 													</MenubarItem>
 												</>
@@ -270,18 +284,16 @@ const UserList: FC<UserListProps> = ({ data, pages }) => {
 				<div className="text-base-1">
 					{selectedItems ? selectedItems?.length : 0} row(s) selected.
 				</div>
-				<div>
-					<Pagination
-						pages={pages}
-						containerClass={''}
-						prevBtnClass={''}
-						nextBtnClass={''}
-						paginateBtnClass={''}
-						paginateActiveClass={
-							'bg-black-dark bg-opacity-10 text-black-dark'
-						}
-					/>
-				</div>
+				<Pagination
+					pages={pages}
+					containerClass={''}
+					prevBtnClass={''}
+					nextBtnClass={''}
+					paginateBtnClass={''}
+					paginateActiveClass={
+						'bg-black-dark bg-opacity-10 text-black-dark'
+					}
+				/>
 			</div>
 			{selectId && <UpdateUser id={selectId} onChange={setSelectId} />}
 		</div>

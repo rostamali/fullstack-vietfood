@@ -1,9 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
+import { ShipFormSchema } from '@/lib/helpers/form-validation';
 import {
 	Form,
 	FormControl,
@@ -13,115 +13,123 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { ShipZoneSchema } from '@/lib/helpers/form-validation';
-import Spinner from '@/components/shared/ui/spinner';
 import ShipZoneSelection from '../countries/ship-zone-selection';
-import ShipMethodSelection from './ship-method-selection';
-import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
-import { createZoneByAdmin } from '@/lib/actions/ship.action';
+import ShipMethods from './ship-methods';
+import { Button } from '@/components/ui/button';
+import { useCreateShipZone, useUpdateShipZone } from '@/lib/hooks/useShip';
+import Spinner from '@/components/shared/ui/spinner';
+type ShipFormProps = {
+	defaultValues: z.infer<typeof ShipFormSchema>;
+	id?: string;
+};
 
-const ShipZoneForm = () => {
-	const [isPending, setIsPending] = useState(false);
-	const form = useForm<z.infer<typeof ShipZoneSchema>>({
-		resolver: zodResolver(ShipZoneSchema),
-		defaultValues: {
-			name: '',
-			regions: null,
-			methods: null,
-		},
+const ShipZoneForm: FC<ShipFormProps> = ({ defaultValues, id }) => {
+	const form = useForm<z.infer<typeof ShipFormSchema>>({
+		resolver: zodResolver(ShipFormSchema),
+		defaultValues,
 	});
-	const handleZoneAction = async (data: z.infer<typeof ShipZoneSchema>) => {
-		setIsPending(true);
-		try {
-			const result = await createZoneByAdmin(data as ShipZoneForm);
-			setIsPending(false);
-			if (result.success) {
-				toast.custom((t) => (
-					<ToastSuccess toastNumber={t} content={result.message} />
-				));
-				form.reset();
-			} else {
-				toast.custom((t) => (
-					<ToastError toastNumber={t} content={result.message} />
-				));
-			}
-		} catch (error) {
-			setIsPending(false);
-			toast.custom((t) => (
-				<ToastError toastNumber={t} content={`Zone action failed`} />
-			));
-			form.reset();
+	const { mutate: createShipZone, isPending: isCreate } = useCreateShipZone();
+	const { mutate: updateProduct, isPending: isUpdate } = useUpdateShipZone();
+	const handleZoneAction = async (data: z.infer<typeof ShipFormSchema>) => {
+		if (form.watch('type') === 'CREATE') {
+			createShipZone(data);
+		} else {
+			updateProduct({
+				id: id as string,
+				values: data,
+			});
 		}
 	};
-
 	return (
-		<Form {...form}>
-			<form
-				className="form-flex-space"
-				onSubmit={form.handleSubmit(handleZoneAction)}
-			>
-				<FormField
-					control={form.control}
-					name="name"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="field-label-sm">
-								Zone name
-							</FormLabel>
-							<FormControl>
-								<Input className="input-field-sm" {...field} />
-							</FormControl>
-							<FormMessage className="form-error" />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="regions"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="field-label-sm">
-								Zone regions
-							</FormLabel>
-							<FormControl>
-								<ShipZoneSelection
-									selected={field.value}
-									onChange={field.onChange}
-									triggerClass={'input-field-sm'}
-								/>
-							</FormControl>
-							<FormMessage className="form-error" />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="methods"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="field-label-sm">
-								Methods
-							</FormLabel>
-							<FormControl>
-								<ShipMethodSelection
-									selected={field.value ? field.value : []}
-									onChange={field.onChange}
-									className="input-field-sm"
-								/>
-							</FormControl>
-							<FormMessage className="form-error" />
-						</FormItem>
-					)}
-				/>
-				<Button className="btn-primary-sm" disabled={isPending}>
-					{isPending && (
-						<Spinner className={'btn-spinner-sm mr-[5px]'} />
-					)}
-					Save Changes
-				</Button>
-			</form>
-		</Form>
+		<div className="ship-form">
+			<Form {...form}>
+				<form
+					className="form-flex-space"
+					onSubmit={form.handleSubmit(handleZoneAction)}
+				>
+					<div className="grid sm:grid-cols-2 grid-cols-1 gap-[25px]">
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="field-label-sm">
+										Zone name
+									</FormLabel>
+									<FormControl>
+										<Input
+											className="input-field-sm"
+											{...field}
+										/>
+									</FormControl>
+									<span className="form-note-sm">
+										Give your zone a name! E.g. Local, or
+										Worldwide.
+									</span>
+									<FormMessage className="form-error" />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="regions"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="field-label-sm">
+										Zone regions
+									</FormLabel>
+									<FormControl>
+										<ShipZoneSelection
+											selected={field.value}
+											onChange={field.onChange}
+											triggerClass={
+												'input-field-sm bg-white'
+											}
+										/>
+									</FormControl>
+									<span className="form-note-sm">
+										List the regions you'd like to include
+										in your shipping zone. Customers will be
+										matched against these regions.
+									</span>
+									<FormMessage className="form-error" />
+								</FormItem>
+							)}
+						/>
+						<div className="sm:col-span-2">
+							<ShipMethods form={form} />
+						</div>
+					</div>
+					<div className="flex justify-end">
+						{form.watch('type') === 'CREATE' ? (
+							<Button
+								className="btn-primary-sm"
+								disabled={isCreate}
+							>
+								{isCreate && (
+									<Spinner
+										className={'btn-spinner-sm mr-[5px]'}
+									/>
+								)}
+								Create New Zone
+							</Button>
+						) : (
+							<Button
+								className="btn-primary-sm"
+								disabled={isUpdate}
+							>
+								{isUpdate && (
+									<Spinner
+										className={'btn-spinner-sm mr-[5px]'}
+									/>
+								)}
+								Save Changes
+							</Button>
+						)}
+					</div>
+				</form>
+			</Form>
+		</div>
 	);
 };
 

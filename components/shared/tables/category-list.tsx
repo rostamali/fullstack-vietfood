@@ -232,7 +232,15 @@ const CategoryList: FC<CategoryProps> = ({ data, pages }) => {
 													>
 														Edit Now
 													</MenubarItem>
-													<MenubarItem className="menubar-item">
+													<MenubarItem
+														disabled={isPending}
+														className="menubar-item"
+														onClick={() => {
+															deleteCategory([
+																category.id,
+															]);
+														}}
+													>
 														Delete Now
 													</MenubarItem>
 												</>
