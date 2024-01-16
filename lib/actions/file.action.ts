@@ -146,7 +146,6 @@ export const fetchModalFiles = async ({ pageParam = 0 }) => {
 	try {
 		const isAdmin = await isAuthenticatedAdmin();
 		if (!isAdmin) return [];
-
 		const files = await prisma.file.findMany({
 			select: {
 				id: true,
@@ -157,7 +156,7 @@ export const fetchModalFiles = async ({ pageParam = 0 }) => {
 			orderBy: {
 				createdAt: 'desc',
 			},
-			skip: Number(pageParam),
+			skip: Number(pageParam) - 1,
 			take: 8,
 		});
 		return files;

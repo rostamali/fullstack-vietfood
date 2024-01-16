@@ -257,3 +257,11 @@ interface CSVBrand {
 	contactPhone: string;
 	contactWebsite: string;
 }
+interface CSVProduct {
+	name: string;
+	excerpt: string;
+	retailPrice: string;
+	salePrice: string;
+	threshold: string;
+	sku: string;
+}

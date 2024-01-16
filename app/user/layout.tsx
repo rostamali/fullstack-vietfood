@@ -1,4 +1,4 @@
-import UserHeader from '@/components/shared/headers/UserHeader';
+import UserHeader from '@/components/shared/headers/user-header';
 import DashboardLink from '@/components/shared/ui/dashboard-link';
 import Logo from '@/components/shared/ui/logo';
 

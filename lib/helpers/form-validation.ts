@@ -149,6 +149,39 @@ export const ChangePasswordFormSchema = z
 	});
 
 /* ================================== */
+// Address Schemas
+/* ================================== */
+export const AddressFormSchema = z.object({
+	type: z
+		.string({
+			required_error: 'Type is required',
+		})
+		.refine((value) => FormTypes.includes(value), {
+			message: 'Type must be one of the options: ' + FormTypes.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Type is required',
+			},
+		),
+	contactName: z
+		.string()
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	phoneNumber: z
+		.string()
+		.min(1, { message: 'Phone number is required' })
+		.max(30, { message: 'Phone number must not exceed 30 characters' }),
+	countryCode: z.string().min(2, { message: 'Country is required' }),
+	stateCode: z.string().min(2, { message: 'State is required' }),
+	cityName: z.string(),
+	zipCode: z.string().min(2, { message: 'Zipcode is required' }),
+	addressLine1: z.string().min(2, { message: 'Address is required' }),
+	addressLine2: z.string(),
+	setDefaultAddress: z.boolean(),
+});
+/* ================================== */
 // Files Schemas
 /* ================================== */
 export const FileUpdateFormSchema = z.object({

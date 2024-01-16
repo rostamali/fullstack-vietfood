@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
 import { importCategoryFromCSV } from '../actions/category.action';
 import { importBrandFromCSV } from '../actions/brand.action';
+import { importProductFromCSV } from '../actions/product.action';
 
 export const useUploadUser = () => {
 	return useMutation({
@@ -55,6 +56,29 @@ export const useUploadBrand = () => {
 	return useMutation({
 		mutationFn: async (data: CSVBrand[]) => {
 			return await importBrandFromCSV(data);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+export const useUploadProduct = () => {
+	return useMutation({
+		mutationFn: async (data: CSVProduct[]) => {
+			return await importProductFromCSV(data);
 		},
 		onSuccess: (result) => {
 			if (result.success) {

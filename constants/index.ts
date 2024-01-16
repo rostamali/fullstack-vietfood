@@ -11,8 +11,91 @@ import {
 	LayoutList,
 	BookUser,
 	ArrowDownUp,
+	PhoneCall,
+	AtSign,
+	Home,
+	Facebook,
+	Twitter,
+	Instagram,
 } from 'lucide-react';
-
+export const TopbarLinks = [
+	{
+		label: 'About',
+		url: '/adbout',
+	},
+	{
+		label: 'Wishlist',
+		url: '/wishlist',
+	},
+	{
+		label: 'Compare',
+		url: '/compare',
+	},
+];
+export const NavbarLinks = [
+	{
+		label: 'New Products',
+		url: '/',
+	},
+	{
+		label: 'Best Sales',
+		url: '/',
+	},
+	{
+		label: 'Shops',
+		url: '/shop',
+	},
+	{
+		label: 'Categories',
+		url: '/categories',
+	},
+];
+export const UsefullLinks = [
+	{
+		label: 'My Account',
+		url: '/',
+	},
+	{
+		label: 'Wishlist',
+		url: '/',
+	},
+	{
+		label: 'About us',
+		url: '/',
+	},
+	{
+		label: 'Contact Us',
+		url: '/',
+	},
+];
+export const QuickContact = [
+	{
+		label: 'Carol J. Stephens Mongomery, Al 36104 USA',
+		icon: Home,
+	},
+	{
+		label: '+000 123 456',
+		icon: PhoneCall,
+	},
+	{
+		label: 'hello@store.com',
+		icon: AtSign,
+	},
+];
+export const SocialLinks = [
+	{
+		url: '',
+		icon: Facebook,
+	},
+	{
+		url: '',
+		icon: Twitter,
+	},
+	{
+		url: '',
+		icon: Instagram,
+	},
+];
 export const AdminNavlinks = [
 	{
 		label: 'Dashboard',
@@ -87,6 +170,27 @@ export const UserNavlinks = [
 		icon: CircleUser,
 	},
 ];
+/* ======================================= */
+// Shop Constants
+/* ======================================= */
+export const BrandList = [
+	{
+		label: 'HP',
+	},
+	{
+		label: 'Samsung',
+	},
+	{
+		label: 'Kitchen',
+	},
+	{
+		label: 'Wall Clock',
+	},
+	{
+		label: 'Accessories',
+	},
+];
+
 /* ======================================= */
 // User Constants
 /* ======================================= */

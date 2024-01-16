@@ -219,7 +219,14 @@ const ProductTabFields: FC<TabProps> = ({ form }) => {
 											defaultValue={
 												field.value ? 'true' : 'false'
 											}
-											onChange={field.onChange}
+											onChange={(val) => {
+												form.setValue(
+													'stockStatus',
+													val === 'true'
+														? true
+														: false,
+												);
+											}}
 											options={StockStatus}
 										/>
 									</FormControl>

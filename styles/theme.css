@@ -80,6 +80,33 @@
 	.method-ac__remove {
 		@apply h-[22px] w-[22px] border-light rounded-md text-primary-gray p-0 flex-center;
 	}
+
+	/* Footer */
+	.footer-col-gap {
+		@apply flex flex-col gap-[25px];
+	}
+
+	/* Order */
+	.cart-summary__between {
+		@apply flex items-center justify-between border-b border-b-gray-muted last:border-b-0 py-[15px];
+	}
+	.cart-summary__label {
+		@apply text-black-dark text-base-1;
+	}
+	.cart-summary__value {
+		@apply text-black-dark text-base-2 font-semibold;
+	}
+
+	/* Sliders */
+	.gallery-arrow {
+		@apply bg-gray-light h-[45px] w-[45px] rounded text-black-dark absolute top-[50%] z-[8] translate-y-[-50%];
+	}
+	.gallery-arrow-left {
+		@apply left-0;
+	}
+	.gallery-arrow-right {
+		@apply right-0;
+	}
 }
 
 @layer utilities {
@@ -94,7 +121,7 @@
 		@apply text-[30px] font-poppins font-semibold text-black-dark;
 	}
 	.heading-4 {
-		@apply text-[24px] font-poppins font-medium text-black-dark;
+		@apply text-[24px] max-md:text-[20px] font-poppins font-medium text-black-dark;
 	}
 	.heading-5 {
 		@apply text-[18px] font-poppins font-normal text-black-dark;
@@ -103,10 +130,10 @@
 		@apply text-[16px] font-poppins font-normal text-black-dark;
 	}
 	.text-base-1 {
-		@apply text-[15px] font-poppins font-normal text-black-dark;
+		@apply text-[15px] max-sm:text-[13px] font-poppins font-normal text-black-dark;
 	}
 	.text-base-2 {
-		@apply text-[14px] font-poppins font-normal text-black-dark;
+		@apply text-[14px] max-sm:text-[12px] font-poppins font-normal text-black-dark;
 	}
 
 	/* Links Typography */

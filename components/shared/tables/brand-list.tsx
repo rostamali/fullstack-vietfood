@@ -21,17 +21,11 @@ import {
 	toggleSelectAll,
 	toggleSelectList,
 } from '@/lib/helpers/formater';
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import ActionMenu from '../ui/action-menu';
 import { MenubarItem } from '@/components/ui/menubar';
 import EmptyError from '../ui/empty-error';
 import Pagination from '../filters/pagination';
 import Image from 'next/image';
-import Brand from '../forms/brand-form';
 import UpdateBrand from '../modals/update-brand';
 type BrandProps = {
 	data: BrandTable[];

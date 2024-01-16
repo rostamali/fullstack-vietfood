@@ -20,6 +20,7 @@ const UsersPage = async ({ searchParams }: SearchParams) => {
 			: null,
 		query: searchParams.q ? searchParams.q : null,
 	});
+
 	return (
 		<div className="dashboard-col-space">
 			<div className="flex items-center justify-between gap-[40px]">

@@ -17,15 +17,17 @@ import { ToastError } from '../ui/custom-toast';
 import {
 	useUploadBrand,
 	useUploadCategory,
+	useUploadProduct,
 	useUploadUser,
 } from '@/lib/hooks/useCSV';
 type CsvProps = {
-	type: 'USER' | 'BRAND' | 'CATEGORY';
+	type: 'USER' | 'BRAND' | 'CATEGORY' | 'PRODUCT';
 };
 
 const UploadCSV: FC<CsvProps> = ({ type }) => {
 	const [isPending, setIsPending] = useState(false);
 	const { mutate: uploadUser, isPending: isUser } = useUploadUser();
+	const { mutate: uploadProduct, isPending: isProduct } = useUploadProduct();
 	const { mutate: uploadBrand, isPending: isBrand } = useUploadBrand();
 	const { mutate: uploadCategory, isPending: isCategory } =
 		useUploadCategory();
@@ -52,6 +54,12 @@ const UploadCSV: FC<CsvProps> = ({ type }) => {
 						});
 					} else if (type === 'BRAND') {
 						uploadBrand(value.data as CSVBrand[], {
+							onSuccess: () => {
+								setIsPending(false);
+							},
+						});
+					} else if (type === 'PRODUCT') {
+						uploadProduct(value.data as CSVProduct[], {
 							onSuccess: () => {
 								setIsPending(false);
 							},

@@ -18,7 +18,7 @@ const UpdateShipZone = async ({ searchParams }: SearchParams) => {
 		<div className="dashboard-col-space">
 			{result ? (
 				<>
-					<div className="flex items-center justify-between gap-[40px]">
+					<div className="dashboard-col-space">
 						<DashboardPageTitle
 							title={'Update Zone'}
 							links={ShipPageLinks}

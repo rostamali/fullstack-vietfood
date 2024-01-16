@@ -1,28 +1,43 @@
+import { FC } from 'react';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
+import AddressForm from '../forms/address-form';
+type CreateAddressProps = {
+	triggerClass: string;
+};
 
-const CreateAddress = () => {
+const CreateAddress: FC<CreateAddressProps> = ({ triggerClass }) => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className="btn-primary-lg">New Brand</Button>
+				<Button className={triggerClass}>Add a new address</Button>
 			</DialogTrigger>
 			<DialogContent className="bg-white md:max-w-[550px] max-w-[85%]">
 				<DialogHeader>
-					<DialogTitle className="heading-4">
-						Create New User
+					<DialogTitle className="heading-4 pb-4">
+						Shipping address
 					</DialogTitle>
-					<DialogDescription className="text-base-2">
-						Create a brand new user and add them to this site.
-					</DialogDescription>
 				</DialogHeader>
+				<AddressForm
+					defaultValues={{
+						type: 'CREATE',
+						contactName: '',
+						phoneNumber: '',
+						countryCode: '',
+						stateCode: '',
+						cityName: '',
+						zipCode: '',
+						addressLine1: '',
+						addressLine2: '',
+						setDefaultAddress: false,
+					}}
+				/>
 			</DialogContent>
 		</Dialog>
 	);

@@ -22,6 +22,7 @@ import SelectField from '../ui/select-field';
 import { Button } from '@/components/ui/button';
 import SmallTooltip from '../ui/small-tooltip';
 import { Download } from 'lucide-react';
+import Image from 'next/image';
 type ProductListProps = {
 	data: ProductList[];
 	pages: number;
@@ -104,9 +105,6 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 								<div className="table-head-data">Status</div>
 							</TableHead>
 							<TableHead className="p-0">
-								<div className="table-head-data">Created</div>
-							</TableHead>
-							<TableHead className="p-0">
 								<div className="table-head-end">Action</div>
 							</TableHead>
 						</TableRow>
@@ -121,13 +119,27 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 									<div className="table-cell-start min-h-[80px]">
 										<div className="flex items-center gap-[10px]">
 											<Checkbox className="checkbox-sm" />
-											<div className="flex flex-col gap-[5px]">
-												<span className="text-base-2">
-													{item.name}
-												</span>
-												{/* <span className="text-base-2 !text-[13px] !text-primary-green">
-													{user.email}
-												</span> */}
+											<div className="flex items-center gap-1.5">
+												<Image
+													src={
+														item.thumbnail
+															? `/uploads/files/${item.thumbnail.url}`
+															: '/assets/placeholder.png'
+													}
+													alt={item.name}
+													width={100}
+													height={100}
+													className={`h-[55px] w-[55px] border-light rounded-md object-contain ${
+														item.thumbnail
+															? 'bg-transparent'
+															: 'bg-primary-gray bg-opacity-30'
+													}`}
+												/>
+												<div className="flex flex-col gap-[5px]">
+													<span className="text-base-2">
+														{item.name}
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -171,11 +183,6 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 												Inactive
 											</span>
 										)}
-									</div>
-								</TableCell>
-								<TableCell className="p-0">
-									<div className="table-cell-data min-h-[80px]">
-										{dateFormat(item.createdAt)}
 									</div>
 								</TableCell>
 								<TableCell className="p-0">

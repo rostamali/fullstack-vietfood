@@ -31,7 +31,7 @@ const ProductAdminPage = async ({ searchParams }: SearchParams) => {
 					<Link href={`/admin/product/create`}>
 						<Button className="btn-primary-lg">New Product</Button>
 					</Link>
-					<UploadCSV type={'BRAND'} />
+					<UploadCSV type={'PRODUCT'} />
 				</div>
 			</div>
 			<ProductList

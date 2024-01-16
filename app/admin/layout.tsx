@@ -1,4 +1,4 @@
-import AdminHeader from '@/components/shared/headers/AdminHeader';
+import AdminHeader from '@/components/shared/headers/admin-header';
 import Logo from '@/components/shared/ui/logo';
 import DashboardLink from '@/components/shared/ui/dashboard-link';
 

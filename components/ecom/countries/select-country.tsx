@@ -11,7 +11,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover';
-import { ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { FC } from 'react';
 import { fetchCountryList } from '@/lib/actions/country.action';
 
@@ -63,16 +63,26 @@ const SelectCountry: FC<CountryProps> = ({
 						{data &&
 							data?.map((item, index) => (
 								<CommandItem
-									className="menubar-item flex items-center gap-1"
+									className="menubar-item flex items-center gap-2"
 									key={index}
 									onSelect={() => onChange(item.isoCode)}
 								>
-									<img
-										src={item.flag}
-										className="w-[25px] h-[18px] object-cover border-light"
-										alt=""
+									<Check
+										size={20}
+										className={`${
+											item.isoCode === value
+												? 'opacity-100'
+												: 'opacity-0'
+										}`}
 									/>
-									<span>{item.name}</span>
+									<div className="flex items-center gap-1.5">
+										<img
+											src={item.flag}
+											className="w-[25px] h-[18px] object-cover border-light"
+											alt={item.name}
+										/>
+										<span>{item.name}</span>
+									</div>
 								</CommandItem>
 							))}
 					</CommandGroup>
