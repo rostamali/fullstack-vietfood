@@ -27,9 +27,7 @@ const AddressForm: FC<AddressProps> = ({ defaultValues }) => {
 		resolver: zodResolver(AddressFormSchema),
 		defaultValues,
 	});
-	const handleAddress = async (data: z.infer<typeof AddressFormSchema>) => {
-		console.log(data);
-	};
+	const handleAddress = async (data: z.infer<typeof AddressFormSchema>) => {};
 	return (
 		<Form {...form}>
 			<form

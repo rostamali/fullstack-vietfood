@@ -8,6 +8,7 @@ import 'swiper/css/thumbs';
 import { useState, FC } from 'react';
 import type { Swiper as SwiperSliderType } from 'swiper';
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 type GalleryProps = {
 	gallery: {
 		url: string;
@@ -39,7 +40,7 @@ const ProductGallery: FC<GalleryProps> = ({ gallery, alt }) => {
 								alt={alt}
 								width={500}
 								height={500}
-								className="object-contain w-[80%]"
+								className="object-contain w-[70%]"
 								style={{
 									aspectRatio: '3/3',
 								}}
@@ -48,10 +49,10 @@ const ProductGallery: FC<GalleryProps> = ({ gallery, alt }) => {
 					</SwiperSlide>
 				))}
 				<button className="gallery-arrow gallery-arrow-left">
-					Prev
+					<ChevronLeft />
 				</button>
 				<button className="gallery-arrow gallery-arrow-right">
-					next
+					<ChevronRight />
 				</button>
 			</Swiper>
 			{gallery.length > 1 && (
@@ -72,9 +73,9 @@ const ProductGallery: FC<GalleryProps> = ({ gallery, alt }) => {
 									alt={alt}
 									width={400}
 									height={400}
-									className="object-contain md:w-[80%] w-[90%]"
+									className="object-contain w-[70%]"
 									style={{
-										aspectRatio: '3/3',
+										aspectRatio: '2/2',
 									}}
 								/>
 							</div>

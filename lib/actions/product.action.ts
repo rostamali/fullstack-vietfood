@@ -545,6 +545,7 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 						regularPrice: true,
 						salePrice: true,
 						inStock: true,
+						sku: true,
 					},
 				},
 			},
@@ -593,6 +594,8 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 			inventory: {
 				regularPrice: product.inventory?.regularPrice || null,
 				salePrice: product.inventory?.salePrice || null,
+				sku: product.inventory?.sku || null,
+				inStock: product.inventory?.inStock || null,
 			},
 		};
 	} catch (error) {

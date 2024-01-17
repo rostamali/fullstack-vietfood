@@ -38,9 +38,9 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
 					alt=""
 					width={480}
 					height={500}
-					className="object-contain w-[90%]"
+					className="object-contain w-[70%]"
 					style={{
-						aspectRatio: '3/2',
+						aspectRatio: '3/3',
 					}}
 				/>
 			</div>
@@ -48,7 +48,11 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
 				<h4 className="lg:text-[16px] sm:text-[13px] xm:text-[15px] text-[13px] font-medium text-black-dark duration-100 group-hover:text-primary-green">
 					{product.name.substring(0, 30)}...
 				</h4>
-				<PriceFormat inventory={product.inventory} />
+				<PriceFormat
+					regularClass="text-[14px]"
+					saleClass="text-[18px]"
+					inventory={product.inventory}
+				/>
 			</Link>
 		</div>
 	);

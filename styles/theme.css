@@ -99,13 +99,16 @@
 
 	/* Sliders */
 	.gallery-arrow {
-		@apply bg-gray-light h-[45px] w-[45px] rounded text-black-dark absolute top-[50%] z-[8] translate-y-[-50%];
+		@apply bg-primary-green text-white h-[45px] w-[45px] rounded absolute top-[50%] z-[8] translate-y-[-50%] flex-center;
 	}
 	.gallery-arrow-left {
-		@apply left-0;
+		@apply left-2;
 	}
 	.gallery-arrow-right {
-		@apply right-0;
+		@apply right-2;
+	}
+	.gallery-arrow.swiper-button-disabled {
+		@apply bg-gray-muted text-black-dark;
 	}
 }
 
