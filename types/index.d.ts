@@ -222,6 +222,20 @@ interface ProductList {
 	} | null;
 }
 /* ============================== */
+//  Address Types
+/* ============================== */
+interface AddressCard {
+	id: string;
+	contactName: string;
+	phoneNumber: string;
+	country: string | undefined;
+	state: string | undefined;
+	city: string | null;
+	zipCode: string;
+	address: string;
+	defaultAddress: boolean;
+}
+/* ============================== */
 //  Tax Rate Types
 /* ============================== */
 interface TaxList {

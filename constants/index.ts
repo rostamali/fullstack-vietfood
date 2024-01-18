@@ -166,7 +166,7 @@ export const UserNavlinks = [
 	},
 	{
 		label: 'Profile',
-		url: '/user/Profile',
+		url: '/user/profile',
 		icon: CircleUser,
 	},
 ];

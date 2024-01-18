@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
-import { FC, SetStateAction } from 'react';
+import { FC } from 'react';
 import { AddressFormSchema } from '@/lib/helpers/form-validation';
 import {
 	Form,
@@ -17,17 +17,31 @@ import SelectCountry from '@/components/ecom/countries/select-country';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import SelectState from '@/components/ecom/countries/select-state';
+import { useCreateAddress, useUpdateAddress } from '@/lib/hooks/useAddress';
+import Spinner from '../ui/spinner';
 type AddressProps = {
 	defaultValues: z.infer<typeof AddressFormSchema>;
 	id?: string;
 };
 
-const AddressForm: FC<AddressProps> = ({ defaultValues }) => {
+const AddressForm: FC<AddressProps> = ({ defaultValues, id }) => {
+	const { mutate: createAddress, isPending: isCreate } = useCreateAddress();
+	const { mutate: updateAddress, isPending: isUpdate } = useUpdateAddress();
 	const form = useForm<z.infer<typeof AddressFormSchema>>({
 		resolver: zodResolver(AddressFormSchema),
 		defaultValues,
 	});
-	const handleAddress = async (data: z.infer<typeof AddressFormSchema>) => {};
+	const handleAddress = async (data: z.infer<typeof AddressFormSchema>) => {
+		if (form.watch('type') === 'CREATE') {
+			createAddress(data);
+			form.reset();
+		} else {
+			updateAddress({
+				id: id as string,
+				values: data,
+			});
+		}
+	};
 	return (
 		<Form {...form}>
 			<form
@@ -213,7 +227,25 @@ const AddressForm: FC<AddressProps> = ({ defaultValues }) => {
 					)}
 				/>
 				<div className="flex justify-end">
-					<Button className="btn-primary-sm">Save Changes</Button>
+					{form.watch('type') === 'CREATE' ? (
+						<Button className="btn-primary-sm" disabled={isCreate}>
+							{isCreate && (
+								<Spinner
+									className={'btn-spinner-sm mr-[5px]'}
+								/>
+							)}
+							Create Address
+						</Button>
+					) : (
+						<Button className="btn-primary-sm" disabled={isUpdate}>
+							{isUpdate && (
+								<Spinner
+									className={'btn-spinner-sm mr-[5px]'}
+								/>
+							)}
+							Save Changes
+						</Button>
+					)}
 				</div>
 			</form>
 		</Form>

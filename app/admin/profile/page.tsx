@@ -1,10 +1,8 @@
 import Profile from '@/components/shared/forms/profile';
 import ProfilePicture from '@/components/shared/forms/profile-picture';
-import { Button } from '@/components/ui/button';
 import { fetchAdminProfile } from '@/lib/actions/auth.action';
 import { dateFormat } from '@/lib/helpers/formater';
 import { CalendarDays } from 'lucide-react';
-import Link from 'next/link';
 import ProfileLoading from './loading';
 import ChangePassword from '@/components/shared/modals/change-password';
 

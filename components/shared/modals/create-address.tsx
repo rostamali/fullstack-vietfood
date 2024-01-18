@@ -16,7 +16,7 @@ const CreateAddress: FC<CreateAddressProps> = ({ triggerClass }) => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className={triggerClass}>Add a new address</Button>
+				<Button className={triggerClass}>Add address</Button>
 			</DialogTrigger>
 			<DialogContent className="bg-white md:max-w-[550px] max-w-[85%]">
 				<DialogHeader>

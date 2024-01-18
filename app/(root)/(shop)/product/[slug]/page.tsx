@@ -33,15 +33,6 @@ const ProductDetails = async ({ params }: SearchParams) => {
 						<div className="flex flex-col gap-5 items-start">
 							<h3 className="heading-3">{result?.name}</h3>
 							<div className="flex flex-col gap-4">
-								{result.inventory.sku && (
-									<div className="flex items-center gap-1.5 text-base-2">
-										<span>Product Code:</span>
-										<span className="font-medium">
-											{result.inventory.sku}
-										</span>
-									</div>
-								)}
-
 								<PriceFormat
 									saleClass="text-[22px]"
 									regularClass="text-[18px]"

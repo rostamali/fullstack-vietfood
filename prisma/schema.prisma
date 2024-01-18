@@ -34,6 +34,9 @@ model User {
   lastLogin DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  address        Address[]
+  defaultAddress String?
 }
 
 model Address {
@@ -49,6 +52,9 @@ model Address {
   addressLine2 String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 // Files related models
@@ -212,9 +218,9 @@ model ShippingClass {
   name        String
   description String?
 
-  products Product[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model ShippingZone {
@@ -264,6 +270,7 @@ model TaxRate {
   priority     Int               @default(1)
   taxLocations TaxRateLocation[]
 }
+
 model TaxRateLocation {
   id           String       @id @unique @default(uuid())
   locationCode String
@@ -277,7 +284,7 @@ model TaxRateLocation {
 model Options {
   id       String         @id @unique @default(uuid())
   value    Bytes
-  method   ShippingMethod @relation(fields: [methodId], references: [id],onDelete: Cascade)
+  method   ShippingMethod @relation(fields: [methodId], references: [id], onDelete: Cascade)
   methodId String         @unique
 
   createdAt DateTime @default(now())
