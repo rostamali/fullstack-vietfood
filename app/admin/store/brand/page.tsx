@@ -1,7 +1,7 @@
-import NewBrand from '@/components/shared/modals/create-brand';
-import UploadCSV from '@/components/shared/modals/upload-csv';
-import BrandList from '@/components/shared/tables/brand-list';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import NewBrand from '@/components/elements/modals/create-brand';
+import UploadCSV from '@/components/elements/modals/upload-csv';
+import BrandList from '@/app/admin/store/brand/brand-list';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchBrandByAdmin } from '@/lib/actions/brand.action';
 type SearchParams = {
 	searchParams: {

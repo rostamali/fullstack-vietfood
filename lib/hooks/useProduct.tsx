@@ -2,7 +2,10 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { ProductFormSchema } from '../helpers/form-validation';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 import {
 	createProductByAdmin,
 	updateProductByAdmin,

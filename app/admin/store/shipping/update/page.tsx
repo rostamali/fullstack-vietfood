@@ -1,6 +1,6 @@
-import ShipZoneForm from '@/components/ecom/shipping/ship-zone-form';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
-import EmptyError from '@/components/shared/ui/empty-error';
+import ShipZoneForm from '@/app/admin/store/shipping/ship-zone-form';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
+import EmptyError from '@/components/elements/shared/empty-error';
 import { ShipPageLinks } from '@/constants';
 import { fetchZoneDetailsById } from '@/lib/actions/ship.action';
 import Link from 'next/link';

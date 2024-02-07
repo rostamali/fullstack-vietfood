@@ -224,22 +224,7 @@
 
 	/* Toast */
 	.custom-toast {
-		@apply rounded-md p-[16px] max-xm:p-[12px] w-[320px] max-xm:w-[280px] border flex items-center gap-[15px];
-	}
-	.custom-toast-dismiss {
-		@apply h-[22px] w-[22px] border flex-center rounded-full max-xm:hidden;
-	}
-	.toast-success {
-		@apply custom-toast bg-[#ECFDF3] border-[#008A2E] border-opacity-30 text-[#008A2E];
-	}
-	.toast-success-dismiss {
-		@apply custom-toast-dismiss border-[#008A2E] text-[#008A2E];
-	}
-	.toast-error {
-		@apply custom-toast bg-[#FFF0F0] border-[#E60000] border-opacity-30 text-[#E60000];
-	}
-	.toast-error-dismiss {
-		@apply custom-toast-dismiss border-[#E60000] text-[#E60000];
+		@apply rounded px-[14px] py-[16px] max-xm:px-[12px] max-xm:py-[13px] w-[320px] max-xm:w-[250px] border flex items-center sm:gap-[15px] gap-2 shadow-sm;
 	}
 
 	/* Tables */

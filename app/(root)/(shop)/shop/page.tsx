@@ -1,12 +1,8 @@
 import { fetchShopProducts } from '@/lib/actions/product.action';
 import ProductCard from './product-card';
-import LocalSearch from '@/components/shared/filters/local-search';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
-import { BrandList } from '@/constants';
 import ProductCardSm from './product-card-sm';
 import ProductFilter from './product-filter';
-import EmptyError from '@/components/shared/ui/empty-error';
+import EmptyError from '@/components/elements/shared/empty-error';
 
 type SearchParams = {
 	searchParams: {

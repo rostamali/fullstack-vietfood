@@ -528,7 +528,12 @@ export const ProductFormSchema = z.object({
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
-	shipClass: z.string(),
+	shipClass: z
+		.object({
+			id: z.string(),
+			name: z.string(),
+		})
+		.nullable(),
 
 	// Terms
 	status: z
@@ -597,4 +602,18 @@ export const TaxFormSchema = z.object({
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
+});
+
+/* ================================== */
+// Cart/Order Schemas
+/* ================================== */
+export const addToCartShema = z.object({
+	quantity: z.coerce
+		.string({
+			invalid_type_error: 'Quantity must be a number',
+		})
+		.refine((value) => value !== undefined && value !== null, {
+			message: 'Quantity is required',
+		})
+		.transform((value) => Number(value)),
 });

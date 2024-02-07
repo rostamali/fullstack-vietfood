@@ -1,6 +1,6 @@
-import UploadCSV from '@/components/shared/modals/upload-csv';
-import ProductList from '@/components/shared/tables/product-list';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import UploadCSV from '@/components/elements/modals/upload-csv';
+import ProductList from '@/app/admin/product/product-list';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { Button } from '@/components/ui/button';
 import { ProductPageLinks } from '@/constants';
 import { fetchProductByAdmin } from '@/lib/actions/product.action';

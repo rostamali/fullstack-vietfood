@@ -1,4 +1,5 @@
 'use client';
+import Spinner from '@/components/elements/shared/spinner';
 import { Button } from '@/components/ui/button';
 import {
 	Form,
@@ -14,29 +15,30 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { addToCartShema } from '@/lib/helpers/form-validation';
+import { useAddToCart } from '@/lib/hooks/useOrder';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Heart } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-const addToCartShema = z.object({
-	quantity: z.coerce
-		.string({
-			invalid_type_error: 'Quantity must be a number',
-		})
-		.refine((value) => value !== undefined && value !== null, {
-			message: 'Quantity is required',
-		})
-		.transform((value) => Number(value)),
-});
+type FormProps = {
+	productId: string;
+};
 
-const AddToCart = () => {
+const AddToCart: React.FC<FormProps> = ({ productId }) => {
+	const { mutate: addToCart, isPending } = useAddToCart();
 	const form = useForm<z.infer<typeof addToCartShema>>({
 		resolver: zodResolver(addToCartShema),
 		defaultValues: {
 			quantity: 1,
 		},
 	});
-	const handleAddToCart = (data: z.infer<typeof addToCartShema>) => {};
+	const handleAddToCart = (data: z.infer<typeof addToCartShema>) => {
+		addToCart({
+			quantity: data.quantity,
+			productId: productId,
+		});
+	};
 
 	return (
 		<Form {...form}>
@@ -79,12 +81,18 @@ const AddToCart = () => {
 							</FormItem>
 						)}
 					/>
-					<Button className="btn-primary-sm">
+					<Button className="btn-primary-sm" type="button">
 						<Heart size={20} strokeWidth={2.5} />
 					</Button>
 				</div>
 				<div className="flex items-center gap-4">
-					<Button className="btn-primary-sm xm:w-[150px] w-full">
+					<Button
+						className="btn-primary-sm xm:w-[150px] w-full gap-1"
+						disabled={isPending}
+					>
+						{isPending && (
+							<Spinner className="h-[20px] w-[20px] stroke-white" />
+						)}
 						Add to Cart
 					</Button>
 					<Button

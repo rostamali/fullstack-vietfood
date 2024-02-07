@@ -1,5 +1,5 @@
-import ShipZoneList from '@/components/shared/tables/ship-zone-list';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import ShipZoneList from '@/app/admin/store/shipping/ship-zone-list';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { Button } from '@/components/ui/button';
 import { ShipPageLinks } from '@/constants';
 import { fetchShipZoneByAdmin } from '@/lib/actions/ship.action';

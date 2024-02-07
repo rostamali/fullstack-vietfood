@@ -6,7 +6,7 @@ import prisma from '../prisma';
 import { AddressFormSchema } from '../helpers/form-validation';
 import { CountriesList } from '@/constants/countries';
 import { revalidatePath } from 'next/cache';
-import { StatesList } from '@/constants/countries/states';
+import { countryNameByIso, stateNameByIso } from './country.action';
 
 export const createNewAddress = async (
 	params: z.infer<typeof AddressFormSchema>,
@@ -27,11 +27,9 @@ export const createNewAddress = async (
 			addressLine2,
 			setDefaultAddress,
 		} = params;
-		const getCountry = CountriesList.find(
-			(item) => item.isoCode === countryCode,
-		);
-
+		const getCountry = countryNameByIso(countryCode);
 		if (!getCountry) return handleResponse(false, `Invalid country code`);
+
 		const newAddress = await prisma.address.create({
 			data: {
 				contactName,
@@ -49,7 +47,16 @@ export const createNewAddress = async (
 			},
 		});
 
-		if (setDefaultAddress) {
+		const addresslegth = await prisma.address.findMany({
+			where: {
+				userId: isAuth.id,
+			},
+			select: {
+				id: true,
+			},
+		});
+
+		if (setDefaultAddress || addresslegth.length === 1) {
 			await prisma.user.update({
 				where: {
 					id: isAuth.id,
@@ -88,6 +95,8 @@ export const fetchAddresses = async () => {
 				addressLine2: true,
 			},
 		});
+		if (!address.length) return;
+
 		const currentUser = await prisma.user.findUnique({
 			where: {
 				id: isAuth.id,
@@ -102,11 +111,8 @@ export const fetchAddresses = async () => {
 			contactName: item.contactName,
 			phoneNumber: `+${item.phoneCode} ${item.phoneNumber}`,
 
-			country: CountriesList.find(
-				(country) => country.isoCode === item.countryCode,
-			)?.name,
-			state: StatesList.find((state) => state.isoCode === item.stateCode)
-				?.name,
+			country: countryNameByIso(item.countryCode)?.name,
+			state: stateNameByIso(item.stateCode)?.name,
 			city: item.cityName,
 			zipCode: item.zipCode,
 			address: `${item.addressLine1} ${item.addressLine2}`,

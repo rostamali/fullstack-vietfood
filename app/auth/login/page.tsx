@@ -1,6 +1,6 @@
-import AuthFooter from '@/components/auth/footer';
-import AuthHeader from '@/components/auth/header';
-import Login from '@/components/auth/login';
+import AuthFooter from '@/components/auth/auth-form-footer';
+import AuthHeader from '@/components/auth/auth-form-header';
+import LoginForm from '@/components/auth/login-form';
 
 const LoginPage = () => {
 	return (
@@ -13,7 +13,7 @@ const LoginPage = () => {
 				}
 			/>
 			<div className="flex flex-col gap-[20px]">
-				<Login />
+				<LoginForm />
 				<AuthFooter
 					text={`Don't have an account?`}
 					link={'/auth/signup'}

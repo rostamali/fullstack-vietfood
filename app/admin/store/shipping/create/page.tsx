@@ -1,5 +1,5 @@
-import ShipZoneForm from '@/components/ecom/shipping/ship-zone-form';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import ShipZoneForm from '@/app/admin/store/shipping/ship-zone-form';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { ShipPageLinks } from '@/constants';
 
 const CreateShippingPage = () => {

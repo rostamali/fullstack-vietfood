@@ -1,6 +1,6 @@
-import AdminHeader from '@/components/shared/headers/admin-header';
-import Logo from '@/components/shared/ui/logo';
-import DashboardLink from '@/components/shared/ui/dashboard-link';
+import AdminHeader from '@/components/elements/headers/admin-header';
+import Logo from '@/components/elements/shared/logo';
+import DashboardLink from '@/components/elements/shared/dashboard-link';
 
 export default function AdminLayout({
 	children,

@@ -5,19 +5,29 @@ import {
 	createShipZoneByAdmin,
 	deleteShipClassByAdmin,
 	deleteShipZoneByAdmin,
+	fetchShipClassList,
 	updateShipClassByAdmin,
 	updateShipZoneByAdmin,
 } from '../actions/ship.action';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { ShipClassSchema, ShipFormSchema } from '../helpers/form-validation';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 
 // Shipping classes
 export const useMethodClassList = () => {
 	return useQuery({
 		queryKey: ['methodClassList'],
 		queryFn: async () => await classListForFlatMethods(),
+	});
+};
+export const useShipClassList = () => {
+	return useQuery({
+		queryKey: ['shipClassList'],
+		queryFn: async () => await fetchShipClassList(),
 	});
 };
 export const useCreateShipClass = () => {

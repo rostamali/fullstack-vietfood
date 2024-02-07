@@ -1,7 +1,7 @@
-import CreateCategory from '@/components/shared/modals/create-category';
-import UploadCSV from '@/components/shared/modals/upload-csv';
-import CategoryList from '@/components/shared/tables/category-list';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import CreateCategory from '@/components/elements/modals/create-category';
+import UploadCSV from '@/components/elements/modals/upload-csv';
+import CategoryList from '@/app/admin/store/category/category-list';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchCategoryByAdmin } from '@/lib/actions/category.action';
 type SearchParams = {
 	searchParams: {

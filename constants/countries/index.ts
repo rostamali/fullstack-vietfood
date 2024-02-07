@@ -2,7 +2,7 @@ export const CountriesList = [
 	{
 		name: 'New Zealand',
 		isoCode: 'NZ',
-		flag: 'https://www.worldometers.info/img/flags/nz-flag.gif',
+		flag: '/assets/flags/nz-flag.jpg',
 		phonecode: '64',
 		currency: 'NZD',
 		latitude: '-41.00000000',
@@ -11,7 +11,7 @@ export const CountriesList = [
 	{
 		name: 'Australia',
 		isoCode: 'AU',
-		flag: 'https://www.worldometers.info/img/flags/as-flag.gif',
+		flag: '/assets/flags/as-flag.jpg',
 		phonecode: '61',
 		currency: 'AUD',
 		latitude: '-27.00000000',
@@ -20,7 +20,7 @@ export const CountriesList = [
 	{
 		name: 'Canada',
 		isoCode: 'CA',
-		flag: 'https://www.worldometers.info/img/flags/ca-flag.gif',
+		flag: '/assets/flags/ca-flag.jpg',
 		phonecode: '1',
 		currency: 'CAD',
 		latitude: '60.00000000',
@@ -29,7 +29,7 @@ export const CountriesList = [
 	{
 		name: 'Japan',
 		isoCode: 'JP',
-		flag: 'https://www.worldometers.info/img/flags/ja-flag.gif',
+		flag: '/assets/flags/ja-flag.jpg',
 		phonecode: '81',
 		currency: 'JPY',
 		latitude: '36.00000000',

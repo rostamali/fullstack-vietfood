@@ -1,6 +1,6 @@
-import CreateTaxModal from '@/components/ecom/tax/create-tax-modal';
-import TaxList from '@/components/shared/tables/tax-list';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import CreateTaxModal from '@/app/admin/store/tax/create-tax-modal';
+import TaxList from '@/app/admin/store/tax/tax-list';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchTaxRateByAdmin } from '@/lib/actions/tax.action';
 type SearchParams = {
 	searchParams: {

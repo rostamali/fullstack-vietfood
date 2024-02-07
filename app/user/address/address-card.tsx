@@ -1,6 +1,6 @@
 'use client';
-import UpdateAddress from '@/components/shared/modals/update-address';
-import EmptyError from '@/components/shared/ui/empty-error';
+import UpdateAddress from '@/components/elements/modals/update-address';
+import EmptyError from '@/components/elements/shared/empty-error';
 import { Badge } from '@/components/ui/badge';
 import { useDeleteAddress } from '@/lib/hooks/useAddress';
 import { FC, useState } from 'react';

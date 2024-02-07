@@ -1,6 +1,6 @@
-import UploadFile from '@/components/shared/modals/upload-files';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
-import FileLibrary from '@/components/shared/files/file-library';
+import UploadFile from '@/components/elements/modals/upload-files';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
+import FileLibrary from '@/components/media/files/file-library';
 import { fetchFilesByAdmin } from '@/lib/actions/file.action';
 type SearchParams = {
 	searchParams: {

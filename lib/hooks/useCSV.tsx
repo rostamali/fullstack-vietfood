@@ -1,7 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { importUsersFromCSV } from '../actions/auth.action';
 import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 import { importCategoryFromCSV } from '../actions/category.action';
 import { importBrandFromCSV } from '../actions/brand.action';
 import { importProductFromCSV } from '../actions/product.action';

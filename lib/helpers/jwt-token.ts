@@ -1,3 +1,4 @@
+import * as z from 'zod';
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
@@ -8,6 +9,7 @@ import {
 	rememberAccessTokenOptions,
 } from './cookie-options';
 import { NextResponse } from 'next/server';
+import { RegisterFormSchema } from './form-validation';
 
 const alg = 'HS256';
 
@@ -46,7 +48,9 @@ export const getForgotPasswordTokenSecret = () => {
 /* ============================================= */
 // Create all the token using JOSE
 /* ============================================= */
-export const createEmailVerifyToken = async (user: RegisterUser) => {
+export const createEmailVerifyToken = async (
+	user: z.infer<typeof RegisterFormSchema>,
+) => {
 	const code = Math.floor(100000 + Math.random() * 900000).toString();
 	const hashedCode = bcrypt.hashSync(code, 10);
 

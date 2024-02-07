@@ -1,12 +1,11 @@
 import { fetchProductBySlug } from '@/lib/actions/product.action';
 import ProductGallery from '../product-gallery';
-import PriceFormat from '@/components/shared/ui/price-format';
-import EmptyError from '@/components/shared/ui/empty-error';
+import PriceFormat from '@/components/elements/shared/price-format';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import SocialShare from '../social-share';
 import StarTating from '../star-rating';
 import AddToCart from '../add-to-cart';
+import EmptyError from '@/components/elements/shared/empty-error';
 type SearchParams = {
 	params: {
 		slug: string;
@@ -57,7 +56,7 @@ const ProductDetails = async ({ params }: SearchParams) => {
 									)}
 								</div>
 							</div>
-							<AddToCart />
+							<AddToCart productId={result?.id} />
 							<div className="flex items-center gap-1.5 text-base-2">
 								<span>Category:</span>
 								<span className="font-medium">T-Shirt</span>

@@ -140,6 +140,25 @@ export const classListForFlatMethods = async () => {
 		return;
 	}
 };
+export const fetchShipClassList = async () => {
+	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return;
+
+		const shipClass = await prisma.shippingClass.findMany({
+			select: {
+				id: true,
+				name: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+		});
+		return shipClass;
+	} catch (error) {
+		return;
+	}
+};
 
 /* ================================== */
 // Shipping zone actions

@@ -1,6 +1,6 @@
-import UserHeader from '@/components/shared/headers/user-header';
-import DashboardLink from '@/components/shared/ui/dashboard-link';
-import Logo from '@/components/shared/ui/logo';
+import UserHeader from '@/components/elements/headers/user-header';
+import DashboardLink from '@/components/elements/shared/dashboard-link';
+import Logo from '@/components/elements/shared/logo';
 
 export default function UserLayout({
 	children,

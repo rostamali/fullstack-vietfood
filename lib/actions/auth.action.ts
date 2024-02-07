@@ -18,11 +18,17 @@ import sendMail from '../helpers/send-mail';
 import { verifyEmailTokenOptions } from '../helpers/cookie-options';
 import { revalidatePath } from 'next/cache';
 import { AccountStatus } from '@prisma/client';
-import { ChangePasswordFormSchema } from '../helpers/form-validation';
+import {
+	ChangePasswordFormSchema,
+	LoginFormSchema,
+	RegisterFormSchema,
+} from '../helpers/form-validation';
 
-export const registerUser = async (params: RegisterUser) => {
+export const signupUser = async (
+	params: z.infer<typeof RegisterFormSchema>,
+) => {
 	try {
-		const { firstName, lastName, email, password } = params as RegisterUser;
+		const { firstName, lastName, email, password } = params;
 		const userExist = await prisma.user.findUnique({
 			where: {
 				email,
@@ -30,7 +36,7 @@ export const registerUser = async (params: RegisterUser) => {
 		});
 		if (userExist) return handleResponse(false, 'Account already exists');
 		const bcryptPass = await bcryptPassword(password);
-		const user: RegisterUser = {
+		const user = {
 			firstName,
 			lastName,
 			email,
@@ -101,9 +107,9 @@ export const verifyUserEmail = async (params: { code: string }) => {
 		return handleResponse(false, 'Email verification failed');
 	}
 };
-export const loginUser = async (params: LoginUser) => {
+export const loginUser = async (params: z.infer<typeof LoginFormSchema>) => {
 	try {
-		const { email, password, remember = false } = params as LoginUser;
+		const { email, password, remember = false } = params;
 		const userExist = await prisma.user.findUnique({
 			where: {
 				email,

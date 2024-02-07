@@ -1,4 +1,4 @@
-import ProductForm from '@/components/ecom/product/product-form';
+import ProductForm from '@/app/admin/product/create/product-form';
 const ProductActionPage = () => {
 	return (
 		<div className="dashboard-col-space">

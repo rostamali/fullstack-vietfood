@@ -9,7 +9,10 @@ import {
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { CategoryFormSchema } from '../helpers/form-validation';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 
 export const useCreateCategory = () => {
 	return useMutation({

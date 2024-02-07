@@ -6,7 +6,10 @@ import {
 	updateAddress,
 } from '../actions/address.action';
 import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 import * as z from 'zod';
 import { AddressFormSchema } from '../helpers/form-validation';
 

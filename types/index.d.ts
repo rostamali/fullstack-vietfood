@@ -16,17 +16,7 @@ declare module '@editorjs/table';
 type UserStatus = 'ACTIVE' | 'INACTIVE';
 type UserRole = 'USER' | 'ADMIN';
 type FormTypes = 'CREATE' | 'UPDATE';
-interface RegisterUser {
-	firstName: string;
-	lastName?: string;
-	email: string;
-	password: string;
-}
-interface LoginUser {
-	email: string;
-	password: string;
-	remember: boolean;
-}
+
 interface ITokenOptions {
 	expires: Date;
 	maxAge: number;
@@ -249,6 +239,15 @@ interface TaxList {
 		locationCode: string;
 	}[];
 }
+
+/* ============================== */
+//  Cart Types
+/* ============================== */
+interface AddToCart {
+	quantity: number;
+	productId: string;
+}
+
 /* ============================== */
 //  CSV file types
 /* ============================== */
@@ -278,4 +277,36 @@ interface CSVProduct {
 	salePrice: string;
 	threshold: string;
 	sku: string;
+}
+
+/* ============================== */
+//  Options types
+/* ============================== */
+interface ClassListCost {
+	classId: string;
+	className: string;
+	cost: number;
+}
+interface FlatMethodOptions {
+	cost: number;
+	classList: ClassListCost[];
+}
+interface FreeMethodOptions {
+	required: 'MINI_ORDER_AMOUNT' | 'COUPON';
+	miniOrderAmount?: number;
+}
+interface SelectedFlat {
+	name: string;
+	cost: number;
+	classList: ClassListCost;
+}
+interface SelectedFree {
+	name: string;
+	miniOrderAmount: number;
+}
+
+interface SelectedMethod {
+	method: 'FLAT' | 'FREE';
+	name: string;
+	cost: number | ('FLAT' extends typeof method ? null : number);
 }

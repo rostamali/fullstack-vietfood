@@ -52,3 +52,16 @@ export const stateByCountry = (countryCode: string | null) => {
 		}),
 	);
 };
+
+export const countryNameByIso = (isoCode: string) => {
+	const selectedCountry = CountriesList.find(
+		(country) => country.isoCode === isoCode,
+	);
+	if (!selectedCountry) return null;
+	return selectedCountry;
+};
+export const stateNameByIso = (isoCode: string) => {
+	const selectedState = StatesList.find((state) => state.isoCode === isoCode);
+	if (!selectedState) return null;
+	return selectedState;
+};

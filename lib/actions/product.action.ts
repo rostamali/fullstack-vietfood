@@ -27,6 +27,7 @@ export const createProductByAdmin = async (params: {
 			stockStatus,
 			threshold,
 			soldIndividual,
+			shipClass,
 			weight,
 			status,
 			category,
@@ -99,6 +100,11 @@ export const createProductByAdmin = async (params: {
 						connect: { id: brand.id },
 					},
 				}),
+				...(shipClass && {
+					shipClass: {
+						connect: { id: shipClass.id },
+					},
+				}),
 			},
 		});
 		revalidatePath('/admin/product');
@@ -164,7 +170,12 @@ export const fetchProductById = async (params: { id: string }) => {
 				taxStatus: true,
 				taxClass: true,
 				weight: true,
-				shipClass: true,
+				shipClass: {
+					select: {
+						id: true,
+						name: true,
+					},
+				},
 				status: true,
 				category: {
 					select: {
@@ -211,6 +222,7 @@ export const updateProductByAdmin = async (params: {
 			stockStatus,
 			threshold,
 			soldIndividual,
+			shipClass,
 			weight,
 			status,
 			category,
@@ -252,6 +264,16 @@ export const updateProductByAdmin = async (params: {
 					}),
 				...(!thumbnail && {
 					thumbnail: {
+						disconnect: true,
+					},
+				}),
+				...(shipClass && {
+					shipClass: {
+						connect: { id: shipClass.id },
+					},
+				}),
+				...(!shipClass && {
+					shipClass: {
 						disconnect: true,
 					},
 				}),
@@ -587,6 +609,7 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 		);
 
 		return {
+			id: product.id,
 			name: product.name,
 			excerpt: product.excerpt,
 			description: product.description,

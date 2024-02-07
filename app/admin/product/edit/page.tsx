@@ -1,5 +1,5 @@
-import ProductForm from '@/components/ecom/product/product-form';
-import EmptyError from '@/components/shared/ui/empty-error';
+import ProductForm from '@/app/admin/product/create/product-form';
+import EmptyError from '@/components/elements/shared/empty-error';
 import { fetchProductById } from '@/lib/actions/product.action';
 import Link from 'next/link';
 
@@ -40,7 +40,7 @@ const UpdateProduct = async ({ searchParams }: SearchParams) => {
 						soldIndividual:
 							result.inventory?.soldIndividual || false,
 						weight: result.weight || undefined,
-						shipClass: '',
+						shipClass: result.shipClass ? result.shipClass : null,
 						status: result.status,
 						category: result.category ? result.category : null,
 						brand: result.brand ? result.brand : null,

@@ -1,4 +1,4 @@
-import PriceFormat from '@/components/shared/ui/price-format';
+import PriceFormat from '@/components/elements/shared/price-format';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';

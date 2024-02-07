@@ -1,20 +1,91 @@
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 import {
 	createAccountByAdmin,
 	deleteUserByAdmin,
 	fetchUserProfileById,
+	loginUser,
+	signupUser,
 	updateAccountPassword,
 	updateUserProfileByAdmin,
 } from '@/lib/actions/auth.action';
 import {
 	ChangePasswordFormSchema,
+	LoginFormSchema,
+	RegisterFormSchema,
 	UserFormSchema,
 } from '@/lib/helpers/form-validation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
+/* ================================ */
+// User actions to their accounts
+/* ================================ */
+export const useLoginUser = (onChange: (value: boolean) => void) => {
+	const searchParams = useSearchParams();
+	const redirectURL = searchParams.get('redirect');
+	const router = useRouter();
+
+	return useMutation({
+		mutationFn: async (data: z.infer<typeof LoginFormSchema>) => {
+			return await loginUser(data);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				onChange(false);
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+				router.push(redirectURL ? redirectURL : '/');
+			} else {
+				onChange(true);
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			onChange(true);
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+export const useSignupUser = (onChange: (value: boolean) => void) => {
+	return useMutation({
+		mutationFn: async (data: z.infer<typeof RegisterFormSchema>) => {
+			return await signupUser(data);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+				onChange(true);
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+				onChange(false);
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+			onChange(false);
+		},
+	});
+};
+
+/* ================================ */
+// Admin actions for user accounts
+/* ================================ */
 export const useCreateUser = () => {
 	return useMutation({
 		mutationFn: async (data: z.infer<typeof UserFormSchema>) => {
@@ -134,4 +205,3 @@ export const useDeleteAccount = () => {
 		},
 	});
 };
-//

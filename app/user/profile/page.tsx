@@ -1,7 +1,7 @@
 import ProfileLoading from '@/app/admin/profile/loading';
-import Profile from '@/components/shared/forms/profile';
-import ProfilePicture from '@/components/shared/forms/profile-picture';
-import ChangePassword from '@/components/shared/modals/change-password';
+import Profile from '@/components/elements/forms/profile-form';
+import ProfilePicture from '@/components/elements/forms/profile-picture';
+import ChangePassword from '@/components/elements/modals/change-password';
 import { fetchAdminProfile } from '@/lib/actions/auth.action';
 import { dateFormat } from '@/lib/helpers/formater';
 import { CalendarDays } from 'lucide-react';

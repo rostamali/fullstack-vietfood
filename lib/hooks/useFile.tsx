@@ -1,4 +1,7 @@
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 import {
 	deleteFilesByAdmin,
 	fetchFileDetailsbyAdmin,

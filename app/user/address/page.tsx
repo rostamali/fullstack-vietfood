@@ -1,5 +1,5 @@
-import CreateAddress from '@/components/shared/modals/create-address';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import CreateAddress from '@/components/elements/modals/create-address';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import AddressCard from './address-card';
 import { fetchAddresses } from '@/lib/actions/address.action';
 

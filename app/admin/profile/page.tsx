@@ -1,10 +1,10 @@
-import Profile from '@/components/shared/forms/profile';
-import ProfilePicture from '@/components/shared/forms/profile-picture';
+import Profile from '@/components/elements/forms/profile-form';
+import ProfilePicture from '@/components/elements/forms/profile-picture';
 import { fetchAdminProfile } from '@/lib/actions/auth.action';
 import { dateFormat } from '@/lib/helpers/formater';
 import { CalendarDays } from 'lucide-react';
 import ProfileLoading from './loading';
-import ChangePassword from '@/components/shared/modals/change-password';
+import ChangePassword from '@/components/elements/modals/change-password';
 
 const AdminProfilePage = async () => {
 	const result = await fetchAdminProfile();

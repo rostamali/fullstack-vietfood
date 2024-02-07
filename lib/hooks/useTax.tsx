@@ -8,7 +8,10 @@ import {
 	updateTaxRateByAdmin,
 } from '../actions/tax.action';
 import { toast } from 'sonner';
-import { ToastError, ToastSuccess } from '@/components/shared/ui/custom-toast';
+import {
+	ToastError,
+	ToastSuccess,
+} from '@/components/elements/shared/custom-toast';
 // createTaxRateByAdmin
 export const useCreateTax = () => {
 	return useMutation({

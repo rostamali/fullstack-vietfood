@@ -26,7 +26,11 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${fontPoppins.variable} scrollbar-body`}>
 				<Provider>{children}</Provider>
-				<Toaster richColors className="font-poppins" />
+				<Toaster
+					richColors
+					className="font-poppins"
+					position="bottom-center"
+				/>
 			</body>
 		</html>
 	);

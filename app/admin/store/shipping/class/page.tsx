@@ -1,6 +1,6 @@
-import CreateClass from '@/components/shared/modals/create-class';
-import ShipClassList from '@/components/shared/tables/ship-class-list';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import CreateClass from '@/components/elements/modals/create-class';
+import ShipClassList from '@/app/admin/store/shipping/class/ship-class-list';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { ShipPageLinks } from '@/constants';
 import { fetchShipClassByAdmin } from '@/lib/actions/ship.action';
 type SearchParams = {

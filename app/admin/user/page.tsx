@@ -1,7 +1,7 @@
-import CreateUser from '@/components/shared/modals/create-user';
-import UploadCSV from '@/components/shared/modals/upload-csv';
-import UserList from '@/components/shared/tables/user-list';
-import DashboardPageTitle from '@/components/shared/ui/db-page-title';
+import CreateUser from '@/components/elements/modals/create-user';
+import UploadCSV from '@/components/elements/modals/upload-csv';
+import UserList from '@/app/admin/user/user-list';
+import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchUsersByAdmin } from '@/lib/actions/auth.action';
 type SearchParams = {
 	searchParams: {
