@@ -34,10 +34,8 @@ CREATE TABLE `Address` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `userId` VARCHAR(191) NULL,
-    `cartId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Address_id_key`(`id`),
-    UNIQUE INDEX `Address_cartId_key`(`cartId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -184,11 +182,11 @@ CREATE TABLE `Cart` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `currency` ENUM('usd', 'euro') NOT NULL DEFAULT 'usd',
-    `shippingCost` DOUBLE NULL,
-    `shippingMethods` VARCHAR(191) NULL,
+    `addressId` VARCHAR(191) NULL,
+    `shippingCost` DOUBLE NOT NULL,
+    `shippingMethods` VARCHAR(191) NOT NULL,
     `taxName` VARCHAR(191) NULL,
     `taxAmount` DOUBLE NULL,
-    `isActive` BOOLEAN NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -213,20 +211,37 @@ CREATE TABLE `CartItem` (
 -- CreateTable
 CREATE TABLE `Order` (
     `id` VARCHAR(191) NOT NULL,
-    `orderId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
+    `status` ENUM('PENDING', 'ACCEPT') NOT NULL DEFAULT 'PENDING',
     `subTotal` DOUBLE NOT NULL,
     `tax` DOUBLE NOT NULL,
     `totalDiscount` DOUBLE NOT NULL,
     `shippingCost` DOUBLE NOT NULL,
     `total` DOUBLE NOT NULL,
     `note` VARCHAR(191) NULL,
-    `isActive` BOOLEAN NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `optionId` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `Order_id_key`(`id`),
+    UNIQUE INDEX `Order_optionId_key`(`optionId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PaymentInfo` (
+    `id` VARCHAR(191) NOT NULL,
+    `status` ENUM('PAID', 'UNPAID', 'CANCELLED') NOT NULL DEFAULT 'UNPAID',
+    `paymentIntentId` VARCHAR(191) NOT NULL,
+    `currency` ENUM('usd', 'euro') NOT NULL DEFAULT 'usd',
+    `amount` DOUBLE NOT NULL,
+    `orderId` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `Order_id_key`(`id`),
-    UNIQUE INDEX `Order_orderId_key`(`orderId`),
+    UNIQUE INDEX `PaymentInfo_id_key`(`id`),
+    UNIQUE INDEX `PaymentInfo_paymentIntentId_key`(`paymentIntentId`),
+    UNIQUE INDEX `PaymentInfo_orderId_key`(`orderId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -285,8 +300,10 @@ CREATE TABLE `ShippingMethod` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `zoneId` VARCHAR(191) NOT NULL,
+    `optionId` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `ShippingMethod_id_key`(`id`),
+    UNIQUE INDEX `ShippingMethod_optionId_key`(`optionId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -333,20 +350,15 @@ CREATE TABLE `TaxRateLocation` (
 CREATE TABLE `Options` (
     `id` VARCHAR(191) NOT NULL,
     `value` LONGBLOB NOT NULL,
-    `methodId` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `Options_id_key`(`id`),
-    UNIQUE INDEX `Options_methodId_key`(`methodId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `Address` ADD CONSTRAINT `Address_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Address` ADD CONSTRAINT `Address_cartId_fkey` FOREIGN KEY (`cartId`) REFERENCES `Cart`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Avatar` ADD CONSTRAINT `Avatar_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -388,25 +400,34 @@ ALTER TABLE `ProductInventory` ADD CONSTRAINT `ProductInventory_productId_fkey` 
 ALTER TABLE `Cart` ADD CONSTRAINT `Cart_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_cartId_fkey` FOREIGN KEY (`cartId`) REFERENCES `Cart`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Cart` ADD CONSTRAINT `Cart_addressId_fkey` FOREIGN KEY (`addressId`) REFERENCES `Address`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_cartId_fkey` FOREIGN KEY (`cartId`) REFERENCES `Cart`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Order` ADD CONSTRAINT `Order_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ShippingInfo` ADD CONSTRAINT `ShippingInfo_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Order` ADD CONSTRAINT `Order_optionId_fkey` FOREIGN KEY (`optionId`) REFERENCES `Options`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PaymentInfo` ADD CONSTRAINT `PaymentInfo_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShippingInfo` ADD CONSTRAINT `ShippingInfo_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ShippingMethod` ADD CONSTRAINT `ShippingMethod_zoneId_fkey` FOREIGN KEY (`zoneId`) REFERENCES `ShippingZone`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShippingMethod` ADD CONSTRAINT `ShippingMethod_optionId_fkey` FOREIGN KEY (`optionId`) REFERENCES `Options`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ShippingZoneLocation` ADD CONSTRAINT `ShippingZoneLocation_zoneId_fkey` FOREIGN KEY (`zoneId`) REFERENCES `ShippingZone`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `TaxRateLocation` ADD CONSTRAINT `TaxRateLocation_taxId_fkey` FOREIGN KEY (`taxId`) REFERENCES `TaxRate`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Options` ADD CONSTRAINT `Options_methodId_fkey` FOREIGN KEY (`methodId`) REFERENCES `ShippingMethod`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

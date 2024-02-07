@@ -248,10 +248,20 @@ export const deleteAddress = async (params: { id: string }) => {
 			},
 			select: {
 				id: true,
+				user: {
+					select: {
+						defaultAddress: true,
+					},
+				},
 			},
 		});
 		if (!addressExist)
 			return handleResponse(false, `Address does not exist`);
+		if (
+			addressExist.user?.defaultAddress &&
+			params.id === addressExist.user?.defaultAddress
+		)
+			return handleResponse(false, `Default address can't be deleted`);
 
 		await prisma.address.delete({
 			where: {

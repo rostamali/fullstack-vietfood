@@ -194,7 +194,7 @@ export const createShipZoneByAdmin = async (
 						taxStatus: method.taxStatus as TaxStatus,
 						type: 'FLAT_RATE' as MethodType,
 						active: true,
-						options: {
+						option: {
 							create: {
 								value: Buffer.from(
 									JSON.stringify({
@@ -219,7 +219,7 @@ export const createShipZoneByAdmin = async (
 						taxStatus: 'NONE',
 						type: 'FREE_SHIPPING',
 						active: true,
-						options: {
+						option: {
 							create: {
 								value: Buffer.from(
 									JSON.stringify({
@@ -244,7 +244,7 @@ export const createShipZoneByAdmin = async (
 						taxStatus: method.taxStatus as TaxStatus,
 						type: 'LOCAL_PICKUP',
 						active: true,
-						options: {
+						option: {
 							create: {
 								value: Buffer.from(
 									JSON.stringify({
@@ -261,7 +261,7 @@ export const createShipZoneByAdmin = async (
 			}
 		}
 		revalidatePath('/admin/store/shipping');
-		return handleResponse(true, `Zone created successfullt`);
+		return handleResponse(true, `Zone created successfully`);
 	} catch (error) {
 		return handleResponse(false, `Zone creation failed`);
 	}
@@ -354,7 +354,7 @@ export const fetchZoneDetailsById = async (params: { id: string }) => {
 						name: true,
 						taxStatus: true,
 						type: true,
-						options: {
+						option: {
 							select: {
 								value: true,
 							},
@@ -393,7 +393,7 @@ export const fetchZoneDetailsById = async (params: { id: string }) => {
 				isoCode: region.locationCode,
 			})),
 			flatMethod: flatMethod.map((method) => {
-				const jsonString = method.options?.value.toString('utf-8');
+				const jsonString = method.option?.value.toString('utf-8');
 				const optionsValue = jsonString ? JSON.parse(jsonString) : null;
 
 				return {
@@ -419,7 +419,7 @@ export const fetchZoneDetailsById = async (params: { id: string }) => {
 				};
 			}),
 			freeMethod: freeMethod.map((method) => {
-				const jsonString = method.options?.value.toString('utf-8');
+				const jsonString = method.option?.value.toString('utf-8');
 				const optionsValue = jsonString ? JSON.parse(jsonString) : null;
 				return {
 					name: method.name,
@@ -428,7 +428,7 @@ export const fetchZoneDetailsById = async (params: { id: string }) => {
 				};
 			}),
 			pickupMethod: pickupMethod.map((method) => {
-				const jsonString = method.options?.value.toString('utf-8');
+				const jsonString = method.option?.value.toString('utf-8');
 				const optionsValue = jsonString ? JSON.parse(jsonString) : null;
 				return {
 					name: method.name,
@@ -499,7 +499,7 @@ export const updateShipZoneByAdmin = async (params: {
 						taxStatus: method.taxStatus as TaxStatus,
 						type: 'FLAT_RATE' as MethodType,
 						active: true,
-						options: {
+						option: {
 							create: {
 								value: Buffer.from(
 									JSON.stringify({
@@ -524,7 +524,7 @@ export const updateShipZoneByAdmin = async (params: {
 						taxStatus: 'NONE',
 						type: 'FREE_SHIPPING',
 						active: true,
-						options: {
+						option: {
 							create: {
 								value: Buffer.from(
 									JSON.stringify({
@@ -549,7 +549,7 @@ export const updateShipZoneByAdmin = async (params: {
 						taxStatus: method.taxStatus as TaxStatus,
 						type: 'LOCAL_PICKUP',
 						active: true,
-						options: {
+						option: {
 							create: {
 								value: Buffer.from(
 									JSON.stringify({

@@ -4,17 +4,20 @@ import { handleResponse } from '../helpers/formater';
 import { isAuthenticatedCheck } from './auth.action';
 import prisma from '../prisma';
 import { countryNameByIso, stateNameByIso } from './country.action';
+import { revalidatePath } from 'next/cache';
+import { createPaymentIntent } from './payment.action';
 
+/* ================================ */
+// Cart actions
+/* ================================ */
 export const addToCard = async (params: AddToCart) => {
 	try {
-		// 1. User authentication
 		const isAuth = await isAuthenticatedCheck();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
-		// 2. User exist or not
 		const { quantity, productId } = params;
-		const isUser = await prisma.user.findUnique({
+		const userExist = await prisma.user.findUnique({
 			where: {
 				id: isAuth.id,
 			},
@@ -24,12 +27,12 @@ export const addToCard = async (params: AddToCart) => {
 						id: true,
 					},
 				},
+				defaultAddress: true,
 			},
 		});
-		if (!isUser) return handleResponse(false, `User doesn't exist`);
+		if (!userExist) return handleResponse(false, `User doesn't exist`);
 
-		// 3. Product exist or not
-		const isProduct = await prisma.product.findUnique({
+		const productExist = await prisma.product.findUnique({
 			where: {
 				id: productId,
 			},
@@ -43,16 +46,15 @@ export const addToCard = async (params: AddToCart) => {
 				},
 			},
 		});
-		if (!isProduct) return handleResponse(false, `Product doesn't exist`);
+		if (!productExist)
+			return handleResponse(false, `Product doesn't exist`);
 
-		// 4. Product is stock or out of stock
-		if (isProduct.inventory && !isProduct.inventory.inStock)
+		if (productExist.inventory && !productExist.inventory.inStock)
 			return handleResponse(false, `Product is out of stock`);
 
-		// 5. Produtc sold individual
 		if (
-			isProduct.inventory &&
-			isProduct.inventory.soldIndividual &&
+			productExist.inventory &&
+			productExist.inventory.soldIndividual &&
 			quantity > 1
 		)
 			return handleResponse(
@@ -60,27 +62,38 @@ export const addToCard = async (params: AddToCart) => {
 				`You cannot add more than one to your cart`,
 			);
 
-		// 6. if user had the cart then update or create
-		if (!isUser.cart || !isUser.cart.id) {
-			await prisma.cartItem.create({
+		const shippingDetails = await calculateShipping(isAuth.id);
+
+		if (!userExist.cart || !userExist.cart.id) {
+			await prisma.cart.create({
 				data: {
-					quantity: quantity,
-					cart: {
+					currency: 'usd',
+					user: { connect: { id: isAuth.id } },
+					...(userExist.defaultAddress && {
+						address: {
+							connect: { id: userExist.defaultAddress },
+						},
+					}),
+					shippingCost: shippingDetails
+						? shippingDetails.shippingCost
+						: 0,
+					shippingMethods: shippingDetails
+						? shippingDetails.methodName
+						: 'None',
+					items: {
 						create: {
-							currency: 'usd',
-							user: { connect: { id: isAuth.id } },
-							isActive: true,
+							quantity,
+							product: { connect: { id: productId } },
 						},
 					},
-					product: { connect: { id: productId } },
 				},
 			});
+			return handleResponse(true, `Product added to the cart`);
 		}
 
-		// 7. Is selected product on cart or not if exist update qty
 		const isProductOnCart = await prisma.cartItem.findFirst({
 			where: {
-				cartId: isUser.cart?.id,
+				cartId: userExist.cart?.id,
 				productId,
 			},
 			select: {
@@ -90,29 +103,60 @@ export const addToCard = async (params: AddToCart) => {
 		});
 
 		if (isProductOnCart) {
-			await prisma.cartItem.update({
+			await prisma.cart.update({
 				where: {
-					id: isProductOnCart.id,
+					id: userExist.cart.id,
 				},
 				data: {
-					quantity: quantity + isProductOnCart.quantity,
+					...(userExist.defaultAddress && {
+						address: {
+							connect: { id: userExist.defaultAddress },
+						},
+					}),
+					...(shippingDetails && {
+						shippingCost: shippingDetails.shippingCost,
+						shippingMethods: shippingDetails.methodName,
+					}),
+					items: {
+						update: {
+							where: {
+								id: isProductOnCart.id,
+							},
+							data: {
+								quantity: quantity + isProductOnCart.quantity,
+							},
+						},
+					},
 				},
 			});
 			return handleResponse(true, `Product quantity update`);
 		}
 
-		// 8. If not exist add the product to the cart
-		await prisma.cartItem.create({
+		await prisma.cart.update({
+			where: { id: userExist.cart?.id },
 			data: {
-				quantity: quantity,
-				cart: { connect: { id: isUser.cart?.id } },
-				product: { connect: { id: productId } },
+				user: { connect: { id: isAuth.id } },
+				...(userExist.defaultAddress && {
+					address: {
+						connect: { id: userExist.defaultAddress },
+					},
+				}),
+				...(shippingDetails && {
+					shippingCost: shippingDetails.shippingCost,
+					shippingMethods: shippingDetails.methodName,
+				}),
+				items: {
+					create: {
+						quantity,
+						product: { connect: { id: productId } },
+					},
+				},
 			},
 		});
 
 		return handleResponse(true, `Product added to the cart`);
 	} catch (error) {
-		return handleResponse(false, `Cart action failed`);
+		return handleResponse(false, `Add to cart failed`);
 	}
 };
 export const removeFromCart = async (params: { productId: string }) => {
@@ -166,25 +210,25 @@ export const removeFromCart = async (params: { productId: string }) => {
 		return handleResponse(false, `Cart removed failed`);
 	}
 };
-export const fetchCartItems = async () => {
+export const fetchCartDetails = async () => {
 	try {
 		const isAuth = await isAuthenticatedCheck();
 		if (!isAuth) return;
 
-		const cartData = await cartItems();
-		if (!cartData) return;
+		const cartList = await fetchCartList(isAuth.id);
+		if (!cartList) return;
+		const subtotal = cartSubtotal(cartList.cartItems);
 
-		const subtotal = cartData.reduce((acc, currentItem) => {
-			return acc + currentItem.totalCost;
-		}, 0);
+		const shippingInfo = await calculateShipping(isAuth.id);
+
 		const cartDetails = {
 			summary: {
-				subtotal: subtotal,
-				shippingCost: 0,
+				subtotal,
+				shippingCost: shippingInfo?.shippingCost || 0,
 				taxCost: 0,
-				total: subtotal + 0 + 0,
+				total: subtotal + (shippingInfo?.shippingCost || 0) + 0,
 			},
-			items: cartData,
+			items: cartList.cartItems,
 		};
 		return {
 			...cartDetails,
@@ -197,91 +241,213 @@ export const fetchCheckoutDetails = async () => {
 	try {
 		const isAuth = await isAuthenticatedCheck();
 		if (!isAuth) return;
-		const isUser = await prisma.user.findUnique({
-			where: {
-				id: isAuth.id,
-			},
-			select: {
-				defaultAddress: true,
-			},
-		});
-		if (!isUser) return;
 
-		const defaultAddress = await prisma.address.findFirst({
-			where: {
-				id: isUser.defaultAddress as string,
-			},
-			select: {
-				countryCode: true,
-				stateCode: true,
-			},
-		});
-		const addresses = await prisma.address.findMany({
+		const cartList = await fetchCartList(isAuth.id);
+
+		if (!cartList) return;
+
+		const shippingDetails = await calculateShipping(isAuth.id);
+		if (!shippingDetails) return;
+		const userCart = await prisma.cart.findUnique({
 			where: {
 				userId: isAuth.id,
 			},
 			select: {
-				id: true,
-				contactName: true,
-				phoneCode: true,
-				phoneNumber: true,
-				countryCode: true,
-				stateCode: true,
-				cityName: true,
-				zipCode: true,
-				addressLine1: true,
-				addressLine2: true,
+				shippingCost: true,
 			},
 		});
-		const addressList = addresses.map((item) => ({
-			id: item.id,
-			contactName: item.contactName,
-			phoneNumber: `+${item.phoneCode} ${item.phoneNumber}`,
-			country: countryNameByIso(item.countryCode)?.name,
-			state: stateNameByIso(item.stateCode)?.name,
-			city: item.cityName,
-			zipCode: item.zipCode,
-			address: `${item.addressLine1} ${item.addressLine2}`,
-			defaultAddress: isUser?.defaultAddress === item.id ? true : false,
-		}));
 
-		const shippingDetails = await calculateShipping(defaultAddress);
-		if (!shippingDetails) return;
+		if (!userCart) return;
+
+		const shippingCost = userCart.shippingCost ? userCart.shippingCost : 0;
 
 		return {
 			summary: {
 				subtotal: shippingDetails.subtotal,
-				shippingCost: shippingDetails?.shippingCost
-					? shippingDetails.shippingCost
-					: 0,
+				shippingCost,
 				taxCost: 0,
-				total: shippingDetails.subtotal + shippingDetails.shippingCost,
+				total: shippingDetails.subtotal + shippingCost,
 			},
-			items: shippingDetails.cartData,
-			addressList,
+			cartId: cartList.cartId,
+			items: cartList.cartItems,
+			addressList: shippingDetails.addressList,
 		};
 	} catch (error) {
 		return;
+	}
+};
+export const updateDefaultAddress = async (params: { addressId: string }) => {
+	try {
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth)
+			return handleResponse(false, `You don't have a permission`);
+
+		await prisma.user.update({
+			where: { id: isAuth.id },
+			data: {
+				defaultAddress: params.addressId,
+				cart: {
+					update: {
+						address: {
+							connect: { id: params.addressId },
+						},
+					},
+				},
+			},
+		});
+
+		revalidatePath('/order/checkout');
+		return handleResponse(true, `Shipping address changed`);
+	} catch (error) {
+		return handleResponse(false, `Shipping address failed`);
+	}
+};
+
+/* ================================ */
+// Order actions
+/* ================================ */
+
+export const createUserOrder = async (params: { cartId: string }) => {
+	try {
+		const { cartId } = params;
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth)
+			return {
+				success: false,
+				id: null,
+				message: 'Unauthorized access',
+			};
+		const cartDetails = await fetchCartList(isAuth.id);
+		const cartExist = await prisma.cart.findUnique({
+			where: { id: cartId, userId: isAuth.id },
+			select: {
+				id: true,
+				shippingMethods: true,
+				shippingCost: true,
+				taxAmount: true,
+				taxName: true,
+				currency: true,
+				address: true,
+			},
+		});
+		if (!cartExist || !cartDetails)
+			return {
+				success: false,
+				id: null,
+				message: `Cart doesn't exist`,
+			};
+
+		const subTotal = cartSubtotal(cartDetails.cartItems);
+		const totalAmount = subTotal + cartExist.shippingCost;
+
+		const stripePayment = await createPaymentIntent({
+			currency: cartExist.currency,
+			total: totalAmount,
+		});
+		if (!stripePayment)
+			return {
+				success: false,
+				id: null,
+				message: 'Order created failed',
+			};
+
+		if (!cartExist.address)
+			return {
+				success: false,
+				id: null,
+				message: 'Shipping address not found',
+			};
+		const newOrder = await prisma.order.create({
+			data: {
+				user: { connect: { id: isAuth.id } },
+				status: 'PENDING',
+				subTotal,
+				tax: 0,
+				totalDiscount: 0,
+				shippingCost: cartExist.shippingCost,
+				total: subTotal + cartExist.shippingCost,
+				shippingInfo: {
+					create: {
+						firstName: cartExist.address?.contactName,
+						lastName: '',
+						mobile: `(${cartExist.address.phoneCode}) ${cartExist.address.phoneNumber}`,
+						email: '',
+						addressLine1: cartExist.address.addressLine1 || '',
+						addressLine2: cartExist.address.addressLine2 || '',
+						state: cartExist.address.stateCode,
+						city: cartExist.address.cityName || '',
+						country: cartExist.address.countryCode,
+					},
+				},
+				payment: {
+					create: {
+						status: 'UNPAID',
+						paymentIntentId: stripePayment.paymentIntent,
+						currency: 'usd',
+						amount: totalAmount,
+					},
+				},
+				option: {
+					create: {
+						value: Buffer.from(
+							JSON.stringify({
+								orderItems: cartDetails.cartItems,
+							}),
+						),
+					},
+				},
+			},
+		});
+
+		await prisma.cart.delete({
+			where: {
+				id: params.cartId,
+			},
+		});
+
+		revalidatePath('/order/cart');
+		revalidatePath('/order/checkout');
+
+		return {
+			success: true,
+			id: newOrder.id,
+			message: 'Your order has been created',
+		};
+	} catch (error) {
+		console.log(error);
+		return {
+			success: false,
+			id: null,
+			message: 'Order created failed',
+		};
 	}
 };
 
 /* ================================ */
 // Calculate cost
 /* ================================ */
-type CalShipParams = {
-	countryCode: string;
-	stateCode: string;
-};
-const calculateShipping = async (params: CalShipParams | null) => {
-	if (params) {
+export const calculateShipping = async (userId: string) => {
+	const cartData = await fetchCartList(userId);
+	if (!cartData) return;
+
+	const subtotal = cartSubtotal(cartData.cartItems);
+	let methodName: string = '';
+	let maxCost = 0;
+	let classCostList: ClassListCost[] = [];
+	let shippingCost = 0;
+	let isFreeShippingApplicable = false;
+
+	const userAddress = await getShippingAddress();
+
+	if (userAddress && userAddress.defaultAddress) {
 		const matchZones = await prisma.shippingZoneLocation.findMany({
 			where: {
 				OR: [
 					{
-						locationCode: params.countryCode,
+						locationCode: userAddress.defaultAddress.countryCode,
 					},
 					{
-						locationCode: params.stateCode,
+						locationCode: userAddress.defaultAddress.stateCode,
 					},
 				],
 			},
@@ -293,7 +459,7 @@ const calculateShipping = async (params: CalShipParams | null) => {
 							select: {
 								name: true,
 								type: true,
-								options: true,
+								option: true,
 							},
 						},
 					},
@@ -310,7 +476,7 @@ const calculateShipping = async (params: CalShipParams | null) => {
 
 			return {
 				flatMethods: flatMethod.map((method) => {
-					const jsonVal = method.options?.value.toString('utf-8');
+					const jsonVal = method.option?.value.toString('utf-8');
 					const optionValue: FlatMethodOptions = jsonVal
 						? JSON.parse(jsonVal)
 						: null;
@@ -321,7 +487,7 @@ const calculateShipping = async (params: CalShipParams | null) => {
 					};
 				}),
 				freeMethods: freeMethod.map((method) => {
-					const jsonVal = method.options?.value.toString('utf-8');
+					const jsonVal = method.option?.value.toString('utf-8');
 					const optionValue: FreeMethodOptions = jsonVal
 						? JSON.parse(jsonVal)
 						: null;
@@ -333,20 +499,7 @@ const calculateShipping = async (params: CalShipParams | null) => {
 				}),
 			};
 		});
-
-		const cartData = await cartItems();
-		if (!cartData) return null;
-
-		const subtotal = cartData.reduce((acc, currentItem) => {
-			return acc + currentItem.totalCost;
-		}, 0);
-
-		let methodName: string;
-		let maxCost = 0;
-		let classCostList: ClassListCost[] = [];
-		let shippingCost = 0;
-
-		for (const cartItem of cartData) {
+		for (const cartItem of cartData.cartItems) {
 			for (const method of findZones) {
 				const applicableFlatMethods = method.flatMethods.map(
 					(item) => ({
@@ -384,10 +537,11 @@ const calculateShipping = async (params: CalShipParams | null) => {
 						subtotal >= orderAmount
 					) {
 						methodName = name;
-						maxCost = 0;
+						isFreeShippingApplicable = true;
 					}
 				}
 			}
+
 			if (cartItem.shipClass && classCostList.length > 0) {
 				const classExist = classCostList.find(
 					(item) => item.classId === cartItem.shipClass?.id,
@@ -395,26 +549,120 @@ const calculateShipping = async (params: CalShipParams | null) => {
 				const classCost = classExist ? classExist.cost : 0;
 				shippingCost = shippingCost + classCost;
 			}
-
 			shippingCost = shippingCost + maxCost;
+
+			if (isFreeShippingApplicable) {
+				shippingCost = 0;
+			}
+		}
+
+		await prisma.cart.update({
+			where: {
+				id: cartData.cartId,
+			},
+			data: {
+				shippingCost: shippingCost,
+				shippingMethods: methodName,
+			},
+		});
+	}
+	return {
+		shippingCost,
+		methodName,
+		subtotal,
+		addressList: userAddress ? userAddress.addresses : null,
+	};
+};
+export const getShippingAddress = async () => {
+	try {
+		// 1. Check authorization
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth) return;
+		// 2. Get the user default address ID
+		const userExist = await prisma.user.findUnique({
+			where: {
+				id: isAuth.id,
+			},
+			select: {
+				id: true,
+				defaultAddress: true,
+			},
+		});
+		if (!userExist) return;
+		// 3. Check user have addresses or not
+		const addressList = await prisma.address.findMany({
+			where: {
+				userId: userExist.id,
+			},
+			select: {
+				id: true,
+				contactName: true,
+				phoneCode: true,
+				phoneNumber: true,
+				countryCode: true,
+				stateCode: true,
+				cityName: true,
+				zipCode: true,
+				addressLine1: true,
+				addressLine2: true,
+			},
+			orderBy: {
+				createdAt: 'asc',
+			},
+		});
+		if (!addressList.length) return;
+		const addresses = addressList.map((item) => ({
+			id: item.id,
+			contactName: item.contactName,
+			phoneNumber: `+${item.phoneCode} ${item.phoneNumber}`,
+			country: countryNameByIso(item.countryCode)?.name,
+			state: stateNameByIso(item.stateCode)?.name,
+			city: item.cityName,
+			zipCode: item.zipCode,
+			address: `${item.addressLine1} ${item.addressLine2}`,
+			defaultAddress:
+				userExist?.defaultAddress === item.id ? true : false,
+		}));
+
+		// 4. Get the default address
+		const defaultAddress = await prisma.address.findFirst({
+			where: {
+				id: userExist.defaultAddress as string,
+			},
+			select: {
+				countryCode: true,
+				stateCode: true,
+			},
+		});
+		if (userExist.defaultAddress) {
+			await prisma.user.update({
+				where: { id: isAuth.id },
+				data: {
+					defaultAddress: userExist.defaultAddress,
+					cart: {
+						update: {
+							address: {
+								connect: { id: userExist.defaultAddress },
+							},
+						},
+					},
+				},
+			});
 		}
 
 		return {
-			shippingCost,
-			cartData,
-			subtotal,
+			defaultAddressID: userExist.defaultAddress,
+			addresses,
+			defaultAddress,
 		};
+	} catch (error) {
+		return;
 	}
-	return null;
 };
-
-const cartItems = async () => {
-	const isAuth = await isAuthenticatedCheck();
-	if (!isAuth) return;
-
+export const fetchCartList = async (userId: string) => {
 	const cartData = await prisma.cart.findUnique({
 		where: {
-			userId: isAuth.id,
+			userId: userId,
 		},
 		select: {
 			id: true,
@@ -456,6 +704,7 @@ const cartItems = async () => {
 			},
 		},
 	});
+
 	if (!cartData) return;
 
 	const cartItems = cartData.items.map((item) => ({
@@ -492,7 +741,12 @@ const cartItems = async () => {
 			: 0,
 	}));
 
-	if (!cartItems.length) return;
+	return { cartId: cartData.id, cartItems };
+};
+export const cartSubtotal = (cart: CartCustomItems[]) => {
+	const subtotal = cart.reduce((acc, currentItem) => {
+		return acc + currentItem.totalCost;
+	}, 0);
 
-	return cartItems;
+	return subtotal;
 };

@@ -172,6 +172,12 @@
 	.checkbox-lg {
 		@apply h-[22px] w-[22px] checkbox;
 	}
+	.radio-sm {
+		@apply h-[22px] w-[22px] border-[2px] border-action-success;
+	}
+	.radio-sm circle {
+		@apply bg-action-success fill-action-success;
+	}
 	.form-grid-space {
 		@apply grid gap-[25px];
 	}

@@ -617,3 +617,8 @@ export const addToCartShema = z.object({
 		})
 		.transform((value) => Number(value)),
 });
+export const CheckoutFormSchema = z.object({
+	paymentMethod: z.enum(['card'], {
+		required_error: 'Select the payment method',
+	}),
+});

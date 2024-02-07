@@ -5,7 +5,11 @@ import {
 } from '@/components/elements/shared/custom-toast';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { addToCard } from '../actions/order.action';
+import {
+	addToCard,
+	createUserOrder,
+	updateDefaultAddress,
+} from '../actions/order.action';
 
 export const useAddToCart = () => {
 	return useMutation({
@@ -27,6 +31,38 @@ export const useAddToCart = () => {
 			toast.custom((t) => (
 				<ToastError toastNumber={t} content={error.message} />
 			));
+		},
+	});
+};
+export const useCreateOrder = () => {
+	return useMutation({
+		mutationFn: async (data: { cartId: string }) => {
+			return await createUserOrder(data);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+export const useChangeShipAddress = () => {
+	return useMutation({
+		mutationFn: async (data: { addressId: string }) => {
+			return await updateDefaultAddress({
+				addressId: data.addressId,
+			});
 		},
 	});
 };

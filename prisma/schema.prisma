@@ -59,8 +59,7 @@ model Address {
   user   User?   @relation(fields: [userId], references: [id])
   userId String?
 
-  cart   Cart?   @relation(fields: [cartId], references: [id])
-  cartId String? @unique
+  cart Cart[]
 }
 
 // Files related models
@@ -202,66 +201,95 @@ model Brand {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
+
 enum Currency {
   usd
   euro
 }
+
 // Order related models
 model Cart {
-  id              String     @id @unique @default(uuid())
-  user            User       @relation(fields: [userId], references: [id])
-  userId          String     @unique
-  items           CartItem[]
-  currency        Currency @default(usd)
-  shippingAddress Address?
-  shippingCost    Float?
-  shippingMethods String?
-  // discount        Discount?
-  taxName         String?
-  taxAmount       Float?
-  isActive        Boolean
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id       String     @id @unique @default(uuid())
+  user     User       @relation(fields: [userId], references: [id])
+  userId   String     @unique
+  items    CartItem[]
+  currency Currency   @default(usd)
+
+  address         Address? @relation(fields: [addressId], references: [id])
+  addressId       String?
+  shippingCost    Float
+  shippingMethods String
+
+  taxName   String?
+  taxAmount Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model CartItem {
-  id    String @id @unique @default(uuid())
+  id String @id @unique @default(uuid())
 
   quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cart   Cart   @relation(fields: [cartId], references: [id])
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
   cartId String
 
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPT
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+  CANCELLED
 }
 
 model Order {
   id            String        @id @unique @default(uuid())
-  orderId       String        @unique
   user          User          @relation(fields: [userId], references: [id])
   userId        String
-  // status        OrderStatus[]
+  status        OrderStatus   @default(PENDING)
   subTotal      Float
   tax           Float
   totalDiscount Float
   shippingCost  Float
   total         Float
-  // discount      Discount[]
   shippingInfo  ShippingInfo?
   note          String?
-  // items         OrderItem[]
-  // paymentId     Payment?
-  isActive      Boolean
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+
+  payment   PaymentInfo?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  option   Options @relation(fields: [optionId], references: [id])
+  optionId String  @unique
+}
+
+model PaymentInfo {
+  id              String        @id @unique @default(uuid())
+  status          PaymentStatus @default(UNPAID)
+  paymentIntentId String        @unique
+  currency        Currency      @default(usd)
+  amount          Float
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ShippingInfo {
   id           String   @id @unique @default(uuid())
-  order        Order    @relation(fields: [orderId], references: [id])
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId      String   @unique
   firstName    String
   lastName     String
@@ -321,12 +349,15 @@ model ShippingMethod {
   type      MethodType @default(FLAT_RATE)
   active    Boolean    @default(false)
   order     Int        @default(1)
-  options   Options?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   zone   ShippingZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   zoneId String
+
+  option   Options @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  optionId String  @unique
 }
 
 model ShippingZoneLocation {
@@ -363,10 +394,10 @@ model TaxRateLocation {
 
 // Site Options
 model Options {
-  id       String         @id @unique @default(uuid())
-  value    Bytes
-  method   ShippingMethod @relation(fields: [methodId], references: [id], onDelete: Cascade)
-  methodId String         @unique
+  id     String          @id @unique @default(uuid())
+  value  Bytes
+  method ShippingMethod?
+  order  Order?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

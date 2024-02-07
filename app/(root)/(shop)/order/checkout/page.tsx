@@ -1,5 +1,4 @@
 import CreateAddress from '@/components/elements/modals/create-address';
-import CartItem from '../cart/cart-item';
 import CartSummray from '../cart-summray';
 import { fetchCheckoutDetails } from '@/lib/actions/order.action';
 import EmptyError from '@/components/elements/shared/empty-error';
@@ -7,7 +6,7 @@ import Link from 'next/link';
 import AddressCard from './address-card';
 import CheckoutItem from './checkout-item';
 import { Button } from '@/components/ui/button';
-import PaymentMethods from './payment-methods';
+import CheckoutForm from './checkout-form';
 
 const CheckoutPage = async () => {
 	const result = await fetchCheckoutDetails();
@@ -22,7 +21,9 @@ const CheckoutPage = async () => {
 								<h4 className="heading-4 mb-3">
 									Shipping Address
 								</h4>
-								<AddressCard address={result.addressList} />
+								<AddressCard
+									address={result.addressList || []}
+								/>
 								<div className="mt-2">
 									<CreateAddress
 										triggerClass={
@@ -35,7 +36,8 @@ const CheckoutPage = async () => {
 								<h4 className="heading-4 mb-3">
 									Payment Method
 								</h4>
-								<PaymentMethods />
+
+								<CheckoutForm cartId={result.cartId} />
 							</div>
 						</div>
 						<div>
@@ -50,7 +52,11 @@ const CheckoutPage = async () => {
 
 							<CartSummray summary={result.summary} />
 
-							<Button className="btn-primary-lg w-full mt-6">
+							<Button
+								type="submit"
+								form="checkout-form"
+								className="btn-primary-lg w-full mt-6"
+							>
 								Confirm Order
 							</Button>
 						</div>

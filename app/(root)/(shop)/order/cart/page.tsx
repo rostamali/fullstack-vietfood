@@ -3,11 +3,11 @@ import CartItem from './cart-item';
 import CartSummray from '../cart-summray';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { fetchCartItems } from '@/lib/actions/order.action';
+import { fetchCartDetails } from '@/lib/actions/order.action';
 import EmptyError from '@/components/elements/shared/empty-error';
 
 const CartPage = async () => {
-	const result = await fetchCartItems();
+	const result = await fetchCartDetails();
 
 	return (
 		<div className="cart-page py-[60px]">

@@ -247,6 +247,19 @@ interface AddToCart {
 	quantity: number;
 	productId: string;
 }
+interface CartCustomItems {
+	cartItemId: string;
+	quantity: number;
+	name: string;
+	shipClass: {
+		id: string;
+		name: string;
+	} | null;
+	thumbnail: string | null;
+	category: string;
+	unitPrice: number;
+	totalCost: number;
+}
 
 /* ============================== */
 //  CSV file types
