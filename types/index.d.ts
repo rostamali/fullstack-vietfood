@@ -211,6 +211,23 @@ interface ProductList {
 		inStock: boolean;
 	} | null;
 }
+interface ProductCardProps {
+	id: string;
+	name: string;
+	slug: string;
+	thumbnail: {
+		id: string;
+		fileType: string;
+		title: string;
+		url: string;
+	} | null;
+	inventory: {
+		regularPrice: number | null;
+		salePrice: number | null;
+		inStock: boolean;
+	} | null;
+}
+
 /* ============================== */
 //  Address Types
 /* ============================== */

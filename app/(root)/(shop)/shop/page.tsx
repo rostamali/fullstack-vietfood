@@ -45,7 +45,7 @@ const ShopPage = async ({ searchParams }: SearchParams) => {
 						</div>
 						<div className="shop-content">
 							{result && result.products.length > 0 ? (
-								<div className="bg-white p-4 rounded-md">
+								<div className="">
 									<div className="grid xl:grid-cols-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-2 grid-cols-2 lg:gap-[20px] gap-2">
 										{result.products.map(
 											(product, index) => (

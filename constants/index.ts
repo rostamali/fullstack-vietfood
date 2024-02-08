@@ -34,10 +34,6 @@ export const TopbarLinks = [
 ];
 export const NavbarLinks = [
 	{
-		label: 'New Products',
-		url: '/',
-	},
-	{
 		label: 'Best Sales',
 		url: '/',
 	},
@@ -48,6 +44,10 @@ export const NavbarLinks = [
 	{
 		label: 'Categories',
 		url: '/categories',
+	},
+	{
+		label: 'Contact us',
+		url: '/contact-us',
 	},
 ];
 export const UsefullLinks = [

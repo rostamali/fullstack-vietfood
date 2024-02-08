@@ -33,7 +33,7 @@ const RootHeader = () => {
 							{/* Infos */}
 							<div className="flex items-center gap-5">
 								<Link
-									href="/cart"
+									href="/order/cart"
 									className="relative h-[42px] w-[42px] rounded-full bg-primary-green bg-opacity-40 flex-center"
 								>
 									<ShoppingBag

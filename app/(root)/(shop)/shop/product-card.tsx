@@ -2,30 +2,15 @@ import PriceFormat from '@/components/elements/shared/price-format';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
-type ProductCardProps = {
-	product: {
-		id: string;
-		name: string;
-		slug: string;
-		thumbnail: {
-			id: string;
-			fileType: string;
-			title: string;
-			url: string;
-		} | null;
-		inventory: {
-			regularPrice: number | null;
-			salePrice: number | null;
-			inStock: boolean;
-		} | null;
-	};
+type CardProps = {
+	product: ProductCardProps;
 };
 
-const ProductCard: FC<ProductCardProps> = ({ product }) => {
+const ProductCard: FC<CardProps> = ({ product }) => {
 	return (
-		<div className="product-card overflow-hidden group">
+		<div className="product-card overflow-hidden group bg-white p-4 rounded">
 			<div
-				className={`flex-center h-[260px] ${
+				className={`flex-center rounded h-[260px] ${
 					product.thumbnail ? 'bg-[#F6F6F6]' : 'bg-[#F6F6F6]'
 				}`}
 			>
@@ -35,7 +20,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
 							? `/uploads/files/${product.thumbnail?.url}`
 							: '/assets/placeholder.png'
 					}
-					alt=""
+					alt={product.name}
 					width={480}
 					height={500}
 					className="object-contain w-[70%]"

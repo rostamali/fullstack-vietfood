@@ -45,7 +45,7 @@ const SignupForm = () => {
 						onSubmit={form.handleSubmit(handleSignupUser)}
 						className="form-flex-space"
 					>
-						<div className="grid grid-cols-2 gap-[25px]">
+						<div className="grid sm:grid-cols-2 gap-[25px]">
 							<FormField
 								control={form.control}
 								name="firstName"

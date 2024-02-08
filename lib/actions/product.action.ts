@@ -340,6 +340,8 @@ export const updateProductByAdmin = async (params: {
 				}),
 			},
 		});
+
+		revalidatePath('/admin/product');
 		return handleResponse(true, `Save changes done`);
 	} catch (error) {
 		return handleResponse(false, `Product update failed`);
