@@ -2,9 +2,8 @@
 import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import ProductCard from '../(shop)/shop/product-card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import CategoryCard from '../(shop)/categories/category-card';
+import CategoryCard from '@/components/elements/shared/category-card';
 type SliderProps = {
 	data: ProductCardProps[];
 	title: string;

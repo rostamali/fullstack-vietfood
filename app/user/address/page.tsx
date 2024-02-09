@@ -16,7 +16,7 @@ const UserAddressPage = async () => {
 				/>
 				<CreateAddress triggerClass={'btn-primary-lg'} />
 			</div>
-			{result && <AddressCard address={result} />}
+			<AddressCard address={result ? result : []} />
 		</div>
 	);
 };
