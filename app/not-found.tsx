@@ -7,7 +7,7 @@ export default function NotFound() {
 	return (
 		<>
 			<RootHeader />
-			<main className="font-poppins bg-gray-light">
+			<main className="bg-gray-light">
 				<div className="container">
 					<div className="flex-center flex-col text-center space-y-5 py-[100px]">
 						<h2 className="heading-2 text-primary-white">404</h2>

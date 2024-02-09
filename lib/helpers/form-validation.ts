@@ -622,3 +622,40 @@ export const CheckoutFormSchema = z.object({
 		required_error: 'Select the payment method',
 	}),
 });
+
+/* ================================== */
+// Contact form Schemas
+/* ================================== */
+export const ContactFormSchema = z.object({
+	firstName: z
+		.string({
+			required_error: 'Firstname is required',
+		})
+		.min(1, { message: 'Firstname is required' })
+		.max(25, { message: `Firstname must not exceed 25 characters` }),
+	lastName: z
+		.string({
+			required_error: 'Lastname is should be string',
+		})
+		.max(25, { message: `Lastname must not exceed 25 characters` }),
+	email: z
+		.string({
+			invalid_type_error: 'Email Must be valid',
+			required_error: 'Email is required',
+		})
+		.min(1, { message: 'Email is required' })
+		.email({
+			message: 'Email Must be valid',
+		}),
+	phoneNumber: z
+		.string({
+			required_error: 'Phone number is required',
+		})
+		.min(1, { message: 'Phone number is required' }),
+	message: z
+		.string({
+			required_error: 'Message is required',
+		})
+		.min(50, { message: 'Message should atleast 50 characters' })
+		.max(250, { message: `Message must not exceed 250 characters` }),
+});

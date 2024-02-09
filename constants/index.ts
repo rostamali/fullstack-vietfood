@@ -17,7 +17,15 @@ import {
 	Facebook,
 	Twitter,
 	Instagram,
+	Heart,
+	CreditCard,
+	ShieldCheck,
+	Banknote,
 } from 'lucide-react';
+
+/* ======================================= */
+// Navlinks data
+/* ======================================= */
 export const TopbarLinks = [
 	{
 		label: 'About',
@@ -66,20 +74,6 @@ export const UsefullLinks = [
 	{
 		label: 'Contact Us',
 		url: '/',
-	},
-];
-export const QuickContact = [
-	{
-		label: 'Carol J. Stephens Mongomery, Al 36104 USA',
-		icon: Home,
-	},
-	{
-		label: '+000 123 456',
-		icon: PhoneCall,
-	},
-	{
-		label: 'hello@store.com',
-		icon: AtSign,
 	},
 ];
 export const SocialLinks = [
@@ -165,11 +159,60 @@ export const UserNavlinks = [
 		icon: BookUser,
 	},
 	{
+		label: 'Wishlist',
+		url: '/user/wishlist',
+		icon: Heart,
+	},
+	{
 		label: 'Profile',
 		url: '/user/profile',
 		icon: CircleUser,
 	},
 ];
+
+/* ======================================= */
+// Shop data
+/* ======================================= */
+export const StoreFeature = [
+	{
+		icon: Truck,
+		name: 'Fresh Product',
+		description: 'Everyday fresh product at our store',
+	},
+	{
+		icon: Banknote,
+		name: 'Best Price',
+		description: 'Get the best prices on the market',
+	},
+	{
+		icon: CreditCard,
+		name: 'Secure Payment',
+		description: 'Shop with confidence with secure payment',
+	},
+	{
+		icon: ShieldCheck,
+		name: 'Quality Guaranted',
+		description: 'Experience the finest quality goods from us',
+	},
+];
+export const QuickContact = [
+	{
+		label: 'Address',
+		icon: Home,
+		value: `Carol J. Stephens Mongomery, Al 36104 USA`,
+	},
+	{
+		label: 'Phone',
+		icon: PhoneCall,
+		value: `+000 123 456`,
+	},
+	{
+		label: 'Email',
+		icon: AtSign,
+		value: `hello@store.com`,
+	},
+];
+
 /* ======================================= */
 // Shop Constants
 /* ======================================= */

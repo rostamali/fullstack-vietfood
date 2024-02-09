@@ -8,7 +8,7 @@ export default function UserLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="bg-gray-light relative w-full">
+		<div className="bg-gray-light relative w-full font-poppins">
 			<div className="flex-1 md:grid grid-cols-[266px_minmax(0,1fr)] max-lg:grid-cols-[100px_minmax(0,1fr)]">
 				<section className="bg-white sticky left-0 top-0 px-6 pt-5 flex h-screen flex-col overflow-y-auto max-md:hidden">
 					<Logo

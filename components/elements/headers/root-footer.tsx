@@ -84,7 +84,7 @@ const RootFooter = () => {
 										/>
 									</div>
 									<span className="text-base-1 flex-1">
-										{item.label}
+										{item.value}
 									</span>
 								</li>
 							))}

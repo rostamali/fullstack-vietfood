@@ -1,5 +1,5 @@
 const ProductCategories = () => {
-	return <div>Product Categories</div>;
+	return <div className="categories py-[60px]">Product Categories</div>;
 };
 
 export default ProductCategories;

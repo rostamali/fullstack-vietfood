@@ -5,7 +5,8 @@ import '../styles/theme.css';
 import { Toaster } from '@/components/ui/sonner';
 import Provider from '@/lib/provider';
 
-export const fontPoppins = Poppins({
+const fontPoppins = Poppins({
+	display: 'swap',
 	weight: ['300', '400', '500', '600', '700'],
 	subsets: ['latin'],
 	variable: '--font-poppins',
