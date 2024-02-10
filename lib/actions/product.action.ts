@@ -3,7 +3,7 @@ import * as z from 'zod';
 import { ProductFormSchema } from '../helpers/form-validation';
 import { createSlug, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
-import { AccountStatus, TaxStatus } from '@prisma/client';
+import { ProductCollection, ProductStatus, TaxStatus } from '@prisma/client';
 import { isAuthenticatedAdmin } from './auth.action';
 import { revalidatePath } from 'next/cache';
 
@@ -11,7 +11,15 @@ export const createProductByAdmin = async (params: {
 	data: z.infer<typeof ProductFormSchema>;
 }) => {
 	try {
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin)
+			return {
+				id: null,
+				message: `You don't have permission`,
+			};
+
 		const {
+			collection,
 			name,
 			excerpt,
 			description,
@@ -21,7 +29,6 @@ export const createProductByAdmin = async (params: {
 			regularPrice,
 			salePrice,
 			taxStatus,
-			taxClass,
 			sku,
 			stockQTY,
 			stockStatus,
@@ -49,13 +56,18 @@ export const createProductByAdmin = async (params: {
 				id: null,
 				message: `User different product name`,
 			};
+
+		const content = Buffer.from(
+			JSON.stringify(description || { blocks: [] }),
+		);
 		const newProduct = await prisma.product.create({
 			data: {
 				name,
 				slug,
 				excerpt,
-				description,
-				status: status as AccountStatus,
+				description: content,
+				status: status as ProductStatus,
+				collection: collection as ProductCollection,
 				label,
 				...(thumbnail &&
 					thumbnail.length > 0 && {
@@ -76,7 +88,6 @@ export const createProductByAdmin = async (params: {
 						},
 					}),
 				taxStatus: taxStatus as TaxStatus,
-				taxClass,
 				weight,
 				inventory: {
 					create: {
@@ -133,6 +144,7 @@ export const fetchProductById = async (params: { id: string }) => {
 				name: true,
 				excerpt: true,
 				description: true,
+				collection: true,
 				thumbnail: {
 					select: {
 						id: true,
@@ -168,7 +180,6 @@ export const fetchProductById = async (params: { id: string }) => {
 					},
 				},
 				taxStatus: true,
-				taxClass: true,
 				weight: true,
 				shipClass: {
 					select: {
@@ -194,8 +205,13 @@ export const fetchProductById = async (params: { id: string }) => {
 		});
 		if (!product) return;
 
+		const content = product.description
+			? product.description.toString('utf-8')
+			: JSON.stringify({ blocks: [] });
+
 		return {
 			...product,
+			description: content ? JSON.parse(content) : null,
 		};
 	} catch (error) {
 		return;
@@ -216,7 +232,6 @@ export const updateProductByAdmin = async (params: {
 			regularPrice,
 			salePrice,
 			taxStatus,
-			taxClass,
 			sku,
 			stockQTY,
 			stockStatus,
@@ -228,6 +243,7 @@ export const updateProductByAdmin = async (params: {
 			category,
 			brand,
 			label,
+			collection,
 		} = params.data;
 		const slug = await createSlug(name);
 		const productExist = await prisma.product.findFirst({
@@ -245,6 +261,9 @@ export const updateProductByAdmin = async (params: {
 		if (productExist)
 			return handleResponse(false, `Product name already exist`);
 
+		const content = Buffer.from(
+			JSON.stringify(description || { blocks: [] }),
+		);
 		await prisma.product.update({
 			where: {
 				id: params.id,
@@ -253,8 +272,9 @@ export const updateProductByAdmin = async (params: {
 				name,
 				slug,
 				excerpt,
-				description,
-				status: status as AccountStatus,
+				description: content,
+				status: status as ProductStatus,
+				collection: collection as ProductCollection,
 				label,
 				...(thumbnail &&
 					thumbnail.length > 0 && {
@@ -314,7 +334,6 @@ export const updateProductByAdmin = async (params: {
 						},
 					}),
 				taxStatus: taxStatus as TaxStatus,
-				taxClass,
 				weight,
 				inventory: {
 					update: {
@@ -351,9 +370,10 @@ export const fetchProductByAdmin = async (params: {
 	pageSize: number;
 	page: number;
 	query: string | null;
+	status: string | null;
 }) => {
 	try {
-		const { page = 1, pageSize = 10, query } = params;
+		const { page = 1, pageSize = 10, query, status } = params;
 		const products = await prisma.product.findMany({
 			where: {
 				...(query && {
@@ -361,6 +381,9 @@ export const fetchProductByAdmin = async (params: {
 						{ name: { contains: query } },
 						{ excerpt: { contains: query } },
 					],
+				}),
+				...(status && {
+					status: status as ProductStatus,
 				}),
 			},
 			select: {
@@ -449,7 +472,7 @@ export const importProductFromCSV = async (params: CSVProduct[]) => {
 				data: {
 					name: single.name,
 					slug: modifiedSlug,
-					status: 'ACTIVE',
+					status: 'PUBLISH',
 					isActive: true,
 					excerpt: single.excerpt,
 					inventory: {
@@ -471,159 +494,34 @@ export const importProductFromCSV = async (params: CSVProduct[]) => {
 		return handleResponse(false, 'Product upload failed');
 	}
 };
-
-// Shop Actions
-export const fetchShopProducts = async (params: {
-	pageSize: number;
-	page: number;
-	query: string | null;
+export const deleteProductByIds = async (params: {
+	ids: string[];
+	type: ProductActionTypes;
 }) => {
 	try {
-		const { page = 1, pageSize = 10, query } = params;
-		const products = await prisma.product.findMany({
-			where: {
-				...(query && {
-					OR: [
-						{ name: { contains: query } },
-						{ excerpt: { contains: query } },
-					],
-				}),
-				status: 'ACTIVE',
-			},
-			select: {
-				id: true,
-				name: true,
-				slug: true,
-				thumbnail: {
-					select: {
-						id: true,
-						url: true,
-						title: true,
-						fileType: true,
-					},
-				},
-				inventory: {
-					select: {
-						regularPrice: true,
-						salePrice: true,
-						inStock: true,
-					},
-				},
-				createdAt: true,
-			},
-			orderBy: {
-				createdAt: 'desc',
-			},
-			skip: (Number(page) - 1) * Number(pageSize),
-			take: pageSize,
-		});
-		const countProduct = await prisma.product.count({
-			where: {
-				...(query && {
-					OR: [
-						{ name: { contains: query } },
-						{ excerpt: { contains: query } },
-					],
-				}),
-			},
-		});
-		return {
-			products,
-			pages: Math.ceil(countProduct / pageSize),
-		};
-	} catch (error) {
-		return;
-	}
-};
-export const fetchProductBySlug = async (params: { slug: string }) => {
-	try {
-		const product = await prisma.product.findFirst({
-			where: {
-				slug: params.slug,
-			},
-			select: {
-				id: true,
-				name: true,
-				excerpt: true,
-				description: true,
-				thumbnail: {
-					select: {
-						id: true,
-						url: true,
-						fileType: true,
-					},
-				},
-				gallery: {
-					select: {
-						files: {
-							select: {
-								id: true,
-								url: true,
-								fileType: true,
-							},
-						},
-					},
-				},
-				inventory: {
-					select: {
-						regularPrice: true,
-						salePrice: true,
-						inStock: true,
-						sku: true,
-					},
-				},
-			},
-		});
-		if (!product) return;
+		const isAdmin = await isAuthenticatedAdmin();
+		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const { ids, type } = params;
 
-		const thumbnailImages = product?.thumbnail
-			? [
-					{
-						id: product.thumbnail.id,
-						url: product.thumbnail.url,
-						fileType: product.thumbnail.fileType,
-					},
-			  ]
-			: [];
-		const galleryImages = product?.gallery?.files
-			? product.gallery.files.map((file) => ({
-					id: file.id,
-					url: file.url,
-					fileType: file.fileType,
-			  }))
-			: [];
-		const gallery = [...thumbnailImages, ...galleryImages].reduce(
-			(
-				uniqueImages: { id: string; url: string; fileType: string }[],
-				image,
-			) => {
-				const isDuplicate = uniqueImages.some(
-					(uniqueImage) =>
-						uniqueImage.id === image.id &&
-						uniqueImage.fileType === image.fileType,
-				);
-				if (!isDuplicate) {
-					uniqueImages.push(image);
-				}
-				return uniqueImages;
-			},
-			[],
-		);
+		if (type === 'DELETE') {
+			await prisma.product.deleteMany({
+				where: { id: { in: ids } },
+			});
 
-		return {
-			id: product.id,
-			name: product.name,
-			excerpt: product.excerpt,
-			description: product.description,
-			gallery,
-			inventory: {
-				regularPrice: product.inventory?.regularPrice || null,
-				salePrice: product.inventory?.salePrice || null,
-				sku: product.inventory?.sku || null,
-				inStock: product.inventory?.inStock || null,
-			},
-		};
+			revalidatePath('/admin/product');
+			return handleResponse(true, `Product deleted successfully`);
+		} else {
+			await prisma.product.updateMany({
+				where: { id: { in: ids } },
+				data: {
+					status: 'DRAFT',
+				},
+			});
+
+			revalidatePath('/admin/product');
+			return handleResponse(true, `Product status updated`);
+		}
 	} catch (error) {
-		return;
+		return handleResponse(false, `Product delete failed`);
 	}
 };

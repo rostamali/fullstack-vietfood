@@ -414,7 +414,6 @@ export const createUserOrder = async (params: { cartId: string }) => {
 			message: 'Your order has been created',
 		};
 	} catch (error) {
-		console.log(error);
 		return {
 			success: false,
 			id: null,

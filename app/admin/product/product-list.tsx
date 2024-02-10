@@ -1,5 +1,5 @@
 'use client';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Table,
@@ -16,31 +16,36 @@ import Link from 'next/link';
 import EmptyError from '../../../components/elements/shared/empty-error';
 import LocalSearch from '../../../components/elements/filters/local-search';
 import SelectFilter from '../../../components/elements/filters/select-filter';
-import { UserAction, UserStatus } from '@/constants';
+import { ProductStatus, UserAction } from '@/constants';
 import SelectField from '../../../components/elements/select/select-field';
 import { Button } from '@/components/ui/button';
 import SmallTooltip from '../../../components/elements/shared/small-tooltip';
 import { Download } from 'lucide-react';
 import Image from 'next/image';
+import ProductAction from './product-action';
+import {
+	isChecked,
+	isSelectAll,
+	toggleSelectAll,
+	toggleSelectList,
+} from '@/lib/helpers/formater';
 type ProductListProps = {
 	data: ProductList[];
 	pages: number;
 };
 
 const ProductList: FC<ProductListProps> = ({ data, pages }) => {
+	const [selectedItems, setSelectedItems] = useState<string[] | null>(null);
+
 	return (
 		<div className="product-table dashboard-col-space">
 			<div className="table-header">
 				<div className="grid lg:grid-cols-5 grid-cols-1 lg:gap-[40px] gap-[20px]">
 					<div className="lg:col-span-2 flex items-center gap-[15px]">
-						<SelectField
-							triggerClass={'input-field-lg bg-white'}
-							placeholder={'Select action'}
-							defaultValue={''}
-							onChange={() => {}}
-							options={UserAction}
+						<ProductAction
+							ids={selectedItems}
+							onChange={setSelectedItems}
 						/>
-						<Button className="btn-primary-lg">Apply</Button>
 					</div>
 					<div className="lg:col-span-3 w-full xm:flex xm:items-center xm:justify-between xm:gap-[15px]">
 						<div className="flex-1 grid grid-cols-5 items-center gap-[15px]">
@@ -60,7 +65,7 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 									placeholder={'Filter by status'}
 									triggerClass={'input-field-lg bg-white'}
 									contentClass={'bg-white'}
-									options={UserStatus}
+									options={ProductStatus}
 								/>
 							</div>
 						</div>
@@ -84,7 +89,20 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 							<TableHead className="p-0">
 								<div className="table-head-start">
 									<div className="flex items-center gap-[10px]">
-										<Checkbox className="checkbox-sm" />
+										<Checkbox
+											className="checkbox-sm"
+											checked={isSelectAll<ProductList>(
+												data,
+												selectedItems,
+											)}
+											onClick={() =>
+												toggleSelectAll<ProductList>(
+													data,
+													selectedItems,
+													setSelectedItems,
+												)
+											}
+										/>
 										<span>Product</span>
 									</div>
 								</div>
@@ -117,7 +135,20 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 								<TableCell className="p-0">
 									<div className="table-cell-start min-h-[80px]">
 										<div className="flex items-center gap-[10px]">
-											<Checkbox className="checkbox-sm" />
+											<Checkbox
+												className="checkbox-sm"
+												onClick={() =>
+													toggleSelectList(
+														selectedItems,
+														setSelectedItems,
+														item.id,
+													)
+												}
+												checked={isChecked(
+													selectedItems,
+													item.id,
+												)}
+											/>
 											<div className="flex items-center gap-1.5">
 												<Image
 													src={
@@ -173,13 +204,13 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 								</TableCell>
 								<TableCell className="p-0">
 									<div className="table-cell-data min-h-[80px]">
-										{item.status === 'ACTIVE' ? (
+										{item.status === 'PUBLISH' ? (
 											<span className="badge-success">
-												Active
+												Publish
 											</span>
 										) : (
 											<span className="badge-danger">
-												Inactive
+												Draft
 											</span>
 										)}
 									</div>

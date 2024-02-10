@@ -193,6 +193,8 @@ interface LocalUpdateForm {
 /* ============================== */
 //  Product Types
 /* ============================== */
+type ProductStatus = 'PUBLISH' | 'DRAFT';
+type ProductActionTypes = 'DELETE' | 'DRAFT';
 interface ProductList {
 	id: string;
 	name: string;
@@ -203,7 +205,7 @@ interface ProductList {
 		fileType: string;
 	} | null;
 	slug: string;
-	status: UserStatus;
+	status: ProductStatus;
 	createdAt: Date;
 	inventory: {
 		regularPrice: number | null;
@@ -225,6 +227,15 @@ interface ProductCardProps {
 		regularPrice: number | null;
 		salePrice: number | null;
 		inStock: boolean;
+	} | null;
+}
+interface CategoryCardProps {
+	id: string;
+	name: string;
+	slug: string;
+	thumbnail: {
+		fileType: string;
+		fileName: string;
 	} | null;
 }
 

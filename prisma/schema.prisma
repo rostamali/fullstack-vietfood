@@ -12,10 +12,18 @@ enum Role {
   USER
   ADMIN
 }
-
+enum ProductCollection {
+  NEW_ARRIVAL
+  BEST_SELLING
+  RECOMENDED
+}
 enum AccountStatus {
   INACTIVE
   ACTIVE
+}
+enum ProductStatus {
+  PUBLISH
+  DRAFT
 }
 
 model User {
@@ -94,7 +102,7 @@ model File {
 
   productCategory   ProductCategory? @relation(fields: [productCategoryId], references: [id])
   productCategoryId String?          @unique
-  product           Product?         @relation(fields: [productId], references: [id])
+  product           Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId         String?          @unique
   brand             Brand?           @relation(fields: [brandId], references: [id])
   brandId           String?          @unique
@@ -106,7 +114,7 @@ model Gallery {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String  @unique
 }
 
@@ -136,15 +144,14 @@ model Product {
   slug        String
   excerpt     String?       @db.VarChar(300)
   description Bytes?
-  status      AccountStatus @default(INACTIVE)
+  status      ProductStatus @default(DRAFT)
 
   label      String?
-  isFeatured Boolean @default(false)
+  collection ProductCollection @default(NEW_ARRIVAL)
 
   thumbnail File?
   gallery   Gallery?
 
-  taxClass  String?
   taxStatus TaxStatus @default(NONE)
   weight    Float?
 
@@ -170,7 +177,7 @@ model Product {
 
 model ProductInventory {
   id             String  @id @unique @default(uuid())
-  product        Product @relation(fields: [productId], references: [id])
+  product        Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId      String  @unique
   retailPrice    Float?
   regularPrice   Float?

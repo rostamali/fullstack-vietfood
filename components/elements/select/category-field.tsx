@@ -19,7 +19,7 @@ type Selected = {
 	id: string;
 	slug: string;
 };
-type CategoryProps = {
+type SelectProps = {
 	trigger: string;
 	placeholder: string;
 	value: Selected | null;
@@ -27,7 +27,7 @@ type CategoryProps = {
 	isParent: boolean;
 };
 
-const CategoryField: FC<CategoryProps> = ({
+const CategoryField: FC<SelectProps> = ({
 	trigger,
 	placeholder,
 	value,

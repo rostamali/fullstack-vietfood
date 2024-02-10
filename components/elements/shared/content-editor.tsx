@@ -33,7 +33,7 @@ const ContentEditor: FC<EditorProps> = ({ editorStyle, onChange, value }) => {
 				},
 				placeholder: 'Type here to write details...',
 				inlineToolbar: true,
-				data: { blocks: value },
+				data: { ...value },
 				tools: {
 					header: Header,
 					image: {

@@ -72,19 +72,21 @@ const FileLibraryModal: FC<ModalLibraryProps> = ({
 									/>
 								))}
 							</div>
-							<div className="flex-center mt-[15px]">
-								<Button
-									className="btn-primary-sm"
-									onClick={() => fetchNextPage()}
-									disabled={hasNextPage ? false : true}
-								>
-									{isFetchingNextPage
-										? 'Loading more...'
-										: hasNextPage
-										? 'Load more'
-										: 'Nothing to load'}
-								</Button>
-							</div>
+							{hasNextPage && (
+								<div className="flex-center mt-[15px]">
+									<Button
+										className="btn-primary-sm"
+										onClick={() => fetchNextPage()}
+										disabled={hasNextPage ? false : true}
+									>
+										{isFetchingNextPage
+											? 'Loading more...'
+											: hasNextPage
+											? 'Load more'
+											: 'Nothing to load'}
+									</Button>
+								</div>
+							)}
 						</div>
 						<div className="flex items-center justify-between gap-[15px]">
 							<div className="text-base-1">

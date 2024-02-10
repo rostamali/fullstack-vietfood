@@ -20,7 +20,7 @@ const UpdateProduct = async ({ searchParams }: SearchParams) => {
 						type: 'UPDATE',
 						name: result.name,
 						excerpt: result.excerpt ? result.excerpt : '',
-						description: null,
+						description: result.description,
 						thumbnail: result.thumbnail ? [result.thumbnail] : null,
 						gallery: result?.gallery
 							? result?.gallery?.files
@@ -32,7 +32,6 @@ const UpdateProduct = async ({ searchParams }: SearchParams) => {
 							result.inventory?.regularPrice || undefined,
 						salePrice: result.inventory?.salePrice || undefined,
 						taxStatus: result.taxStatus,
-						taxClass: result.taxClass || '',
 						sku: result.inventory?.sku || '',
 						stockQTY: result.inventory?.stockQTY || undefined,
 						stockStatus: result.inventory?.inStock || false,
@@ -45,6 +44,7 @@ const UpdateProduct = async ({ searchParams }: SearchParams) => {
 						category: result.category ? result.category : null,
 						brand: result.brand ? result.brand : null,
 						label: result.label || '',
+						collection: result.collection,
 					}}
 					pageTitle={'Update Product'}
 					id={result.id}

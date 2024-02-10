@@ -19,14 +19,14 @@ type Selected = {
 	id: string;
 	name: string;
 };
-type CategoryProps = {
+type SelectProps = {
 	trigger: string;
 	placeholder: string;
 	value: Selected | null;
 	onChange: React.Dispatch<React.SetStateAction<Selected | null>>;
 };
 
-const ShipClassField: FC<CategoryProps> = ({
+const ShipClassField: FC<SelectProps> = ({
 	trigger,
 	placeholder,
 	value,

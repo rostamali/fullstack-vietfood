@@ -46,8 +46,11 @@ export const signupUser = async (
 
 		await sendMail({
 			email,
-			subject: 'Account activation email',
-			template: `<h1>Verify Code: ${code}</h1>`,
+			subject: 'Activate your account',
+			template: `email-verification.ejs`,
+			data: {
+				code,
+			},
 		});
 
 		cookies().set(

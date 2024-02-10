@@ -5,7 +5,7 @@ import { Navigation } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CategoryCard from '@/components/elements/shared/category-card';
 type SliderProps = {
-	data: ProductCardProps[];
+	data: CategoryCardProps[];
 	title: string;
 	subtitle: string;
 };
@@ -13,12 +13,12 @@ type SliderProps = {
 const CategorySlider: React.FC<SliderProps> = ({ data, title, subtitle }) => {
 	return (
 		<div className="space-y-6">
-			<div className="flex sm:items-center justify-between sm:flex-row flex-col gap-4">
+			<div className="flex items-center justify-between gap-4">
 				<div className="space-y-2">
 					<h3 className="heading-3">{title}</h3>
 					<p className="text-base-1">{subtitle}</p>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 max-xm:flex-col">
 					<button className={`product-arrow category-arrow-left`}>
 						<ChevronLeft />
 					</button>
@@ -51,7 +51,7 @@ const CategorySlider: React.FC<SliderProps> = ({ data, title, subtitle }) => {
 				>
 					{data.map((item, index) => (
 						<SwiperSlide key={index}>
-							<CategoryCard />
+							<CategoryCard item={item} />
 						</SwiperSlide>
 					))}
 				</Swiper>

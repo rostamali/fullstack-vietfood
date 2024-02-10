@@ -1,6 +1,6 @@
 'use server';
 import { revalidatePath } from 'next/cache';
-import sharp from 'sharp';
+import Jimp from 'jimp';
 import { fileSizeFormat, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
 import { isAuthenticatedAdmin, isAuthenticatedCheck } from './auth.action';
@@ -282,17 +282,14 @@ export const uploadProfilePicture = async (formData: FormData) => {
 		}
 		const fileName = `upload-${Date.now()}-${
 			Math.random() * (999 - 1) + 1
-		}.${file.type.split('/')[1]}`;
+		}.jpg`;
 
-		const resizeAvatar = await sharp(await file.arrayBuffer())
-			.resize(200, 200)
-			.withMetadata()
-			.jpeg({ quality: 80 })
-			.toBuffer();
 		const uploadPath = join('./public/uploads', 'avatar/', fileName);
-		const compressSize = fileSizeFormat(resizeAvatar.length);
+		const uploadedAvatar = await file.arrayBuffer();
+		const compressAvatar = await Jimp.read(Buffer.from(uploadedAvatar));
 
-		await writeFile(uploadPath, resizeAvatar);
+		compressAvatar.cover(200, 200).quality(60).writeAsync(uploadPath);
+		const compressSize = fileSizeFormat(compressAvatar.bitmap.data.length);
 		await prisma.avatar.create({
 			data: {
 				fileName: fileName,

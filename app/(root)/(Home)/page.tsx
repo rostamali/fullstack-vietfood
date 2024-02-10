@@ -1,23 +1,20 @@
-import { fetchShopProducts } from '@/lib/actions/product.action';
 import HeroBanner from './hero-banner';
 import ProductSlider from './product-slider';
 import CategorySlider from './category-slider';
 import { StoreFeature } from '@/constants';
+import { fetchHomepageDetails } from '@/lib/actions/shop.action';
 
 export default async function Home() {
-	const result = await fetchShopProducts({
-		pageSize: 9,
-		page: 1,
-		query: null,
-	});
+	const result = await fetchHomepageDetails();
+
 	return (
 		<div className="home-page">
 			<HeroBanner />
-			{result && result.products.length && (
-				<div className="best-products py-[60px]">
+			{result && result.bestSell.length > 0 && (
+				<div className="best-products pb-[60px]">
 					<div className="container">
 						<ProductSlider
-							data={result.products}
+							data={result.bestSell}
 							title={`Best Selling`}
 							subtitle={`Discover Our Best Selling Products`}
 							navclass={'best-products'}
@@ -25,22 +22,22 @@ export default async function Home() {
 					</div>
 				</div>
 			)}
-			{result && result.products.length && (
+			{result && result.categories.length > 0 && (
 				<div className="categories">
 					<div className="container">
 						<CategorySlider
-							data={result.products}
+							data={result.categories}
 							title={`Shop By Categories`}
 							subtitle={`Find What You Need, Effortlessly`}
 						/>
 					</div>
 				</div>
 			)}
-			{result && result.products.length && (
+			{result && result.newArrival.length > 0 && (
 				<div className="new-products py-[60px]">
 					<div className="container">
 						<ProductSlider
-							data={result.products}
+							data={result.newArrival}
 							title={`New Arrivals`}
 							subtitle={`Be the First to Explore Our Latest Products!`}
 							navclass={'new-products'}

@@ -19,12 +19,12 @@ const ProductSlider: React.FC<SliderProps> = ({
 }) => {
 	return (
 		<div className="space-y-6">
-			<div className="flex sm:items-center justify-between sm:flex-row flex-col gap-4">
+			<div className="flex items-center justify-between flex-row gap-4">
 				<div className="space-y-2">
 					<h3 className="heading-3">{title}</h3>
 					<p className="text-base-1">{subtitle}</p>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 max-xm:flex-col">
 					<button className={`product-arrow ${navclass}-arrow-left`}>
 						<ChevronLeft />
 					</button>

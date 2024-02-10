@@ -8,6 +8,7 @@ import {
 } from '@/components/elements/shared/custom-toast';
 import {
 	createProductByAdmin,
+	deleteProductByIds,
 	updateProductByAdmin,
 } from '../actions/product.action';
 import { useRouter } from 'next/navigation';
@@ -49,6 +50,35 @@ export const useUpdateProduct = () => {
 			return await updateProductByAdmin({
 				data: data.values,
 				id: data.id,
+			});
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+export const useDeleteProduct = () => {
+	return useMutation({
+		mutationFn: async (data: {
+			ids: string[];
+			type: ProductActionTypes;
+		}) => {
+			return await deleteProductByIds({
+				ids: data.ids,
+				type: data.type,
 			});
 		},
 		onSuccess: (result) => {

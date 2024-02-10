@@ -12,7 +12,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import SelectField from '@/components/elements/select/select-field';
-import { StockStatus, TaxStatusList } from '@/constants';
+import { ProductCollection, StockStatus, TaxStatusList } from '@/constants';
 import { Checkbox } from '@/components/ui/checkbox';
 import SetGallery from '@/components/media/files/set-gallery';
 import ShipClassField from '@/components/elements/select/ship-class-field';
@@ -25,17 +25,15 @@ const ProductTabFields: FC<TabProps> = ({ form }) => {
 		<Tabs defaultValue="general" className="w-full font-poppins">
 			<TabsList>
 				<div className="flex items-center gap-2 bg-white p-1.5 rounded-md flex-wrap">
-					{['general', 'tax', 'inventory', 'shipping', 'gallery'].map(
-						(item, index) => (
-							<TabsTrigger
-								key={index}
-								value={item}
-								className="border-transparent data-[state=active]:bg-gray-muted data-[state=active]:shadow-none capitalize rounded-md"
-							>
-								{item}
-							</TabsTrigger>
-						),
-					)}
+					{TabList.map((item, index) => (
+						<TabsTrigger
+							key={index}
+							value={item.value}
+							className="border-transparent data-[state=active]:bg-gray-muted data-[state=active]:shadow-none capitalize rounded-md"
+						>
+							{item.label}
+						</TabsTrigger>
+					))}
 				</div>
 			</TabsList>
 			<div className="mt-[40px]">
@@ -113,56 +111,33 @@ const ProductTabFields: FC<TabProps> = ({ form }) => {
 								</FormItem>
 							)}
 						/>
-					</div>
-				</TabsContent>
-				<TabsContent value="tax">
-					<div className="form-flex-space">
-						<FormField
-							control={form.control}
-							name="taxStatus"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="field-label-sm">
-										Tax Status
-									</FormLabel>
-									<FormControl>
-										<SelectField
-											triggerClass={
-												'input-field-sm bg-white'
-											}
-											placeholder={'Select status'}
-											defaultValue={field.value}
-											onChange={field.onChange}
-											options={TaxStatusList}
-										/>
-									</FormControl>
-									<FormMessage className="form-error" />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="taxClass"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="field-label-sm">
-										Tax Class
-									</FormLabel>
-									<FormControl>
-										<SelectField
-											triggerClass={
-												'input-field-sm bg-white'
-											}
-											placeholder={'Select status'}
-											defaultValue={field.value}
-											onChange={field.onChange}
-											options={TaxStatusList}
-										/>
-									</FormControl>
-									<FormMessage className="form-error" />
-								</FormItem>
-							)}
-						/>
+						<div className="sm:col-span-2">
+							<FormField
+								control={form.control}
+								name="collection"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="field-label-sm">
+											Collection Type
+										</FormLabel>
+										<FormControl>
+											<SelectField
+												triggerClass={
+													'input-field-sm bg-white'
+												}
+												placeholder={
+													'Select collection...'
+												}
+												defaultValue={field.value}
+												onChange={field.onChange}
+												options={ProductCollection}
+											/>
+										</FormControl>
+										<FormMessage className="form-error" />
+									</FormItem>
+								)}
+							/>
+						</div>
 					</div>
 				</TabsContent>
 				<TabsContent value="inventory">
@@ -281,8 +256,31 @@ const ProductTabFields: FC<TabProps> = ({ form }) => {
 						/>
 					</div>
 				</TabsContent>
-				<TabsContent value="shipping">
-					<div className="form-flex-space">
+				<TabsContent value="tax-shipping">
+					<div className="grid sm:grid-cols-2 gap-[25px]">
+						<FormField
+							control={form.control}
+							name="taxStatus"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="field-label-sm">
+										Tax Status
+									</FormLabel>
+									<FormControl>
+										<SelectField
+											triggerClass={
+												'input-field-sm bg-white'
+											}
+											placeholder={'Select status'}
+											defaultValue={field.value}
+											onChange={field.onChange}
+											options={TaxStatusList}
+										/>
+									</FormControl>
+									<FormMessage className="form-error" />
+								</FormItem>
+							)}
+						/>
 						<FormField
 							control={form.control}
 							name="weight"
@@ -326,6 +324,10 @@ const ProductTabFields: FC<TabProps> = ({ form }) => {
 						/>
 					</div>
 				</TabsContent>
+
+				<TabsContent value="shipping">
+					<div className="form-flex-space"></div>
+				</TabsContent>
 				<TabsContent value="gallery">
 					<div className="form-flex-space">
 						<FormField
@@ -358,5 +360,24 @@ const ProductTabFields: FC<TabProps> = ({ form }) => {
 		</Tabs>
 	);
 };
+
+const TabList = [
+	{
+		label: 'General',
+		value: 'general',
+	},
+	{
+		label: 'Inventory',
+		value: 'inventory',
+	},
+	{
+		label: 'Tax & Shipping',
+		value: 'tax-shipping',
+	},
+	{
+		label: 'Gallery',
+		value: 'gallery',
+	},
+];
 
 export default ProductTabFields;

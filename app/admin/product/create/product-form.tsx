@@ -21,6 +21,8 @@ import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import ContentEditor from '../../../../components/elements/shared/content-editor';
 import { useCreateProduct, useUpdateProduct } from '@/lib/hooks/useProduct';
 import Spinner from '@/components/elements/shared/spinner';
+import SelectField from '@/components/elements/select/select-field';
+import { ProductCollection } from '@/constants';
 type productformProps = {
 	defaultValues: z.infer<typeof ProductFormSchema>;
 	pageTitle: string;
@@ -71,11 +73,7 @@ const ProductForm: FC<productformProps> = ({
 									disabled={isCreate}
 								>
 									{isCreate && (
-										<Spinner
-											className={
-												'btn-spinner-sm mr-[5px]'
-											}
-										/>
+										<Spinner className="h-[20px] w-[20px] stroke-white" />
 									)}
 									Save Changes
 								</Button>
@@ -85,11 +83,7 @@ const ProductForm: FC<productformProps> = ({
 									disabled={isUpdate}
 								>
 									{isUpdate && (
-										<Spinner
-											className={
-												'btn-spinner-sm mr-[5px]'
-											}
-										/>
+										<Spinner className="h-[20px] w-[20px] stroke-white" />
 									)}
 									Save Changes
 								</Button>
@@ -138,6 +132,7 @@ const ProductForm: FC<productformProps> = ({
 									</FormItem>
 								)}
 							/>
+
 							<ProductTabFields form={form} />
 						</div>
 						<div className="form-sidebar">

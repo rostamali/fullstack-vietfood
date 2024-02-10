@@ -51,7 +51,7 @@ export const NavbarLinks = [
 	},
 	{
 		label: 'Categories',
-		url: '/categories',
+		url: '/shop/category',
 	},
 	{
 		label: 'Contact us',
@@ -171,7 +171,7 @@ export const UserNavlinks = [
 ];
 
 /* ======================================= */
-// Shop data
+// Shop Constants
 /* ======================================= */
 export const StoreFeature = [
 	{
@@ -212,10 +212,6 @@ export const QuickContact = [
 		value: `hello@store.com`,
 	},
 ];
-
-/* ======================================= */
-// Shop Constants
-/* ======================================= */
 export const BrandList = [
 	{
 		label: 'HP',
@@ -231,6 +227,42 @@ export const BrandList = [
 	},
 	{
 		label: 'Accessories',
+	},
+];
+export const ProductCollection = [
+	{
+		label: 'New Arrivals',
+		value: 'NEW_ARRIVAL',
+	},
+	{
+		label: 'Best Selling',
+		value: 'BEST_SELLING',
+	},
+	{
+		label: 'Recommended',
+		value: 'RECOMENDED',
+	},
+];
+export const HeroSlider = [
+	{
+		url: `/assets/slider/banner-slide-1.png`,
+	},
+	{
+		url: `/assets/slider/banner-slide-2.png`,
+	},
+	{
+		url: `/assets/slider/banner-slide-3.png`,
+	},
+];
+export const ShopSlider = [
+	{
+		url: `/assets/slider/shop-slide-1.jpg`,
+	},
+	{
+		url: `/assets/slider/shop-slide-2.webp`,
+	},
+	{
+		url: `/assets/slider/shop-slide-3.jpg`,
 	},
 ];
 
@@ -355,11 +387,11 @@ export const FreeShipRequired = [
 export const ProductStatus = [
 	{
 		label: 'Publish',
-		value: 'ACTIVE',
+		value: 'PUBLISH',
 	},
 	{
 		label: 'Draft',
-		value: 'INACTIVE',
+		value: 'DRAFT',
 	},
 ];
 export const StockStatus = [

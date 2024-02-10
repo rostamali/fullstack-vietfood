@@ -5,6 +5,8 @@ import * as z from 'zod';
 const UserRole = ['ADMIN', 'USER'];
 const FormTypes = ['CREATE', 'UPDATE'];
 const UserStatus = ['ACTIVE', 'INACTIVE'];
+const ProductCollection = ['NEW_ARRIVAL', 'BEST_SELLING', 'RECOMENDED'];
+const ProductStatus = ['PUBLISH', 'DRAFT'];
 
 export const LoginFormSchema = z.object({
 	email: z
@@ -482,6 +484,21 @@ export const ProductFormSchema = z.object({
 		.transform((value) =>
 			value === undefined || value === null ? undefined : Number(value),
 		),
+	collection: z
+		.string({
+			required_error: 'Collection status is required',
+		})
+		.refine((value) => ProductCollection.includes(value), {
+			message:
+				'Collection must be one of the options: ' +
+				ProductCollection.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Collection is required',
+			},
+		),
 
 	// Taxes
 	taxStatus: z
@@ -499,7 +516,6 @@ export const ProductFormSchema = z.object({
 				message: 'Tax status is required',
 			},
 		),
-	taxClass: z.string(),
 
 	// Inventory
 	sku: z.string(),
@@ -540,9 +556,10 @@ export const ProductFormSchema = z.object({
 		.string({
 			required_error: 'Status is required',
 		})
-		.refine((value) => UserStatus.includes(value), {
+		.refine((value) => ProductStatus.includes(value), {
 			message:
-				'Status must be one of the options: ' + UserStatus.join(', '),
+				'Status must be one of the options: ' +
+				ProductStatus.join(', '),
 		})
 		.refine(
 			(value) => value !== undefined && value !== null && value !== '',

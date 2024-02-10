@@ -1,6 +1,5 @@
 import LocalSearch from '@/components/elements/filters/local-search';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
 import { BrandList } from '@/constants';
 
 const ProductFilter = () => {
@@ -29,24 +28,6 @@ const ProductFilter = () => {
 						</li>
 					))}
 				</ul>
-			</div>
-			<div>
-				<h5 className="heading-5 mb-3">Brands</h5>
-				<ul className="flex flex-col gap-2">
-					{BrandList.map((item, index) => (
-						<li key={index} className="flex items-center gap-3">
-							<Checkbox className="checkbox-sm" />
-							<span className="text-base-2">{item.label}</span>
-						</li>
-					))}
-				</ul>
-			</div>
-			<div>
-				<h5 className="heading-5 mb-3">Brands</h5>
-				<Slider
-					defaultValue={[0, 100]}
-					className={`w-full rounded-md bg-gray-muted`}
-				/>
 			</div>
 		</div>
 	);

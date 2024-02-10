@@ -13,6 +13,9 @@
 		margin: 0;
 		-moz-appearance: textfield;
 	}
+	#content-editor {
+		@apply h-[400px] overflow-auto scrollbar-body;
+	}
 	/* Dashboard Layouts */
 	.dashboard-container {
 		@apply mx-auto w-full max-w-6xl px-6 sm:px-14;

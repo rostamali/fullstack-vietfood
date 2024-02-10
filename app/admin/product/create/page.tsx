@@ -7,7 +7,7 @@ const ProductActionPage = () => {
 					type: 'CREATE',
 					name: '',
 					excerpt: '',
-					description: '',
+					description: { blocks: [] },
 					thumbnail: null,
 					gallery: null,
 					retailPrice: undefined,
@@ -19,13 +19,13 @@ const ProductActionPage = () => {
 					threshold: undefined,
 					soldIndividual: false,
 					taxStatus: 'NONE',
-					taxClass: '',
 					weight: undefined,
-					shipClass: '',
+					shipClass: null,
 					status: '',
 					category: null,
 					brand: null,
 					label: '',
+					collection: '',
 				}}
 				pageTitle={'Create Product'}
 			/>

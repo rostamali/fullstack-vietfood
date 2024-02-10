@@ -10,7 +10,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import SelectField from '@/components/elements/select/select-field';
-import { ProductStatus } from '@/constants';
+import { ProductCollection, ProductStatus } from '@/constants';
 import SetThumbnail from '@/components/media/files/set-thumbnail';
 import SelectBrand from '@/components/elements/select/brand-field';
 import CategoryField from '@/components/elements/select/category-field';
@@ -96,7 +96,7 @@ const ProductSidebarFields: FC<FieldSidebarProps> = ({ form }) => {
 								}
 								modalTitle={'Select Thumbnail'}
 								onChange={field.onChange}
-								frameClass="w-full h-[240px] bg-white rounded-md"
+								frameClass="w-full h-[285px] bg-white rounded-md"
 								thumbClass="overflow-hidden rounded-md"
 								iconClass="text-black-dark text-opacity-50"
 								selected={field.value ? field.value : null}

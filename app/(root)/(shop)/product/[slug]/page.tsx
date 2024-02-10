@@ -1,4 +1,3 @@
-import { fetchProductBySlug } from '@/lib/actions/product.action';
 import ProductGallery from '../product-gallery';
 import PriceFormat from '@/components/elements/shared/price-format';
 import Link from 'next/link';
@@ -6,6 +5,7 @@ import SocialShare from '../social-share';
 import StarTating from '../star-rating';
 import AddToCart from '../add-to-cart';
 import EmptyError from '@/components/elements/shared/empty-error';
+import { fetchProductBySlug } from '@/lib/actions/shop.action';
 type SearchParams = {
 	params: {
 		slug: string;

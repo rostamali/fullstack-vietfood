@@ -34,6 +34,7 @@ const ContactUs = () => {
 							<div className="flex items-center gap-1.5">
 								{SocialLinks.map((item, index) => (
 									<Link
+										key={index}
 										href={item.url}
 										className="h-[35px] w-[35px] rounded-md border-light flex-center bg-primary-green bg-opacity-20 text-black-dark duration-150 hover:bg-primary-green hover:text-white"
 									>

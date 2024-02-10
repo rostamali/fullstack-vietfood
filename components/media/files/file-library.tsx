@@ -116,7 +116,7 @@ const FileLibrary: FC<FileListProps> = ({ files, pages }) => {
 				<div className="text-base-1">
 					{selectedItems ? selectedItems.length : 0} file(s) selected.
 				</div>
-				<div className="">
+				<div>
 					<Pagination
 						pages={pages}
 						containerClass={''}

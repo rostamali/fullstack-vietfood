@@ -19,14 +19,14 @@ type Selected = {
 	id: string;
 	slug: string;
 };
-type BrandProps = {
+type SelectProps = {
 	trigger: string;
 	placeholder: string;
 	value: Selected | null;
 	onChange: React.Dispatch<React.SetStateAction<Selected | null>>;
 };
 
-const BrandField: FC<BrandProps> = ({
+const BrandField: FC<SelectProps> = ({
 	trigger,
 	placeholder,
 	value,

@@ -14,7 +14,7 @@ import {
 import { ChevronsUpDown } from 'lucide-react';
 import { FC } from 'react';
 import { useStateByCountry } from '@/lib/hooks/useCountry';
-type StateProps = {
+type SelectProps = {
 	trigger: string;
 	placeholder: string;
 	value: string | null;
@@ -22,7 +22,7 @@ type StateProps = {
 	onChange: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-const StateField: FC<StateProps> = ({
+const StateField: FC<SelectProps> = ({
 	trigger,
 	placeholder,
 	value,

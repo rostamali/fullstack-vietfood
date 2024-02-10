@@ -8,7 +8,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { formUrlQuery, removeKeysFromQuery } from '@/lib/helpers/search-query';
+import { formUrlQuery } from '@/lib/helpers/search-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FC } from 'react';
 type SelectFilterProps = {
@@ -38,13 +38,6 @@ const SelectFilter: FC<SelectFilterProps> = ({
 			params: searchParams.toString(),
 			key: filterKey,
 			value: value.toLowerCase(),
-		});
-		router.push(newUrl, { scroll: false });
-	};
-	const handleFilterClear = () => {
-		const newUrl = removeKeysFromQuery({
-			params: searchParams.toString(),
-			keysToRemove: [filterKey],
 		});
 		router.push(newUrl, { scroll: false });
 	};
@@ -80,14 +73,6 @@ const SelectFilter: FC<SelectFilterProps> = ({
 						))
 					) : (
 						<SelectLabel>No options found</SelectLabel>
-					)}
-					{options.length > 0 && (
-						<SelectLabel
-							className="menubar-item cursor-pointer font-medium"
-							onClick={handleFilterClear}
-						>
-							Clear Filter
-						</SelectLabel>
 					)}
 				</SelectGroup>
 			</SelectContent>

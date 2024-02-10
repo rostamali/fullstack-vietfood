@@ -45,7 +45,7 @@ const RootHeader = () => {
 									</div>
 								</Link>
 								<Link
-									href="/cart"
+									href="/user/wishlist"
 									className="relative h-[42px] w-[42px] rounded-full bg-action-warning bg-opacity-40 flex-center"
 								>
 									<Heart

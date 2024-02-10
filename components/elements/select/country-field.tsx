@@ -16,14 +16,14 @@ import { FC } from 'react';
 import { fetchCountryList } from '@/lib/actions/country.action';
 import Image from 'next/image';
 
-type CountryProps = {
+type SelectProps = {
 	trigger: string;
 	placeholder: string;
 	value: string | null;
 	onChange: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-const CountryField: FC<CountryProps> = ({
+const CountryField: FC<SelectProps> = ({
 	trigger,
 	placeholder,
 	value,
