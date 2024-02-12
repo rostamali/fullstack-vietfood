@@ -1,8 +1,16 @@
 import Link from 'next/link';
 import CheckedIcon from './checked-icon';
 import { Button } from '@/components/ui/button';
+import { redirect } from 'next/navigation';
+type SearchParams = {
+	searchParams: {
+		orderId: string | null;
+	};
+};
 
-const ThankYouPage = () => {
+const ThankYouPage = ({ searchParams }: SearchParams) => {
+	if (!searchParams.orderId) redirect('/permission-error');
+
 	return (
 		<div className="thank-you-page py-[60px]">
 			<div className="container">
@@ -13,8 +21,12 @@ const ThankYouPage = () => {
 					<div className="space-y-4">
 						<h2 className="heading-2">Thanks For Your Order !</h2>
 						<p className="text-base-1">
-							Thanks for placing order SHOPER42712, you will
-							receive a confirmation email if not contact{' '}
+							Thanks for placing order{' '}
+							<span className="text-action-success">
+								{searchParams.orderId}
+							</span>
+							, you will receive a confirmation email if not
+							contact{' '}
 							<Link
 								href="mailto:info@company.com"
 								className="text-primary-green"

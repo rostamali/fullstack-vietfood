@@ -362,6 +362,13 @@ export const createUserOrder = async (params: { cartId: string }) => {
 				message: `Cart doesn't exist`,
 			};
 
+		if (!cartExist.address)
+			return {
+				success: false,
+				id: null,
+				message: 'Shipping address not found',
+			};
+
 		const subTotal = cartSubtotal(cartDetails.cartItems);
 		const totalAmount = subTotal + cartExist.shippingCost;
 
@@ -376,12 +383,6 @@ export const createUserOrder = async (params: { cartId: string }) => {
 				message: 'Order created failed',
 			};
 
-		if (!cartExist.address)
-			return {
-				success: false,
-				id: null,
-				message: 'Shipping address not found',
-			};
 		const newOrder = await prisma.order.create({
 			data: {
 				user: { connect: { id: isAuth.id } },
@@ -457,17 +458,27 @@ export const getUserPaymentDetails = async (params: {
 
 		const order = await prisma.order.findUnique({
 			where: { id: orderId },
+			select: {
+				id: true,
+				total: true,
+				payment: {
+					select: {
+						clientSecret: true,
+						paymentIntentId: true,
+					},
+				},
+			},
 		});
 
-		if (!order) return;
+		const publishKey = process.env.STRIPE_PUBLISH_KEY;
+		if (!order || !publishKey) return;
 
 		return {
-			summary: {
-				subtotal: order.subTotal,
-				shippingCost: order.shippingCost,
-				taxCost: 0,
-				total: order.total,
-			},
+			orderId: order.id,
+			total: order.total,
+			clientSecret: order.payment?.clientSecret,
+			paymentIntent: order.payment?.paymentIntentId,
+			publishKey,
 		};
 	} catch (error) {
 		return;
