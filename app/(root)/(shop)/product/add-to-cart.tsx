@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import { addToCartShema } from '@/lib/helpers/form-validation';
 import { useAddToCart } from '@/lib/hooks/useOrder';
+import { useAddToWishlist } from '@/lib/hooks/useShop';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Heart } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -27,6 +28,7 @@ type FormProps = {
 
 const AddToCart: React.FC<FormProps> = ({ productId }) => {
 	const { mutate: addToCart, isPending } = useAddToCart();
+	const { mutate: addToWishlist, isPending: isAdding } = useAddToWishlist();
 	const form = useForm<z.infer<typeof addToCartShema>>({
 		resolver: zodResolver(addToCartShema),
 		defaultValues: {
@@ -81,25 +83,32 @@ const AddToCart: React.FC<FormProps> = ({ productId }) => {
 							</FormItem>
 						)}
 					/>
-					<Button className="btn-primary-sm" type="button">
-						<Heart size={20} strokeWidth={2.5} />
+					<Button
+						className="btn-primary-sm"
+						type="button"
+						onClick={() => {
+							addToWishlist({
+								productId,
+							});
+						}}
+						disabled={isAdding}
+					>
+						{isAdding ? (
+							<Spinner className="h-[20px] w-[20px] stroke-white" />
+						) : (
+							<Heart size={20} strokeWidth={2.5} />
+						)}
 					</Button>
 				</div>
 				<div className="flex items-center gap-4">
 					<Button
-						className="btn-primary-sm xm:w-[150px] w-full gap-1"
+						className="btn-primary-sm xm:w-[218px] w-full gap-1"
 						disabled={isPending}
 					>
 						{isPending && (
 							<Spinner className="h-[20px] w-[20px] stroke-white" />
 						)}
 						Add to Cart
-					</Button>
-					<Button
-						type="button"
-						className="btn-ghost-sm w-[150px] max-xm:hidden"
-					>
-						Buy Now
 					</Button>
 				</div>
 			</form>

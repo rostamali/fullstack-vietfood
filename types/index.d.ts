@@ -9,6 +9,7 @@ declare module '@editorjs/code';
 declare module '@editorjs/link';
 declare module '@editorjs/image';
 declare module '@editorjs/table';
+declare module 'editorjs-parser';
 
 /* ============================== */
 //  User or Auth types
@@ -285,6 +286,15 @@ interface CartCustomItems {
 	} | null;
 	thumbnail: string | null;
 	category: string;
+	unitPrice: number;
+	totalCost: number;
+}
+interface CheckoutItems {
+	cartItemId: string;
+	name: string;
+	thumbnail: string | null;
+	category: string;
+	quantity: number;
 	unitPrice: number;
 	totalCost: number;
 }

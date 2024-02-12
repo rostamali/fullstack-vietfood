@@ -66,6 +66,38 @@ export async function middleware(req: NextRequest) {
 		}
 	}
 
+	// Shop Authentication
+	const shopCondition =
+		req.nextUrl.pathname.startsWith('/shop') ||
+		req.nextUrl.pathname.startsWith('/order') ||
+		req.nextUrl.pathname.startsWith('/product');
+	if (shopCondition) {
+		if (!authenticated) {
+			response.cookies.delete('vietfood_refresh_token');
+			response.cookies.delete('vietfood_access_token');
+			return NextResponse.redirect(
+				new URL(
+					`/auth/login?redirect=${req.nextUrl.pathname}`,
+					req.url,
+				),
+			);
+		} else if (
+			authenticated.role === 'USER' ||
+			authenticated.role === 'ADMIN'
+		) {
+			return;
+		} else {
+			response.cookies.delete('vietfood_refresh_token');
+			response.cookies.delete('vietfood_access_token');
+			return NextResponse.redirect(
+				new URL(
+					`/auth/login?redirect=${req.nextUrl.pathname}`,
+					req.url,
+				),
+			);
+		}
+	}
+
 	return;
 }
 

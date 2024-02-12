@@ -20,6 +20,7 @@ export const createPaymentIntent = async (params: IntentProps) => {
 
 		return {
 			paymentIntent: paymentIntent.id,
+			clientSecret: paymentIntent.client_secret,
 		};
 	} catch (error) {
 		return;

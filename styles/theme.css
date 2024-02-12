@@ -285,4 +285,42 @@
 		width: var(--radix-popover-trigger-width);
 		max-height: var(--radix-popover-content-available-height);
 	}
+
+	/* ========== Editor JS Content Style ========= */
+	.content-description h1 {
+		@apply heading-1 mb-3;
+	}
+	.content-description h2 {
+		@apply heading-2 mb-3;
+	}
+	.content-description h3 {
+		@apply heading-3 mb-3;
+	}
+	.content-description h4 {
+		@apply heading-4 mb-3;
+	}
+	.content-description h5 {
+		@apply heading-5 mb-3;
+	}
+	.content-description h6 {
+		@apply heading-6 mb-3;
+	}
+	.content-description pre {
+		@apply bg-white p-5 rounded-md my-4;
+	}
+	.content-description pre code {
+		@apply w-full whitespace-pre-wrap break-words;
+	}
+	.content-description ul {
+		@apply list-disc pl-[40px] my-4 space-y-4;
+	}
+	.content-description figure img {
+		@apply rounded-md;
+	}
+	.content-description figcaption {
+		@apply bg-white p-3 rounded-md mt-2 text-base-2 mb-4;
+	}
+	.content-description a {
+		@apply text-action-danger underline duration-150 hover:text-action-success;
+	}
 }

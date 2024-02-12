@@ -31,7 +31,7 @@ const CouponForm = () => {
 						control={form.control}
 						name="name"
 						render={({ field }) => (
-							<FormItem>
+							<FormItem className="w-full">
 								<FormControl>
 									<Input
 										placeholder="Coupon Code"

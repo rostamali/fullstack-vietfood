@@ -1,8 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { QuickContact, SocialLinks, UsefullLinks } from '@/constants';
 import Link from 'next/link';
-import React from 'react';
 
 const RootFooter = () => {
 	return (

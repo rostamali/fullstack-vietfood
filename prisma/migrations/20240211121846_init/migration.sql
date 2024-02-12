@@ -232,6 +232,7 @@ CREATE TABLE `PaymentInfo` (
     `id` VARCHAR(191) NOT NULL,
     `status` ENUM('PAID', 'UNPAID', 'CANCELLED') NOT NULL DEFAULT 'UNPAID',
     `paymentIntentId` VARCHAR(191) NOT NULL,
+    `clientSecret` VARCHAR(191) NOT NULL,
     `currency` ENUM('usd', 'euro') NOT NULL DEFAULT 'usd',
     `amount` DOUBLE NOT NULL,
     `orderId` VARCHAR(191) NOT NULL,
@@ -346,6 +347,26 @@ CREATE TABLE `TaxRateLocation` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Wishlist` (
+    `id` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `Wishlist_id_key`(`id`),
+    UNIQUE INDEX `Wishlist_userId_key`(`userId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ProductsOnWishlist` (
+    `productId` VARCHAR(191) NOT NULL,
+    `wishlistId` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`productId`, `wishlistId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Options` (
     `id` VARCHAR(191) NOT NULL,
     `value` LONGBLOB NOT NULL,
@@ -430,3 +451,12 @@ ALTER TABLE `ShippingZoneLocation` ADD CONSTRAINT `ShippingZoneLocation_zoneId_f
 
 -- AddForeignKey
 ALTER TABLE `TaxRateLocation` ADD CONSTRAINT `TaxRateLocation_taxId_fkey` FOREIGN KEY (`taxId`) REFERENCES `TaxRate`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Wishlist` ADD CONSTRAINT `Wishlist_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ProductsOnWishlist` ADD CONSTRAINT `ProductsOnWishlist_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ProductsOnWishlist` ADD CONSTRAINT `ProductsOnWishlist_wishlistId_fkey` FOREIGN KEY (`wishlistId`) REFERENCES `Wishlist`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

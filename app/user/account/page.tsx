@@ -1,5 +1,4 @@
 import { CircleDollarSign } from 'lucide-react';
-import React from 'react';
 
 const UserAccountPage = () => {
 	return (

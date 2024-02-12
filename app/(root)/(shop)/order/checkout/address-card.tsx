@@ -43,14 +43,6 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
 											<p>{item.contactName}</p>
 											<p>{item.phoneNumber}</p>
 										</div>
-										<div className="flex items-center gap-2">
-											<button className="font-poppins text-[12px] text-primary-green">
-												Edit
-											</button>
-											<button className="font-poppins text-[12px] text-action-danger">
-												Delete
-											</button>
-										</div>
 									</div>
 									<p className="text-base-2">
 										{item.state}. {item.city} -
@@ -59,7 +51,6 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
 									</p>
 								</div>
 							</div>
-
 							{isPending && (
 								<div className="absolute w-full h-full bg-gray-light bg-opacity-40 top-0 left-0 right-0"></div>
 							)}

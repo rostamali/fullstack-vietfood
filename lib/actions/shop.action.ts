@@ -1,5 +1,8 @@
 'use server';
+import { revalidatePath } from 'next/cache';
+import { handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
+import { isAuthenticatedCheck } from './auth.action';
 
 export const fetchShopProducts = async (params: {
 	pageSize: number;
@@ -72,6 +75,7 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 			select: {
 				id: true,
 				name: true,
+				slug: true,
 				excerpt: true,
 				description: true,
 				thumbnail: {
@@ -98,6 +102,16 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 						salePrice: true,
 						inStock: true,
 						sku: true,
+					},
+				},
+				category: {
+					select: {
+						name: true,
+					},
+				},
+				brand: {
+					select: {
+						name: true,
 					},
 				},
 			},
@@ -138,11 +152,17 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 			[],
 		);
 
+		const description = product.description
+			? product.description.toString('utf-8')
+			: null;
+
 		return {
 			id: product.id,
 			name: product.name,
 			excerpt: product.excerpt,
-			description: product.description,
+			description: description
+				? JSON.parse(description)
+				: JSON.parse(JSON.stringify({ blocks: [] })),
 			gallery,
 			inventory: {
 				regularPrice: product.inventory?.regularPrice || null,
@@ -150,6 +170,11 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 				sku: product.inventory?.sku || null,
 				inStock: product.inventory?.inStock || null,
 			},
+			category: product.category
+				? product.category.name
+				: 'Uncategorized',
+			brand: product.brand ? product.brand.name : 'Unknown',
+			shareLink: `${process.env.HOST}/product/${product.slug}`,
 		};
 	} catch (error) {
 		return;
@@ -373,3 +398,144 @@ export const fetchProductByCategory = async (params: {
 		return;
 	}
 };
+
+/* ============= Wishlist actions ============= */
+export const addProductToWishlist = async (params: { productId: string }) => {
+	try {
+		const { productId } = params;
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth) return handleResponse(false, `You don't have permission`);
+
+		const wishlistExist = await prisma.wishlist.findUnique({
+			where: { userId: isAuth.id },
+		});
+
+		if (wishlistExist) {
+			const productOnWishlist = await prisma.productsOnWishlist.findFirst(
+				{
+					where: {
+						wishlistId: wishlistExist.id,
+						productId,
+					},
+				},
+			);
+			if (productOnWishlist)
+				return handleResponse(true, `Item already added to wishlist`);
+
+			await prisma.wishlist.update({
+				where: { userId: isAuth.id },
+				data: {
+					products: {
+						create: {
+							product: { connect: { id: productId } },
+						},
+					},
+				},
+			});
+			return handleResponse(true, `Item added to wishlist`);
+		}
+
+		await prisma.wishlist.create({
+			data: {
+				user: { connect: { id: isAuth.id } },
+				products: {
+					create: {
+						product: { connect: { id: productId } },
+					},
+				},
+			},
+		});
+		return handleResponse(true, `Item added to wishlist`);
+	} catch (error) {
+		return handleResponse(false, `Add to wishlist failed`);
+	}
+};
+export const fetchWishlistProducts = async () => {
+	try {
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth) return;
+
+		const wishlist = await prisma.wishlist.findUnique({
+			where: {
+				userId: isAuth.id,
+			},
+			select: {
+				products: {
+					select: {
+						product: {
+							select: {
+								id: true,
+								name: true,
+								slug: true,
+								collection: true,
+								thumbnail: {
+									select: {
+										id: true,
+										url: true,
+										title: true,
+										fileType: true,
+									},
+								},
+								inventory: {
+									select: {
+										regularPrice: true,
+										salePrice: true,
+										inStock: true,
+									},
+								},
+								createdAt: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		if (!wishlist) return;
+
+		const products = wishlist.products.map((item) => item.product);
+
+		return {
+			products,
+		};
+	} catch (error) {
+		return;
+	}
+};
+export const removeProductFormWishlist = async (params: {
+	productId: string;
+}) => {
+	try {
+		const { productId } = params;
+
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth) return handleResponse(false, `You don't have permission`);
+
+		const productOnWishlist = await prisma.productsOnWishlist.findFirst({
+			where: {
+				wishlist: {
+					userId: isAuth.id,
+				},
+				productId,
+			},
+		});
+		if (!productOnWishlist)
+			return handleResponse(false, `Product not exist on wishlist`);
+		await prisma.productsOnWishlist.delete({
+			where: {
+				productId_wishlistId: {
+					productId: productOnWishlist.productId,
+					wishlistId: productOnWishlist.wishlistId,
+				},
+			},
+		});
+		revalidatePath('/user/wishlist');
+
+		return handleResponse(true, `Item removed from wishlist`);
+	} catch (error) {
+		return handleResponse(false, `Remove action failed`);
+	}
+};
+
+/* ============= Store Actions ============= */
+// export const;

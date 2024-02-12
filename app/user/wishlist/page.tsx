@@ -1,10 +1,13 @@
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
-import PriceFormat from '@/components/elements/shared/price-format';
+import EmptyError from '@/components/elements/shared/empty-error';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
+import { fetchWishlistProducts } from '@/lib/actions/shop.action';
 import Link from 'next/link';
+import WishlistCard from './wishlist-card';
 
-const Wishllist = () => {
+const Wishllist = async () => {
+	const result = await fetchWishlistProducts();
+
 	return (
 		<div className="dashboard-col-space">
 			<div className="flex items-center justify-between gap-[40px]">
@@ -18,53 +21,22 @@ const Wishllist = () => {
 				</Link>
 			</div>
 			<div className="wishlist">
-				<div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-5 lg:gap-2 gap-5">
-					{[1, 2, 3, 4, 5, 6].map((item, index) => (
-						<div className="product-card overflow-hidden group bg-white p-4 rounded">
-							<div
-								className={`flex-center rounded h-[260px] bg-[#F6F6F6]`}
-								key={index}
-							>
-								<Image
-									src={`/uploads/files/upload-1707453426544-369.94372964481596.png`}
-									alt={''}
-									width={480}
-									height={500}
-									className="object-contain w-[70%]"
-									style={{
-										aspectRatio: '3/3',
-									}}
-								/>
-							</div>
-							<div className="space-y-2">
-								<Link
-									href={`/product/fsh`}
-									className="mt-3 block"
-								>
-									<h4 className="lg:text-[16px] sm:text-[13px] xm:text-[15px] text-[13px] font-medium text-black-dark duration-100 group-hover:text-primary-green">
-										Digital smart watch
-									</h4>
-									<PriceFormat
-										regularClass="text-[14px]"
-										saleClass="text-[18px]"
-										inventory={{
-											regularPrice: 42,
-											salePrice: 36,
-										}}
-									/>
-								</Link>
-								<div className="flex items-center gap-2 flex-col">
-									<Button className="btn-primary-sm w-full">
-										Add To Cart
-									</Button>
-									<Button className="btn-ghost-sm w-full">
-										Remove Item
-									</Button>
-								</div>
-							</div>
-						</div>
-					))}
-				</div>
+				{result && result.products.length ? (
+					<div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-5 lg:gap-2 gap-5">
+						{result.products.map((item, index) => (
+							<WishlistCard item={item} key={index} />
+						))}
+					</div>
+				) : (
+					<EmptyError
+						contentClass={
+							'sm:max-w-[450px] justify-center mx-auto text-center items-center py-[60px]'
+						}
+						title={'Your Wishlist is Empty'}
+						description={`Start adding products to your wishlist to keep track of your favorite items and receive updates on their availability and price changes.`}
+						Links={null}
+					/>
+				)}
 			</div>
 		</div>
 	);

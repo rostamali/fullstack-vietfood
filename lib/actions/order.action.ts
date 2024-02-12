@@ -88,6 +88,9 @@ export const addToCard = async (params: AddToCart) => {
 					},
 				},
 			});
+
+			revalidatePath('/order/cart');
+			revalidatePath('/order/checkout');
 			return handleResponse(true, `Product added to the cart`);
 		}
 
@@ -154,6 +157,8 @@ export const addToCard = async (params: AddToCart) => {
 			},
 		});
 
+		revalidatePath('/order/cart');
+		revalidatePath('/order/checkout');
 		return handleResponse(true, `Product added to the cart`);
 	} catch (error) {
 		return handleResponse(false, `Add to cart failed`);
@@ -302,6 +307,26 @@ export const updateDefaultAddress = async (params: { addressId: string }) => {
 		return handleResponse(false, `Shipping address failed`);
 	}
 };
+export const checkProductOnCart = async (params: {
+	userId: string;
+	productId: string;
+}) => {
+	try {
+		const { userId, productId } = params;
+		const product = await prisma.cartItem.findFirst({
+			where: {
+				productId,
+				cart: {
+					userId,
+				},
+			},
+		});
+		if (!product) return false;
+		return true;
+	} catch (error) {
+		return false;
+	}
+};
 
 /* ================================ */
 // Order actions
@@ -383,6 +408,7 @@ export const createUserOrder = async (params: { cartId: string }) => {
 					create: {
 						status: 'UNPAID',
 						paymentIntentId: stripePayment.paymentIntent,
+						clientSecret: stripePayment.clientSecret as string,
 						currency: 'usd',
 						amount: totalAmount,
 					},
@@ -419,6 +445,32 @@ export const createUserOrder = async (params: { cartId: string }) => {
 			id: null,
 			message: 'Order created failed',
 		};
+	}
+};
+export const getUserPaymentDetails = async (params: {
+	orderId: string | null;
+}) => {
+	try {
+		const { orderId } = params;
+		const isAuth = await isAuthenticatedCheck();
+		if (!isAuth || !orderId) return;
+
+		const order = await prisma.order.findUnique({
+			where: { id: orderId },
+		});
+
+		if (!order) return;
+
+		return {
+			summary: {
+				subtotal: order.subTotal,
+				shippingCost: order.shippingCost,
+				taxCost: 0,
+				total: order.total,
+			},
+		};
+	} catch (error) {
+		return;
 	}
 };
 

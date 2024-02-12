@@ -16,6 +16,7 @@ const ProductCategories = async ({ searchParams }: SearchParams) => {
 		page: searchParams.page ? parseInt(searchParams.page) : 1,
 		query: searchParams.q ? searchParams.q : null,
 	});
+
 	return (
 		<div className="categories py-[60px]">
 			<div className="container space-y-16">

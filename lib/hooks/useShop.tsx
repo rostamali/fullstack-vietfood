@@ -1,21 +1,19 @@
 'use client';
+import { useMutation } from '@tanstack/react-query';
+import {
+	addProductToWishlist,
+	removeProductFormWishlist,
+} from '../actions/shop.action';
+import { toast } from 'sonner';
 import {
 	ToastError,
 	ToastSuccess,
 } from '@/components/elements/shared/custom-toast';
-import { useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import {
-	addToCard,
-	createUserOrder,
-	updateDefaultAddress,
-} from '../actions/order.action';
-import { useRouter } from 'next/navigation';
 
-export const useAddToCart = () => {
+export const useAddToWishlist = () => {
 	return useMutation({
-		mutationFn: async (data: AddToCart) => {
-			return await addToCard(data);
+		mutationFn: async (data: { productId: string }) => {
+			return await addProductToWishlist(data);
 		},
 		onSuccess: (result) => {
 			if (result.success) {
@@ -35,19 +33,16 @@ export const useAddToCart = () => {
 		},
 	});
 };
-export const useCreateOrder = () => {
-	const router = useRouter();
-
+export const useRemoveFromWishlist = () => {
 	return useMutation({
-		mutationFn: async (data: { cartId: string }) => {
-			return await createUserOrder(data);
+		mutationFn: async (data: { productId: string }) => {
+			return await removeProductFormWishlist(data);
 		},
 		onSuccess: (result) => {
 			if (result.success) {
 				toast.custom((t) => (
 					<ToastSuccess toastNumber={t} content={result.message} />
 				));
-				router.push(`/order/payment?orderId=${result.id}`);
 			} else {
 				toast.custom((t) => (
 					<ToastError toastNumber={t} content={result.message} />
@@ -58,15 +53,6 @@ export const useCreateOrder = () => {
 			toast.custom((t) => (
 				<ToastError toastNumber={t} content={error.message} />
 			));
-		},
-	});
-};
-export const useChangeShipAddress = () => {
-	return useMutation({
-		mutationFn: async (data: { addressId: string }) => {
-			return await updateDefaultAddress({
-				addressId: data.addressId,
-			});
 		},
 	});
 };

@@ -1,12 +1,12 @@
-import CreateAddress from '@/components/elements/modals/create-address';
-import CartSummray from '../cart-summray';
 import { fetchCheckoutDetails } from '@/lib/actions/order.action';
 import EmptyError from '@/components/elements/shared/empty-error';
 import Link from 'next/link';
-import AddressCard from './address-card';
 import CheckoutItem from './checkout-item';
-import { Button } from '@/components/ui/button';
-import CheckoutForm from './checkout-form';
+import CreateAddress from '@/components/elements/modals/create-address';
+import AddressCard from './address-card';
+import CartSummray from '../cart-summray';
+import CheckoutBtn from './checkout-btn';
+import CouponForm from '@/components/elements/forms/coupon-form';
 
 const CheckoutPage = async () => {
 	const result = await fetchCheckoutDetails();
@@ -15,8 +15,18 @@ const CheckoutPage = async () => {
 		<div className="checkout-page py-[60px]">
 			<div className="container">
 				{result ? (
-					<div className="grid lg:grid-cols-[1fr,330px] max-md:grid-cols-1 gap-[25px]">
-						<div>
+					<div className="grid grid-cols-[1fr,420px] gap-6">
+						<div className="space-y-6">
+							<div className="bg-white rounded-md">
+								<h4 className="heading-4 mb-3 p-4">
+									Your Order
+								</h4>
+								<div className="space-y-2 md:h-[372px] overflow-y-auto scrollbar-sm">
+									{result.items.map((item, index) => (
+										<CheckoutItem data={item} key={index} />
+									))}
+								</div>
+							</div>
 							<div className="bg-white p-4 mb-5 rounded-md">
 								<h4 className="heading-4 mb-3">
 									Shipping Address
@@ -32,33 +42,14 @@ const CheckoutPage = async () => {
 									/>
 								</div>
 							</div>
-							<div className="bg-white p-4 mb-5 rounded-md">
-								<h4 className="heading-4 mb-3">
-									Payment Method
-								</h4>
-
-								<CheckoutForm cartId={result.cartId} />
-							</div>
 						</div>
-						<div>
-							<div className="bg-white p-4 rounded-md mb-6 space-y-4">
-								<h4 className="heading-4">Your Order</h4>
-								<div className="space-y-2">
-									{result.items.map((item, index) => (
-										<CheckoutItem data={item} key={index} />
-									))}
-								</div>
+						<div className="space-y-6">
+							<div className="bg-white p-4 mb-5 rounded-md">
+								<h4 className="heading-4 mb-4">Coupon</h4>
+								<CouponForm />
 							</div>
-
 							<CartSummray summary={result.summary} />
-
-							<Button
-								type="submit"
-								form="checkout-form"
-								className="btn-primary-lg w-full mt-6"
-							>
-								Confirm Order
-							</Button>
+							<CheckoutBtn cartId={result.cartId} />
 						</div>
 					</div>
 				) : (

@@ -18,16 +18,16 @@ const CartPage = async () => {
 							<div className="bg-white mb-5 rounded-md p-4">
 								<div className="flex sm:items-center justify-between max-sm:flex-col gap-3">
 									<h5 className="heading-5">
-										Shopping Cart: 4
+										Shopping Cart: {result.items.length}
 									</h5>
-									<Link href="" className="">
+									<Link href="/shop" className="">
 										<Button className="btn-ghost-sm">
 											Continue Shopping
 										</Button>
 									</Link>
 								</div>
 							</div>
-							<div className="h-[435px] overflow-y-auto scrollbar-sm">
+							<div className="md:h-[426px] overflow-y-auto scrollbar-sm">
 								{result.items.map((item, index) => (
 									<div
 										className="bg-white first:rounded-t-md last:rounded-b-md overflow-hidden"
