@@ -155,7 +155,7 @@ export const verifyAccessToken = async (token: string) => {
 		return;
 	}
 };
-export const isAuthenticated = async (params: {
+export const isAuthEdge = async (params: {
 	refreshToken: string | null;
 	accessToken: string | null;
 }) => {

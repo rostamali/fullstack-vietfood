@@ -1,4 +1,4 @@
-import { NavbarLinks, TopbarLinks } from '@/constants';
+import { NavbarLinks } from '@/constants';
 import Link from 'next/link';
 import Logo from '../shared/logo';
 import {
@@ -12,8 +12,11 @@ import {
 import NavSearch from '../filters/nav-search';
 import { Separator } from '@/components/ui/separator';
 import RootNavbar from '../drawers/root-navbar';
+import { fetchHeaderDetails } from '@/lib/actions/shop.action';
 
-const RootHeader = () => {
+const RootHeader = async () => {
+	const result = await fetchHeaderDetails();
+
 	return (
 		<header id="site-header">
 			<div className="desktop-header max-md:hidden">
@@ -33,7 +36,7 @@ const RootHeader = () => {
 							{/* Infos */}
 							<div className="flex items-center gap-5">
 								<Link
-									href="/order/cart"
+									href={result.cart.link}
 									className="relative h-[42px] w-[42px] rounded-full bg-primary-green bg-opacity-40 flex-center"
 								>
 									<ShoppingBag
@@ -41,11 +44,11 @@ const RootHeader = () => {
 										className="text-black-dark"
 									/>
 									<div className="absolute h-[20px] w-[20px] bg-primary-green rounded-full font-poppins text-[13px] flex-center text-white -top-1 -right-1">
-										4
+										{result.cart.count}
 									</div>
 								</Link>
 								<Link
-									href="/user/wishlist"
+									href={result.wishlist.link}
 									className="relative h-[42px] w-[42px] rounded-full bg-action-warning bg-opacity-40 flex-center"
 								>
 									<Heart
@@ -53,15 +56,18 @@ const RootHeader = () => {
 										className="text-black-dark"
 									/>
 									<div className="absolute h-[20px] w-[20px] bg-action-warning rounded-full font-poppins text-[13px] flex-center text-white -top-1 -right-1">
-										4
+										{result.wishlist.count}
 									</div>
 								</Link>
-								<div className="h-[42px] w-[42px] rounded-full bg-action-warning bg-opacity-40 flex-center">
+								<Link
+									href={result.profileLink}
+									className="h-[42px] w-[42px] rounded-full bg-action-warning bg-opacity-40 flex-center"
+								>
 									<UserRound
 										size={17}
 										className="text-black-dark"
 									/>
-								</div>
+								</Link>
 							</div>
 						</div>
 					</div>

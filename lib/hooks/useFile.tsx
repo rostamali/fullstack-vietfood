@@ -5,13 +5,13 @@ import {
 import {
 	deleteFilesByAdmin,
 	fetchFileDetailsbyAdmin,
-	updateFilesByAdmin,
+	compressFileByAdmin,
 	uploadFilesByAdmin,
 } from '@/lib/actions/file.action';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { FileUpdateFormSchema } from '../helpers/form-validation';
+import { CompressFormSchema } from '../helpers/form-validation';
 
 export const useFileDetails = (id: string) => {
 	return useQuery({
@@ -67,19 +67,23 @@ export const useUploadFiles = () => {
 		},
 	});
 };
-export const useUpdateFiles = () => {
+export const useCompressFile = (fileId: string) => {
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (data: {
 			id: string;
-			file: z.infer<typeof FileUpdateFormSchema>;
+			file: z.infer<typeof CompressFormSchema>;
 		}) => {
-			return await updateFilesByAdmin({
+			return await compressFileByAdmin({
 				id: data.id,
 				file: data.file,
 			});
 		},
 		onSuccess: (result) => {
 			if (result.success) {
+				queryClient.invalidateQueries({
+					queryKey: ['fileDetails', fileId],
+				});
 				toast.custom((t) => (
 					<ToastSuccess toastNumber={t} content={result.message} />
 				));

@@ -4,15 +4,15 @@ import { ProductFormSchema } from '../helpers/form-validation';
 import { createSlug, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
 import { ProductCollection, ProductStatus, TaxStatus } from '@prisma/client';
-import { isAuthenticatedAdmin } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import { revalidatePath } from 'next/cache';
 
 export const createProductByAdmin = async (params: {
 	data: z.infer<typeof ProductFormSchema>;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return {
 				id: null,
 				message: `You don't have permission`,
@@ -132,8 +132,8 @@ export const createProductByAdmin = async (params: {
 };
 export const fetchProductById = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const product = await prisma.product.findUnique({
 			where: {
@@ -222,6 +222,10 @@ export const updateProductByAdmin = async (params: {
 	id: string;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `Product update failed`);
+
 		const {
 			name,
 			excerpt,
@@ -373,6 +377,9 @@ export const fetchProductByAdmin = async (params: {
 	status: string | null;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
+
 		const { page = 1, pageSize = 10, query, status } = params;
 		const products = await prisma.product.findMany({
 			where: {
@@ -434,10 +441,10 @@ export const fetchProductByAdmin = async (params: {
 };
 export const importProductFromCSV = async (params: CSVProduct[]) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return {
-				success: true,
+				success: false,
 				message: `You don't have permission`,
 			};
 
@@ -499,8 +506,10 @@ export const deleteProductByIds = async (params: {
 	type: ProductActionTypes;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
+
 		const { ids, type } = params;
 
 		if (type === 'DELETE') {

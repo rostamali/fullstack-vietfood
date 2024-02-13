@@ -1,7 +1,7 @@
 'use server';
 import * as z from 'zod';
 import { handleResponse } from '../helpers/formater';
-import { isAuthenticatedCheck } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import prisma from '../prisma';
 import { AddressFormSchema } from '../helpers/form-validation';
 import { CountriesList } from '@/constants/countries';
@@ -12,7 +12,7 @@ export const createNewAddress = async (
 	params: z.infer<typeof AddressFormSchema>,
 ) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
@@ -75,7 +75,7 @@ export const createNewAddress = async (
 };
 export const fetchAddresses = async () => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return;
 
 		const address = await prisma.address.findMany({
@@ -127,7 +127,7 @@ export const fetchAddresses = async () => {
 };
 export const fetchAddressDetails = async (params: { id: string }) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return;
 
 		const address = await prisma.address.findUnique({
@@ -169,7 +169,7 @@ export const updateAddress = async (params: {
 	data: z.infer<typeof AddressFormSchema>;
 }) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
@@ -237,7 +237,7 @@ export const updateAddress = async (params: {
 };
 export const deleteAddress = async (params: { id: string }) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 

@@ -2,7 +2,7 @@
 import * as z from 'zod';
 import { revalidatePath } from 'next/cache';
 import { createSlug, handleResponse } from '../helpers/formater';
-import { isAuthenticatedAdmin } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import prisma from '../prisma';
 import { BrandFormSchema } from '../helpers/form-validation';
 
@@ -10,8 +10,9 @@ export const createBrandByAdmin = async (
 	params: z.infer<typeof BrandFormSchema>,
 ) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		const {
 			name,
@@ -66,6 +67,10 @@ export const updateBrandByAdmin = async (params: {
 	id: string;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
+
 		const {
 			name,
 			description,
@@ -139,6 +144,8 @@ export const fetchBrandByAdmin = async (params: {
 	query: string | null;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 		const { page = 1, pageSize = 10, query } = params;
 		const brands = await prisma.brand.findMany({
 			where: {
@@ -196,8 +203,8 @@ export const fetchBrandByAdmin = async (params: {
 };
 export const brandDetailsById = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const brand = await prisma.brand.findUnique({
 			where: {
@@ -231,8 +238,8 @@ export const brandDetailsById = async (params: { id: string }) => {
 };
 export const importBrandFromCSV = async (params: CSVBrand[]) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return {
 				success: true,
 				message: `You don't have permission`,

@@ -676,3 +676,39 @@ export const ContactFormSchema = z.object({
 		.min(50, { message: 'Message should atleast 50 characters' })
 		.max(250, { message: `Message must not exceed 250 characters` }),
 });
+
+/* ================================== */
+// File compress Schemas
+/* ================================== */
+
+export const CompressFormSchema = z.object({
+	width: z.coerce
+		.number({
+			invalid_type_error: 'Width must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? 0 : Number(value),
+		)
+		.refine((value) => value > 0, {
+			message: 'Width must be positive',
+			path: [],
+		}),
+	height: z.coerce
+		.number({
+			invalid_type_error: 'Height must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? 0 : Number(value),
+		)
+		.refine((value) => value > 0, {
+			message: 'Height must be positive',
+			path: [],
+		}),
+	quality: z.coerce
+		.string({
+			invalid_type_error: 'Priority must be a number',
+		})
+		.transform((value) =>
+			value === undefined || value === null ? undefined : Number(value),
+		),
+});

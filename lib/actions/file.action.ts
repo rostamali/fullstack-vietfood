@@ -1,11 +1,13 @@
 'use server';
+import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import Jimp from 'jimp';
 import { fileSizeFormat, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
-import { isAuthenticatedAdmin, isAuthenticatedCheck } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import { join } from 'path';
-import { unlink, writeFile } from 'fs/promises';
+import { readFile, unlink, writeFile } from 'fs/promises';
+import { CompressFormSchema } from '../helpers/form-validation';
 
 export const uploadFilesByAdmin = async (formData: FormData) => {
 	try {
@@ -16,8 +18,8 @@ export const uploadFilesByAdmin = async (formData: FormData) => {
 			return handleResponse(false, 'No files uploaded');
 		}
 
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 
 		for (let i = 0; i < files.length; i++) {
@@ -40,7 +42,7 @@ export const uploadFilesByAdmin = async (formData: FormData) => {
 					size: filesize,
 					author: {
 						connect: {
-							id: isAdmin.id,
+							id: isAuth.id,
 						},
 					},
 				},
@@ -60,8 +62,8 @@ export const fetchFilesByAdmin = async (params: {
 	query: string | null;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const { page = 1, pageSize = 10, type, query } = params;
 		const files = await prisma.file.findMany({
@@ -110,8 +112,8 @@ export const fetchFilesByAdmin = async (params: {
 };
 export const fetchFileDetailsbyAdmin = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return null;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return null;
 
 		const file = await prisma.file.findUnique({
 			where: {
@@ -144,8 +146,8 @@ export const fetchFileDetailsbyAdmin = async (params: { id: string }) => {
 };
 export const fetchModalFiles = async ({ pageParam = 0 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return [];
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return [];
 		const files = await prisma.file.findMany({
 			select: {
 				id: true,
@@ -164,49 +166,75 @@ export const fetchModalFiles = async ({ pageParam = 0 }) => {
 		return [];
 	}
 };
-export const updateFilesByAdmin = async (params: {
-	file: {
-		title: string;
-		description: string | null;
-	};
+export const compressFileByAdmin = async (params: {
+	file: z.infer<typeof CompressFormSchema>;
 	id: string;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
-		const { file, id } = params;
+		const {
+			file: { width, height, quality },
+			id,
+		} = params;
+
 		const fileExist = await prisma.file.findUnique({
 			where: {
 				id,
 			},
 			select: {
 				id: true,
+				fileType: true,
+				fileName: true,
 			},
 		});
 		if (!fileExist) return handleResponse(false, 'File does not exist');
+		if (fileExist.fileType !== 'image')
+			return handleResponse(false, `Choose only "image" type`);
+
+		const filePath = join('./public/uploads', 'files/', fileExist.fileName);
+		const fileBuffer = await readFile(filePath);
+		const selectedFile = await Jimp.read(fileBuffer);
+
+		const newFileName = `upload-${Date.now()}-${
+			Math.random() * (999 - 1) + 1
+		}.jpg`;
+		const uploadPath = join('./public/uploads', 'files/', newFileName);
+		selectedFile
+			.cover(width, height)
+			.quality(quality ? quality : 100)
+			.writeAsync(uploadPath);
+
+		await unlink(filePath);
+
+		const newUploadBuffer = await readFile(uploadPath);
+		const compressSize = fileSizeFormat(newUploadBuffer.length);
 
 		await prisma.file.update({
 			where: {
 				id,
 			},
 			data: {
-				title: file.title,
-				description: file.description,
+				fileName: newFileName,
+				url: newFileName,
+				size: compressSize,
+				isCompress: true,
 			},
 		});
 		revalidatePath('/admin/files', 'page');
 
-		return handleResponse(true, 'File updated successfully');
+		return handleResponse(true, 'File compressed successfully');
 	} catch (error) {
-		return handleResponse(false, 'File update failed');
+		return handleResponse(false, 'File compressed failed');
 	}
 };
 export const deleteFilesByAdmin = async (params: { fileId: string[] }) => {
 	try {
 		const { fileId } = params;
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 
 		const filesToDelete = await prisma.file.findMany({
@@ -254,7 +282,7 @@ export const uploadProfilePicture = async (formData: FormData) => {
 			return handleResponse(false, 'No files uploaded');
 		}
 
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
@@ -311,7 +339,7 @@ export const uploadProfilePicture = async (formData: FormData) => {
 };
 export const deleteProfilePicture = async (params: { refreshLink: string }) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 

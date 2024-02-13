@@ -1,7 +1,7 @@
 'use server';
 import * as z from 'zod';
 import { createSlug, handleResponse } from '../helpers/formater';
-import { isAuthenticatedAdmin } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import prisma from '../prisma';
 import { revalidatePath } from 'next/cache';
 import { LocationType, MethodType, TaxStatus } from '@prisma/client';
@@ -16,8 +16,8 @@ export const createShipClassByAdmin = async (
 	params: z.infer<typeof ShipClassSchema>,
 ) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 
 		const { name, description } = params;
@@ -39,8 +39,8 @@ export const updateShipClassByAdmin = async (params: {
 	id: string;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 		const { name, description } = params.data;
 		const classExist = await prisma.shippingClass.findUnique({
@@ -73,8 +73,8 @@ export const fetchShipClassByAdmin = async (params: {
 	page: number;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const { page = 1, pageSize = 10 } = params;
 		const shipClass = await prisma.shippingClass.findMany({
@@ -104,8 +104,8 @@ export const deleteShipClassByAdmin = async (params: {
 	classIds: string[];
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 
 		await prisma.shippingClass.deleteMany({
@@ -123,8 +123,8 @@ export const deleteShipClassByAdmin = async (params: {
 };
 export const classListForFlatMethods = async () => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 		const shipClass = await prisma.shippingClass.findMany({
 			select: {
 				id: true,
@@ -142,8 +142,8 @@ export const classListForFlatMethods = async () => {
 };
 export const fetchShipClassList = async () => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const shipClass = await prisma.shippingClass.findMany({
 			select: {
@@ -167,8 +167,8 @@ export const createShipZoneByAdmin = async (
 	params: z.infer<typeof ShipFormSchema>,
 ) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 		const { name, regions, flatMethod, freeMethod, pickupMethod } = params;
 
@@ -271,8 +271,8 @@ export const fetchShipZoneByAdmin = async (params: {
 	page: number;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const { page = 1, pageSize = 10 } = params;
 		const zonesList = await prisma.shippingZone.findMany({
@@ -333,8 +333,8 @@ export const fetchShipZoneByAdmin = async (params: {
 };
 export const fetchZoneDetailsById = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const shipZone = await prisma.shippingZone.findUnique({
 			where: {
@@ -450,8 +450,8 @@ export const updateShipZoneByAdmin = async (params: {
 	data: z.infer<typeof ShipFormSchema>;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 
 		const {
@@ -573,8 +573,8 @@ export const updateShipZoneByAdmin = async (params: {
 };
 export const deleteShipZoneByAdmin = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return handleResponse(false, `You don't have a permission`);
 
 		await prisma.shippingZone.delete({

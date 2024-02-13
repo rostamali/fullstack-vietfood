@@ -1,7 +1,7 @@
 'use server';
 import * as z from 'zod';
 import { createSlug, handleResponse } from '../helpers/formater';
-import { isAuthenticatedAdmin } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import { TaxFormSchema } from '../helpers/form-validation';
 import prisma from '../prisma';
 import { revalidatePath } from 'next/cache';
@@ -10,8 +10,9 @@ export const createTaxRateByAdmin = async (
 	params: z.infer<typeof TaxFormSchema>,
 ) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		const { name, country, state, zipCode, taxRate, priority } = params;
 		const slug = await createSlug(name);
@@ -52,8 +53,8 @@ export const fetchTaxRateByAdmin = async (params: {
 	query: string | null;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const { page = 1, pageSize = 10, query } = params;
 		const taxRates = await prisma.taxRate.findMany({
@@ -98,8 +99,8 @@ export const fetchTaxRateByAdmin = async (params: {
 };
 export const fetchTaxDetailsById = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const taxRate = await prisma.taxRate.findUnique({
 			where: {
@@ -133,8 +134,9 @@ export const updateTaxRateByAdmin = async (params: {
 	id: string | null;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 		const {
 			data: { name, taxRate, country, state, priority, zipCode },
 			id,
@@ -203,8 +205,9 @@ export const updateTaxRateByAdmin = async (params: {
 };
 export const deleteTaxRateByIds = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		await prisma.taxRateLocation.deleteMany({
 			where: {

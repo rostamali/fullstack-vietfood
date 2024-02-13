@@ -2,7 +2,7 @@
 import { revalidatePath } from 'next/cache';
 import { createSlug, handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
-import { isAuthenticatedAdmin } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import { CategoryFormSchema } from '../helpers/form-validation';
 import * as z from 'zod';
 
@@ -10,8 +10,9 @@ export const createCategoryByAdmin = async (
 	params: z.infer<typeof CategoryFormSchema>,
 ) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		const { name, description, thumbnail, parent } = params;
 		const slug = await createSlug(name);
@@ -59,6 +60,10 @@ export const updateCategoryByAdmin = async (params: {
 	id: string;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
+
 		const { name, description, thumbnail, parent } = params.data;
 		const categoryExist = await prisma.productCategory.findUnique({
 			where: {
@@ -135,6 +140,9 @@ export const fetchCategoryByAdmin = async (params: {
 	query: string | null;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
+
 		const { page = 1, pageSize = 10, query } = params;
 
 		const categories = await prisma.productCategory.findMany({
@@ -214,8 +222,8 @@ export const fetchCategoryList = async () => {
 };
 export const fetchCategoryDetails = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const category = await prisma.productCategory.findUnique({
 			where: {
@@ -253,8 +261,9 @@ export const fetchCategoryDetails = async (params: { id: string }) => {
 };
 export const deleteCategoryByAdmin = async (params: { catIds: string[] }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		await prisma.productCategory.deleteMany({
 			where: {
@@ -270,8 +279,8 @@ export const deleteCategoryByAdmin = async (params: { catIds: string[] }) => {
 };
 export const importCategoryFromCSV = async (params: CSVCategory[]) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return {
 				success: true,
 				message: `You don't have permission`,

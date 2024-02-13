@@ -1,12 +1,12 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import UpdateFile from '../../elements/forms/update-file';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { dateFormat } from '@/lib/helpers/formater';
+import { UserRoleFormat, dateFormat } from '@/lib/helpers/formater';
 import FileDetailScreen from '@/components/loading/file-details-screen';
 import FileView from './file-view';
 import { useFileDetails } from '@/lib/hooks/useFile';
+import CompressFile from './compress-file';
 
 const FileDetails = () => {
 	const searchParams = useSearchParams();
@@ -33,8 +33,6 @@ const FileDetails = () => {
 						}}
 						heightClass={'h-[220px]'}
 					/>
-				</div>
-				<div className="file-info-wrap">
 					<div className="grid grid-cols-2 gap-[20px]">
 						<div className="file-info">
 							<h6 className="heading-6">Size:</h6>
@@ -48,51 +46,27 @@ const FileDetails = () => {
 								{dateFormat(data?.createdAt)}
 							</p>
 						</div>
-						<div className="file-info">
-							<h6 className="heading-6">Compress:</h6>
-							<p className="text-base-2 mt-[4px]">
-								{data.isCompress ? 'True' : 'False'}
-							</p>
-						</div>
-						<div className="file-info">
-							<h6 className="heading-6">Compress %:</h6>
-							<p className="text-base-s mt-[4px]">
-								<span className="badge-info">
-									{data.compressPercent
-										? `${data.compressPercent}%`
-										: '0%'}
-								</span>
-							</p>
-						</div>
-					</div>
-					<div className="mt-[20px]">
-						<h6 className="heading-6">Actions:</h6>
-						<div className="flex items-center gap-[5px] mt-[5px]">
-							<Button className="p-0 h-auto badge-danger">
-								Delete
-							</Button>
-							<Button className="p-0 h-auto badge-success">
-								Compress
-							</Button>
-						</div>
 					</div>
 				</div>
+				<div className="file-info-wrap">
+					<h5 className="heading-5 mb-4">Compress File</h5>
+					<CompressFile fileId={data.id} />
+				</div>
 			</div>
-			<UpdateFile
-				author={
-					data.author
-						? {
-								name: `${data.author.firstName} ${data.author.lastName}`,
-								role: data.author.role,
-						  }
-						: null
-				}
-				defaultValues={{
-					title: data.title,
-					description: data.description ? data.description : '',
-				}}
-				fileId={data.id}
-			/>
+
+			{data.author && (
+				<div className="flex items-center gap-[5px]">
+					<div className="h-[45px] w-[45px] bg-primary-gray rounded-full"></div>
+					<div className="flex flex-col gap-[4px]">
+						<p className="text-base-1">
+							{data.author.firstName} {data.author.lastName}
+						</p>
+						<span className="text-base-2 !text-[13px]">
+							{UserRoleFormat[data.author.role]}
+						</span>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

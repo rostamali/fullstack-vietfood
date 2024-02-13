@@ -1,7 +1,11 @@
 'use server';
 import * as z from 'zod';
 import { cookies } from 'next/headers';
-import { handleResponse } from '../helpers/formater';
+import {
+	UserRoleFormat,
+	UserStatusFormat,
+	handleResponse,
+} from '../helpers/formater';
 import prisma from '../prisma';
 import {
 	bcryptPassword,
@@ -10,7 +14,7 @@ import {
 } from '../helpers/bcrypt-code';
 import {
 	createEmailVerifyToken,
-	isAuthenticated,
+	isAuthEdge,
 	sendAuthToken,
 	verifyEmailConfirmToken,
 } from '../helpers/jwt-token';
@@ -152,7 +156,7 @@ export const loginUser = async (params: z.infer<typeof LoginFormSchema>) => {
 };
 export const logoutUser = async () => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
@@ -166,8 +170,8 @@ export const logoutUser = async () => {
 };
 export const importUsersFromCSV = async (params: CSVUser[]) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return {
 				success: false,
 				message: `You don't have permission`,
@@ -199,8 +203,8 @@ export const fetchUsersByAdmin = async (params: {
 	query: string | null;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const { page = 1, pageSize = 10, status, query } = params;
 		const users = await prisma.user.findMany({
@@ -264,8 +268,9 @@ export const createAccountByAdmin = async (params: {
 	status: string;
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		const {
 			firstName,
@@ -287,7 +292,7 @@ export const createAccountByAdmin = async (params: {
 		if (userExist) return handleResponse(false, 'User already exists');
 		const bcryptPass = await bcryptPassword(password as string);
 
-		await prisma.user.create({
+		const newUser = await prisma.user.create({
 			data: {
 				firstName,
 				lastName,
@@ -299,6 +304,8 @@ export const createAccountByAdmin = async (params: {
 			},
 			select: {
 				id: true,
+				email: true,
+				role: true,
 			},
 		});
 		revalidatePath('/admin/user', 'page');
@@ -306,9 +313,17 @@ export const createAccountByAdmin = async (params: {
 			try {
 				await sendMail({
 					email,
-					subject: 'Account activation email',
-					template: `<h1>Account created successfully</h1>`,
+					subject:
+						'Welcome to Vietfood - Your Account has been Created!',
+					template: `new-account.ejs`,
+					data: {
+						name: `${firstName} ${lastName}`,
+						email: newUser.email,
+						role: UserRoleFormat[newUser.role],
+						password,
+					},
 				});
+
 				return handleResponse(true, `New account created successfully`);
 			} catch (error) {
 				return handleResponse(
@@ -325,8 +340,8 @@ export const createAccountByAdmin = async (params: {
 };
 export const fetchUserProfileById = async (params: { id: string }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const user = await prisma.user.findUnique({
 			where: {
@@ -352,8 +367,9 @@ export const updateUserProfileByAdmin = async (params: {
 }) => {
 	try {
 		const { data, id } = params;
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		const userExist = await prisma.user.findUnique({
 			where: {
@@ -387,19 +403,22 @@ export const updateUserProfileByAdmin = async (params: {
 				firstName: true,
 				lastName: true,
 				role: true,
+				status: true,
 			},
 		});
 		revalidatePath('/admin/user', 'page');
 		if (data.sendMessage) {
 			await sendMail({
 				email: updated.email,
-				subject: 'Account activation email',
-				template: `<h1>Account info:</br>
-				Fullname: ${updated.firstName} ${updated.lastName}</br>
-				Email: ${updated.email}</br>
-				Role: ${updated.role}</br>
-				${data.password ? `Password: ${data.password}` : ``}
-				</h1>`,
+				subject: 'Updated your account at Vietfood',
+				template: `update-account.ejs`,
+				data: {
+					name: `${updated.firstName} ${updated.lastName}`,
+					email: updated.email,
+					role: UserRoleFormat[updated.role],
+					status: UserStatusFormat[updated.status],
+					password: data.password,
+				},
 			});
 		}
 
@@ -410,18 +429,12 @@ export const updateUserProfileByAdmin = async (params: {
 };
 export const fetchProfileMenu = async () => {
 	try {
-		const accessToken = cookies().get('vietfood_access_token')?.value;
-		const refreshToken = cookies().get('vietfood_refresh_token')?.value;
+		const isAuth = await isAuthenticated();
 
-		const authenticated = await isAuthenticated({
-			accessToken: accessToken ? accessToken : null,
-			refreshToken: refreshToken ? refreshToken : null,
-		});
-		if (!authenticated) return;
-
+		if (!isAuth) return;
 		const userExist = await prisma.user.findUnique({
 			where: {
-				id: authenticated.id,
+				id: isAuth.id,
 				status: 'ACTIVE',
 				isVerified: true,
 			},
@@ -449,12 +462,12 @@ export const fetchProfileMenu = async () => {
 };
 export const fetchAdminProfile = async () => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
 
 		const profile = await prisma.user.findUnique({
 			where: {
-				id: isAdmin.id,
+				id: isAuth.id,
 				status: 'ACTIVE',
 				isVerified: true,
 			},
@@ -484,8 +497,9 @@ export const deleteUserByAdmin = async (params: {
 	actionType: 'DEACTIVE' | 'DELETE';
 }) => {
 	try {
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin) return handleResponse(false, `You don't have permission`);
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
 
 		if (params.actionType === 'DELETE') {
 			await prisma.user.deleteMany({
@@ -519,7 +533,7 @@ export const updateAccountPassword = async (
 	params: z.infer<typeof ChangePasswordFormSchema>,
 ) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return handleResponse(false, `You don't have permission`);
 
 		const { oldPassword, newPassword } = params;
@@ -564,46 +578,13 @@ export const updateAccountPassword = async (
 /* ================================== */
 // Check user authentications
 /* ================================== */
-export const isAuthenticatedAdmin = async () => {
+
+export const isAuthenticated = async () => {
 	try {
 		const accessToken = cookies().get('vietfood_access_token')?.value;
 		const refreshToken = cookies().get('vietfood_refresh_token')?.value;
 
-		const authenticated = await isAuthenticated({
-			accessToken: accessToken ? accessToken : null,
-			refreshToken: refreshToken ? refreshToken : null,
-		});
-		if (!authenticated || authenticated.role !== 'ADMIN') return;
-
-		const userExist = await prisma.user.findUnique({
-			where: {
-				id: authenticated.id,
-				status: 'ACTIVE',
-				isVerified: true,
-				role: 'ADMIN',
-			},
-			select: {
-				id: true,
-				status: true,
-				isVerified: true,
-				role: true,
-			},
-		});
-		if (!userExist) return;
-
-		return {
-			id: userExist.id,
-		};
-	} catch (error) {
-		return;
-	}
-};
-export const isAuthenticatedCheck = async () => {
-	try {
-		const accessToken = cookies().get('vietfood_access_token')?.value;
-		const refreshToken = cookies().get('vietfood_refresh_token')?.value;
-
-		const authenticated = await isAuthenticated({
+		const authenticated = await isAuthEdge({
 			accessToken: accessToken ? accessToken : null,
 			refreshToken: refreshToken ? refreshToken : null,
 		});
@@ -626,6 +607,7 @@ export const isAuthenticatedCheck = async () => {
 
 		return {
 			id: userExist.id,
+			role: userExist.role,
 		};
 	} catch (error) {
 		return;

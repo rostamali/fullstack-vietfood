@@ -1,7 +1,7 @@
 'use server';
 
 import { handleResponse } from '../helpers/formater';
-import { isAuthenticatedCheck } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import prisma from '../prisma';
 import { countryNameByIso, stateNameByIso } from './country.action';
 import { revalidatePath } from 'next/cache';
@@ -12,7 +12,7 @@ import { createPaymentIntent } from './payment.action';
 /* ================================ */
 export const addToCard = async (params: AddToCart) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
@@ -167,7 +167,7 @@ export const addToCard = async (params: AddToCart) => {
 export const removeFromCart = async (params: { productId: string }) => {
 	try {
 		// 1. User authentication
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
@@ -217,7 +217,7 @@ export const removeFromCart = async (params: { productId: string }) => {
 };
 export const fetchCartDetails = async () => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return;
 
 		const cartList = await fetchCartList(isAuth.id);
@@ -244,7 +244,7 @@ export const fetchCartDetails = async () => {
 };
 export const fetchCheckoutDetails = async () => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return;
 
 		const cartList = await fetchCartList(isAuth.id);
@@ -283,7 +283,7 @@ export const fetchCheckoutDetails = async () => {
 };
 export const updateDefaultAddress = async (params: { addressId: string }) => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return handleResponse(false, `You don't have a permission`);
 
@@ -335,7 +335,7 @@ export const checkProductOnCart = async (params: {
 export const createUserOrder = async (params: { cartId: string }) => {
 	try {
 		const { cartId } = params;
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth)
 			return {
 				success: false,
@@ -453,7 +453,7 @@ export const getUserPaymentDetails = async (params: {
 }) => {
 	try {
 		const { orderId } = params;
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth || !orderId) return;
 
 		const order = await prisma.order.findUnique({
@@ -638,7 +638,7 @@ export const calculateShipping = async (userId: string) => {
 export const getShippingAddress = async () => {
 	try {
 		// 1. Check authorization
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return;
 		// 2. Get the user default address ID
 		const userExist = await prisma.user.findUnique({

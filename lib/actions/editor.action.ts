@@ -1,8 +1,7 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { fileSizeFormat, handleResponse } from '../helpers/formater';
-import { isAuthenticatedAdmin } from './auth.action';
+import { isAuthenticated } from './auth.action';
 import { join } from 'path';
 import { writeFile } from 'fs/promises';
 import prisma from '../prisma';
@@ -16,8 +15,8 @@ export const uploadEditorImage = async (formData: FormData) => {
 				url: null,
 			};
 
-		const isAdmin = await isAuthenticatedAdmin();
-		if (!isAdmin)
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
 			return {
 				message: `You don't have permission`,
 				url: null,
@@ -41,7 +40,7 @@ export const uploadEditorImage = async (formData: FormData) => {
 				size: filesize,
 				author: {
 					connect: {
-						id: isAdmin.id,
+						id: isAuth.id,
 					},
 				},
 			},

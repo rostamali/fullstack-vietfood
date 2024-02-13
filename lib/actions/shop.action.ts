@@ -2,7 +2,7 @@
 import { revalidatePath } from 'next/cache';
 import { handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
-import { isAuthenticatedCheck } from './auth.action';
+import { isAuthenticated } from './auth.action';
 
 export const fetchShopProducts = async (params: {
 	pageSize: number;
@@ -10,6 +10,9 @@ export const fetchShopProducts = async (params: {
 	query: string | null;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return;
+
 		const { page = 1, pageSize = 10, query } = params;
 		const products = await prisma.product.findMany({
 			where: {
@@ -68,6 +71,8 @@ export const fetchShopProducts = async (params: {
 };
 export const fetchProductBySlug = async (params: { slug: string }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return;
 		const product = await prisma.product.findFirst({
 			where: {
 				slug: params.slug,
@@ -277,6 +282,8 @@ export const fetchCategoriesByUser = async (params: {
 	query: string | null;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return;
 		const { page = 1, pageSize = 10, query } = params;
 
 		const categories = await prisma.productCategory.findMany({
@@ -333,6 +340,8 @@ export const fetchProductByCategory = async (params: {
 	query: string | null;
 }) => {
 	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return;
 		const { slug, page = 1, pageSize = 10, query } = params;
 
 		const products = await prisma.product.findMany({
@@ -403,7 +412,7 @@ export const fetchProductByCategory = async (params: {
 export const addProductToWishlist = async (params: { productId: string }) => {
 	try {
 		const { productId } = params;
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return handleResponse(false, `You don't have permission`);
 
 		const wishlistExist = await prisma.wishlist.findUnique({
@@ -452,7 +461,7 @@ export const addProductToWishlist = async (params: { productId: string }) => {
 };
 export const fetchWishlistProducts = async () => {
 	try {
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return;
 
 		const wishlist = await prisma.wishlist.findUnique({
@@ -508,7 +517,7 @@ export const removeProductFormWishlist = async (params: {
 	try {
 		const { productId } = params;
 
-		const isAuth = await isAuthenticatedCheck();
+		const isAuth = await isAuthenticated();
 		if (!isAuth) return handleResponse(false, `You don't have permission`);
 
 		const productOnWishlist = await prisma.productsOnWishlist.findFirst({
@@ -538,4 +547,49 @@ export const removeProductFormWishlist = async (params: {
 };
 
 /* ============= Store Actions ============= */
-// export const;
+export const fetchHeaderDetails = async () => {
+	const isAuth = await isAuthenticated();
+
+	const cart = await prisma.cart.findUnique({
+		where: {
+			userId: isAuth?.id,
+		},
+		select: {
+			items: {
+				select: {
+					id: true,
+				},
+			},
+		},
+	});
+	const wishlist = await prisma.wishlist.findUnique({
+		where: {
+			userId: isAuth?.id,
+		},
+		select: {
+			products: {
+				select: {
+					productId: true,
+				},
+			},
+		},
+	});
+
+	return {
+		cart: {
+			link: isAuth ? `/order/cart` : `/auth/login?redirect=/order/cart`,
+			count: cart ? cart.items.length : 0,
+		},
+		wishlist: {
+			link: isAuth
+				? `/user/wishlist`
+				: `/auth/login?redirect=/user/wishlist`,
+			count: wishlist ? wishlist.products.length : 0,
+		},
+		profileLink: isAuth
+			? isAuth.role === 'ADMIN'
+				? `/admin`
+				: `/user/account`
+			: `/auth/login?redirect=/user/account`,
+	};
+};

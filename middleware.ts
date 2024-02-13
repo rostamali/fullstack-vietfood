@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAuthenticated } from './lib/helpers/jwt-token';
+import { isAuthEdge } from './lib/helpers/jwt-token';
 
 export async function middleware(req: NextRequest) {
 	const response = NextResponse.next();
@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
 	const accessToken = req.cookies.get('vietfood_access_token')?.value;
 
 	// admin dashboard access
-	const authenticated = await isAuthenticated({
+	const authenticated = await isAuthEdge({
 		accessToken: accessToken ? accessToken : null,
 		refreshToken: refreshToken ? refreshToken : null,
 	});
