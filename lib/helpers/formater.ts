@@ -141,3 +141,21 @@ export const createSlug = async (name: string) => {
 	});
 	return slug;
 };
+
+export const generateOrderId = (prefix = 'VFOOD') => {
+	const timestamp = Date.now().toString(36);
+	const randomChars = Math.random().toString(36).substring(2, 4);
+	return `${prefix}-${timestamp}-${randomChars}`.toUpperCase();
+};
+
+export const OrderStatusFormat: Record<OrderStatus, string> = {
+	ACCEPT: 'Accept',
+	CANCELLED: 'Cancelled',
+	DELIVERED: 'Delivered',
+	PENDING: 'Pending',
+};
+export const PaymentStatusFormat: Record<PaymentStatus, string> = {
+	PAID: 'Paid',
+	CANCELLED: 'Cancelled',
+	UNPAID: 'Unpaid',
+};

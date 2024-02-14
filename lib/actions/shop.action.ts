@@ -441,6 +441,9 @@ export const addProductToWishlist = async (params: { productId: string }) => {
 					},
 				},
 			});
+
+			revalidatePath('/');
+
 			return handleResponse(true, `Item added to wishlist`);
 		}
 
@@ -454,6 +457,7 @@ export const addProductToWishlist = async (params: { productId: string }) => {
 				},
 			},
 		});
+		revalidatePath('/');
 		return handleResponse(true, `Item added to wishlist`);
 	} catch (error) {
 		return handleResponse(false, `Add to wishlist failed`);
@@ -550,46 +554,62 @@ export const removeProductFormWishlist = async (params: {
 export const fetchHeaderDetails = async () => {
 	const isAuth = await isAuthenticated();
 
-	const cart = await prisma.cart.findUnique({
-		where: {
-			userId: isAuth?.id,
-		},
-		select: {
-			items: {
-				select: {
-					id: true,
+	if (isAuth) {
+		const cart = await prisma.cart.findFirst({
+			where: {
+				userId: isAuth?.id,
+			},
+			select: {
+				items: {
+					select: {
+						id: true,
+					},
 				},
 			},
-		},
-	});
-	const wishlist = await prisma.wishlist.findUnique({
-		where: {
-			userId: isAuth?.id,
-		},
-		select: {
-			products: {
-				select: {
-					productId: true,
+		});
+		const wishlist = await prisma.wishlist.findFirst({
+			where: {
+				userId: isAuth?.id,
+			},
+			select: {
+				products: {
+					select: {
+						productId: true,
+					},
 				},
 			},
-		},
-	});
+		});
+
+		return {
+			cart: {
+				link: isAuth
+					? `/order/cart`
+					: `/auth/login?redirect=/order/cart`,
+				count: cart ? cart.items.length : 0,
+			},
+			wishlist: {
+				link: isAuth
+					? `/user/wishlist`
+					: `/auth/login?redirect=/user/wishlist`,
+				count: wishlist ? wishlist.products.length : 0,
+			},
+			profileLink: isAuth
+				? isAuth.role === 'ADMIN'
+					? `/admin`
+					: `/user/account`
+				: `/auth/login?redirect=/user/account`,
+		};
+	}
 
 	return {
 		cart: {
-			link: isAuth ? `/order/cart` : `/auth/login?redirect=/order/cart`,
-			count: cart ? cart.items.length : 0,
+			link: `/auth/login?redirect=/order/cart`,
+			count: 0,
 		},
 		wishlist: {
-			link: isAuth
-				? `/user/wishlist`
-				: `/auth/login?redirect=/user/wishlist`,
-			count: wishlist ? wishlist.products.length : 0,
+			link: `/auth/login?redirect=/user/wishlist`,
+			count: 0,
 		},
-		profileLink: isAuth
-			? isAuth.role === 'ADMIN'
-				? `/admin`
-				: `/user/account`
-			: `/auth/login?redirect=/user/account`,
+		profileLink: `/auth/login?redirect=/user/account`,
 	};
 };

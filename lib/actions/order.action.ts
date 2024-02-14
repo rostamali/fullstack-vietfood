@@ -1,11 +1,11 @@
 'use server';
-
-import { handleResponse } from '../helpers/formater';
+import { generateOrderId, handleResponse } from '../helpers/formater';
 import { isAuthenticated } from './auth.action';
 import prisma from '../prisma';
 import { countryNameByIso, stateNameByIso } from './country.action';
 import { revalidatePath } from 'next/cache';
 import { createPaymentIntent } from './payment.action';
+import { OrderStatus } from '@prisma/client';
 
 /* ================================ */
 // Cart actions
@@ -164,7 +164,7 @@ export const addToCard = async (params: AddToCart) => {
 		return handleResponse(false, `Add to cart failed`);
 	}
 };
-export const removeFromCart = async (params: { productId: string }) => {
+export const removeFromCart = async (params: { cartItemId: string }) => {
 	try {
 		// 1. User authentication
 		const isAuth = await isAuthenticated();
@@ -172,7 +172,7 @@ export const removeFromCart = async (params: { productId: string }) => {
 			return handleResponse(false, `You don't have a permission`);
 
 		// 2. User exist or not
-		const { productId } = params;
+		const { cartItemId } = params;
 		const isUser = await prisma.user.findUnique({
 			where: {
 				id: isAuth.id,
@@ -189,27 +189,14 @@ export const removeFromCart = async (params: { productId: string }) => {
 		// 3. Cart exist or not
 		if (!isUser.cart || !isUser.cart.id)
 			return handleResponse(false, `Cart doesn't exist`);
-		// 4. Check that cart have the specific product
-		const isProductOnCart = await prisma.cartItem.findFirst({
-			where: {
-				cartId: isUser.cart?.id,
-				productId,
-			},
-			select: {
-				id: true,
-				quantity: true,
-			},
-		});
-		if (!isProductOnCart)
-			return handleResponse(false, `Product not found in cart`);
 
 		// 6. Remove that product from cart
-		// await prisma.cartItem.delete({
-		// 	where: {
-		// 		cartId: isUser.cart?.id,
-		// 		productId,
-		// 	},
-		// });
+		await prisma.cartItem.delete({
+			where: {
+				id: cartItemId,
+			},
+		});
+		revalidatePath('/order/cart');
 		return handleResponse(true, `Product removed from cart`);
 	} catch (error) {
 		return handleResponse(false, `Cart removed failed`);
@@ -366,7 +353,7 @@ export const createUserOrder = async (params: { cartId: string }) => {
 			return {
 				success: false,
 				id: null,
-				message: 'Shipping address not found',
+				message: 'Shipping address required',
 			};
 
 		const subTotal = cartSubtotal(cartDetails.cartItems);
@@ -383,8 +370,11 @@ export const createUserOrder = async (params: { cartId: string }) => {
 				message: 'Order created failed',
 			};
 
+		const orderId = generateOrderId();
 		const newOrder = await prisma.order.create({
 			data: {
+				orderId,
+				orderItem: cartDetails.cartItems.length,
 				user: { connect: { id: isAuth.id } },
 				status: 'PENDING',
 				subTotal,
@@ -437,7 +427,7 @@ export const createUserOrder = async (params: { cartId: string }) => {
 
 		return {
 			success: true,
-			id: newOrder.id,
+			id: newOrder.orderId,
 			message: 'Your order has been created',
 		};
 	} catch (error) {
@@ -448,7 +438,7 @@ export const createUserOrder = async (params: { cartId: string }) => {
 		};
 	}
 };
-export const getUserPaymentDetails = async (params: {
+export const getOrderPaymentDetails = async (params: {
 	orderId: string | null;
 }) => {
 	try {
@@ -457,12 +447,14 @@ export const getUserPaymentDetails = async (params: {
 		if (!isAuth || !orderId) return;
 
 		const order = await prisma.order.findUnique({
-			where: { id: orderId },
+			where: { orderId },
 			select: {
 				id: true,
+				orderId: true,
 				total: true,
 				payment: {
 					select: {
+						status: true,
 						clientSecret: true,
 						paymentIntentId: true,
 					},
@@ -474,17 +466,179 @@ export const getUserPaymentDetails = async (params: {
 		if (!order || !publishKey) return;
 
 		return {
-			orderId: order.id,
+			orderId: order.orderId,
 			total: order.total,
 			clientSecret: order.payment?.clientSecret,
 			paymentIntent: order.payment?.paymentIntentId,
 			publishKey,
+			paymentStatus: order.payment?.status,
 		};
 	} catch (error) {
 		return;
 	}
 };
+export const fetchUserOrders = async (params: {
+	page: number;
+	pageSize: number;
+	query: string | null;
+	status: string | null;
+}) => {
+	try {
+		const { page = 1, pageSize = 10, query, status } = params;
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return;
 
+		const orderData = await prisma.order.findMany({
+			where: {
+				userId: isAuth.id,
+				...(query && {
+					orderId: { contains: query },
+				}),
+				...(status && {
+					status: status as OrderStatus,
+				}),
+			},
+			select: {
+				orderId: true,
+				createdAt: true,
+				orderItem: true,
+				total: true,
+				status: true,
+				payment: {
+					select: {
+						status: true,
+					},
+				},
+			},
+			orderBy: { createdAt: 'desc' },
+			skip: (Number(page) - 1) * Number(pageSize),
+			take: pageSize,
+		});
+
+		const orders = orderData.map((item) => {
+			return {
+				orderDate: item.createdAt,
+				orderId: item.orderId,
+				orderStatus: item.status,
+				paymentStatus: item.payment?.status,
+				orderItems: item.orderItem,
+				total: item.total,
+				paymentLink: item.payment?.status === 'UNPAID' ? true : false,
+			};
+		});
+
+		const countOrder = await prisma.order.count({
+			where: {
+				userId: isAuth.id,
+				...(query && {
+					orderId: { contains: query },
+				}),
+				...(status && {
+					status: status as OrderStatus,
+				}),
+			},
+		});
+
+		return {
+			orders,
+			pages: Math.ceil(countOrder / pageSize),
+		};
+	} catch (error) {
+		return;
+	}
+};
+export const fetchUserOrderDetails = async (params: {
+	orderId: string | null;
+}) => {
+	try {
+		const { orderId } = params;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || !orderId) return;
+
+		const orderItem = await prisma.order.findUnique({
+			where: {
+				orderId,
+				userId: isAuth.id,
+			},
+			select: {
+				orderId: true,
+				createdAt: true,
+				option: {
+					select: {
+						value: true,
+					},
+				},
+				status: true,
+				tax: true,
+				shippingCost: true,
+				total: true,
+				totalDiscount: true,
+				payment: {
+					select: {
+						status: true,
+					},
+				},
+				shippingInfo: {
+					select: {
+						firstName: true,
+						lastName: true,
+						mobile: true,
+						addressLine1: true,
+						addressLine2: true,
+						state: true,
+						city: true,
+						country: true,
+					},
+				},
+			},
+		});
+		if (!orderItem) return;
+
+		const orderDetailsString = orderItem.option.value.toString('utf-8');
+		const orderDetails: OrderItemOptions = JSON.parse(orderDetailsString);
+
+		const state = stateNameByIso(
+			orderItem.shippingInfo?.state as string,
+		)?.name;
+		const city = orderItem.shippingInfo?.city;
+		const country = countryNameByIso(
+			orderItem.shippingInfo?.country as string,
+		)?.name;
+
+		return {
+			orderDate: orderItem.createdAt,
+			orderId: orderItem.orderId,
+			items: orderDetails.orderItems,
+			orderStatus: orderItem.status,
+			paymentStaus: orderItem.payment?.status,
+			summary: [
+				{
+					label: 'Tax',
+					value: orderItem.tax,
+				},
+				{
+					label: 'Shipping Cost',
+					value: orderItem.shippingCost,
+				},
+				{
+					label: 'Total Discount',
+					value: orderItem.totalDiscount,
+				},
+				{
+					label: 'Total Amount',
+					value: orderItem.total,
+				},
+			],
+			shipping: {
+				name: `${orderItem.shippingInfo?.firstName} ${orderItem.shippingInfo?.lastName}`,
+				mobile: orderItem.shippingInfo?.mobile,
+				address: `${orderItem.shippingInfo?.addressLine1} ${orderItem.shippingInfo?.addressLine2} ${city}, ${state}, ${country}`,
+			},
+		};
+	} catch (error) {
+		return;
+	}
+};
 /* ================================ */
 // Calculate cost
 /* ================================ */
@@ -811,4 +965,97 @@ export const cartSubtotal = (cart: CartCustomItems[]) => {
 	}, 0);
 
 	return subtotal;
+};
+
+/* ================================ */
+// Admin actions for order
+/* ================================ */
+export const fetchOrdersByAdmin = async (params: {
+	page: number;
+	pageSize: number;
+	query: string | null;
+	status: string | null;
+}) => {
+	try {
+		const { page = 1, pageSize = 10, query, status } = params;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
+
+		const orderList = await prisma.order.findMany({
+			where: {
+				...(query && {
+					user: {
+						OR: [
+							{ firstName: { contains: query } },
+							{ lastName: { contains: query } },
+						],
+					},
+				}),
+				...(status && {
+					status: status as OrderStatus,
+				}),
+			},
+			select: {
+				status: true,
+				createdAt: true,
+				total: true,
+				orderId: true,
+				orderItem: true,
+				user: {
+					select: {
+						firstName: true,
+						lastName: true,
+						email: true,
+						avatar: {
+							select: {
+								url: true,
+							},
+						},
+					},
+				},
+				payment: {
+					select: {
+						status: true,
+					},
+				},
+			},
+			orderBy: { createdAt: 'desc' },
+			skip: (Number(page) - 1) * Number(pageSize),
+			take: pageSize,
+		});
+		const orders = orderList.map((item) => ({
+			name: `${item.user.firstName} ${item.user.lastName}`,
+			email: item.user.email,
+			avatar: item.user.avatar ? item.user.avatar.url : null,
+			orderItems: item.orderItem,
+			total: item.total,
+			orderStatus: item.status,
+			paymentStatus: item.payment?.status || 'UNPAID',
+			orderCreated: item.createdAt,
+			orderId: item.orderId,
+		}));
+
+		const countOrder = await prisma.order.count({
+			where: {
+				...(query && {
+					user: {
+						OR: [
+							{ firstName: { contains: query } },
+							{ lastName: { contains: query } },
+						],
+					},
+				}),
+				...(status && {
+					status: status as OrderStatus,
+				}),
+			},
+		});
+
+		return {
+			orders,
+			pages: Math.ceil(countOrder / pageSize),
+		};
+	} catch (error) {
+		return;
+	}
 };

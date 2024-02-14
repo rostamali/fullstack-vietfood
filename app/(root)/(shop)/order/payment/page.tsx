@@ -1,7 +1,9 @@
 import StripeCheckout from '@/app/(root)/(shop)/order/payment/(stripe)/stripe-checkout';
-import { getUserPaymentDetails } from '@/lib/actions/order.action';
+import { getOrderPaymentDetails } from '@/lib/actions/order.action';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import PaymentSuccess from '../thank-you/payment-success';
 type SearchParams = {
 	searchParams: {
 		orderId: string | null;
@@ -9,13 +11,20 @@ type SearchParams = {
 };
 
 const PaymentPage = async ({ searchParams }: SearchParams) => {
-	const result = await getUserPaymentDetails({
+	const result = await getOrderPaymentDetails({
 		orderId: searchParams.orderId,
 	});
+
+	if (!result) redirect('/permission-error');
+
 	return (
 		<div className="py-[60px]">
 			<div className="container">
-				{result && (
+				{result.paymentStatus === 'PAID' ? (
+					<div className="md:w-[450px] w-full mx-auto">
+						<PaymentSuccess orderId={result.orderId} />
+					</div>
+				) : (
 					<div className="w-[450px] mx-auto space-y-8 bg-white p-6 rounded-md">
 						<div className="space-y-4">
 							<Link

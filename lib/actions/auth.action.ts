@@ -460,10 +460,10 @@ export const fetchProfileMenu = async () => {
 		return;
 	}
 };
-export const fetchAdminProfile = async () => {
+export const fetchUserProfile = async () => {
 	try {
 		const isAuth = await isAuthenticated();
-		if (!isAuth || isAuth.role !== 'ADMIN') return;
+		if (!isAuth) return;
 
 		const profile = await prisma.user.findUnique({
 			where: {

@@ -219,6 +219,10 @@ enum Currency {
   usd
   euro
 }
+enum PaymentMethod {
+  STRIPE
+  PAYPAL
+}
 
 // Order related models
 model Cart {
@@ -257,6 +261,8 @@ model CartItem {
 enum OrderStatus {
   PENDING
   ACCEPT
+  CANCELLED
+  DELIVERED
 }
 
 enum PaymentStatus {
@@ -267,9 +273,11 @@ enum PaymentStatus {
 
 model Order {
   id            String        @id @unique @default(uuid())
+  orderId       String        @unique
   user          User          @relation(fields: [userId], references: [id])
   userId        String
   status        OrderStatus   @default(PENDING)
+  orderItem     Int
   subTotal      Float
   tax           Float
   totalDiscount Float
@@ -293,6 +301,7 @@ model PaymentInfo {
   clientSecret    String
   currency        Currency      @default(usd)
   amount          Float
+  method PaymentMethod @default(STRIPE)
 
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String @unique

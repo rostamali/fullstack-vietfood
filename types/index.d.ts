@@ -299,6 +299,40 @@ interface CheckoutItems {
 	totalCost: number;
 }
 
+type PaymentStatus = 'PAID' | 'UNPAID' | 'CANCELLED';
+type OrderStatus = 'PENDING' | 'ACCEPT' | 'CANCELLED' | 'DELIVERED';
+interface AdminOrderList {
+	name: string;
+	email: string;
+	avatar: string | null;
+	orderItems: number;
+	total: number;
+	orderStatus: $Enums.OrderStatus;
+	paymentStatus: PaymentStatus;
+	orderCreated: Date;
+	orderId: string;
+}
+
+interface OrderItemOptions {
+	orderItems: {
+		quantity: number;
+		name: string;
+		thumbnail: string;
+		category: string;
+		unitPrice: number;
+		totalCost: number;
+	}[];
+}
+interface UserOrderList {
+	orderDate: Date;
+	orderId: string;
+	orderItems: number;
+	total: number;
+	orderStatus: OrderStatus;
+	paymentStatus: PaymentStatus | undefined;
+	paymentLink: boolean;
+}
+
 /* ============================== */
 //  CSV file types
 /* ============================== */

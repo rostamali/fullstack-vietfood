@@ -16,8 +16,7 @@ import Link from 'next/link';
 import EmptyError from '../../../components/elements/shared/empty-error';
 import LocalSearch from '../../../components/elements/filters/local-search';
 import SelectFilter from '../../../components/elements/filters/select-filter';
-import { ProductStatus, UserAction } from '@/constants';
-import SelectField from '../../../components/elements/select/select-field';
+import { ProductStatus } from '@/constants';
 import { Button } from '@/components/ui/button';
 import SmallTooltip from '../../../components/elements/shared/small-tooltip';
 import { Download } from 'lucide-react';
@@ -70,14 +69,11 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 							</div>
 						</div>
 						<div className="max-xm:hidden">
-							<SmallTooltip
-								trigger={
-									<Button className="btn-ghost-lg">
-										<Download strokeWidth={1.5} size={20} />
-									</Button>
-								}
-								content={'Export Data'}
-							/>
+							<SmallTooltip content={'Export Data'}>
+								<Button className="btn-ghost-lg">
+									<Download strokeWidth={1.5} size={20} />
+								</Button>
+							</SmallTooltip>
 						</div>
 					</div>
 				</div>
@@ -154,7 +150,7 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 													src={
 														item.thumbnail
 															? `/uploads/files/${item.thumbnail.url}`
-															: '/assets/placeholder.png'
+															: '/assets/placeholder.svg'
 													}
 													alt={item.name}
 													width={100}

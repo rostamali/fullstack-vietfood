@@ -1,7 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { FC } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft, MoveLeft } from 'lucide-react';
+import SmallTooltip from './small-tooltip';
 type TitleProps = {
 	title: string;
 	links: {
@@ -13,6 +15,7 @@ type TitleProps = {
 
 const DashboardPageTitle: FC<TitleProps> = ({ links, title, params }) => {
 	const pathname = usePathname();
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const removeQueryParams = (url: string) => {
 		if (params) {
@@ -26,7 +29,19 @@ const DashboardPageTitle: FC<TitleProps> = ({ links, title, params }) => {
 
 	return (
 		<div className="flex flex-col items-start">
-			<h3 className="heading-3">{title}</h3>
+			<div className="flex items-center gap-2">
+				<SmallTooltip content="Go Back">
+					<button
+						className="bg-white h-[30px] w-[30px] rounded-md flex-center text-black-dark"
+						onClick={() => {
+							router.back();
+						}}
+					>
+						<MoveLeft size={16} />
+					</button>
+				</SmallTooltip>
+				<h3 className="heading-3">{title}</h3>
+			</div>
 			<ul className="flex-center gap-[10px]">
 				{links.map((link, index) => (
 					<li key={index}>

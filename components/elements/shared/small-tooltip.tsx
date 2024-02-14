@@ -7,15 +7,15 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 type TooltipProps = {
-	trigger: React.ReactNode;
+	children: React.ReactNode;
 	content: string;
 };
 
-const SmallTooltip: FC<TooltipProps> = ({ trigger, content }) => {
+const SmallTooltip: FC<TooltipProps> = ({ children, content }) => {
 	return (
 		<TooltipProvider>
 			<Tooltip>
-				<TooltipTrigger asChild>{trigger}</TooltipTrigger>
+				<TooltipTrigger asChild>{children}</TooltipTrigger>
 				<TooltipContent className="bg-primary-green shadow-none">
 					<p className="text-base-2 !text-white">{content}</p>
 				</TooltipContent>

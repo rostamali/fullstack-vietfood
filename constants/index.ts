@@ -404,3 +404,21 @@ export const StockStatus = [
 		value: 'false',
 	},
 ];
+export const OrderStatus = [
+	{
+		label: 'Pending',
+		value: 'PENDING',
+	},
+	{
+		label: 'Accept',
+		value: 'ACCEPT',
+	},
+	{
+		label: 'Cancelled',
+		value: 'CANCELLED',
+	},
+	{
+		label: 'Delivered',
+		value: 'DELIVERED',
+	},
+];

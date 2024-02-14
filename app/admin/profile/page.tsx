@@ -1,13 +1,13 @@
 import Profile from '@/components/elements/forms/profile-form';
 import ProfilePicture from '@/components/elements/forms/profile-picture';
-import { fetchAdminProfile } from '@/lib/actions/auth.action';
+import { fetchUserProfile } from '@/lib/actions/auth.action';
 import { dateFormat } from '@/lib/helpers/formater';
 import { CalendarDays } from 'lucide-react';
 import ProfileLoading from './loading';
 import ChangePassword from '@/components/elements/modals/change-password';
 
 const AdminProfilePage = async () => {
-	const result = await fetchAdminProfile();
+	const result = await fetchUserProfile();
 	if (!result || !result.profile) return <ProfileLoading />;
 	return (
 		<div className="dashboard-col-space">

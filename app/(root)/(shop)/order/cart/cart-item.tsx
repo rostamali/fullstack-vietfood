@@ -1,4 +1,6 @@
+'use client';
 import { Button } from '@/components/ui/button';
+import { useRemoveFromCart } from '@/lib/hooks/useOrder';
 import { Minus, Plus, X } from 'lucide-react';
 import Image from 'next/image';
 type CardProps = {
@@ -14,6 +16,8 @@ type CardProps = {
 };
 
 const CartItem: React.FC<CardProps> = ({ data }) => {
+	const { mutate: removeFromCart, isPending } = useRemoveFromCart();
+
 	return (
 		<div className="bg-white border-b-2 border-b-gray-muted py-[30px] px-[30px]">
 			<div className="grid md:grid-cols-8 grid-cols-3 gap-[25px] items-center">
@@ -74,7 +78,13 @@ const CartItem: React.FC<CardProps> = ({ data }) => {
 				</div>
 				{/* shop cart remove btn */}
 				<div className="text-right order-5 flex items-center justify-end">
-					<Button className="h-7 w-7 border-2 p-0 text-action-danger border-action-danger">
+					<Button
+						className="h-7 w-7 border-2 p-0 text-action-danger border-action-danger"
+						onClick={() => {
+							removeFromCart({ cartItemId: data.cartItemId });
+						}}
+						disabled={isPending}
+					>
 						<X size={18} strokeWidth={2.5} />
 					</Button>
 				</div>

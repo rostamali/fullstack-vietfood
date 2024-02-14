@@ -210,8 +210,10 @@ CREATE TABLE `CartItem` (
 -- CreateTable
 CREATE TABLE `Order` (
     `id` VARCHAR(191) NOT NULL,
+    `orderId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
-    `status` ENUM('PENDING', 'ACCEPT') NOT NULL DEFAULT 'PENDING',
+    `status` ENUM('PENDING', 'ACCEPT', 'CANCELLED', 'DELIVERED') NOT NULL DEFAULT 'PENDING',
+    `orderItem` INTEGER NOT NULL,
     `subTotal` DOUBLE NOT NULL,
     `tax` DOUBLE NOT NULL,
     `totalDiscount` DOUBLE NOT NULL,
@@ -223,6 +225,7 @@ CREATE TABLE `Order` (
     `optionId` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Order_id_key`(`id`),
+    UNIQUE INDEX `Order_orderId_key`(`orderId`),
     UNIQUE INDEX `Order_optionId_key`(`optionId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -235,6 +238,7 @@ CREATE TABLE `PaymentInfo` (
     `clientSecret` VARCHAR(191) NOT NULL,
     `currency` ENUM('usd', 'euro') NOT NULL DEFAULT 'usd',
     `amount` DOUBLE NOT NULL,
+    `method` ENUM('STRIPE', 'PAYPAL') NOT NULL DEFAULT 'STRIPE',
     `orderId` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,

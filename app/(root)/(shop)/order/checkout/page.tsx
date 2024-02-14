@@ -21,7 +21,7 @@ const CheckoutPage = async () => {
 								<h4 className="heading-4 mb-3 p-4">
 									Your Order
 								</h4>
-								<div className="space-y-2 md:h-[372px] overflow-y-auto scrollbar-sm">
+								<div className="space-y-2 md:max-h-[372px] overflow-y-auto scrollbar-sm">
 									{result.items.map((item, index) => (
 										<CheckoutItem data={item} key={index} />
 									))}

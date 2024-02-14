@@ -2,6 +2,7 @@
 import { StripeElementsOptions, loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import StripeCheckoutForm from './stripe-checkout-form';
+import { useState } from 'react';
 type StripeProps = {
 	clientSecret: string | undefined;
 	publishKey: string;
