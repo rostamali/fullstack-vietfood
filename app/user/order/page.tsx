@@ -4,6 +4,10 @@ import LocalSearch from '@/components/elements/filters/local-search';
 import SelectFilter from '@/components/elements/filters/select-filter';
 import { OrderStatus } from '@/constants';
 import OrderList from './order-list';
+export const metadata = {
+	title: 'My Orders - Vietfood User Dashboard',
+};
+
 type SearchParams = {
 	searchParams: {
 		page: string;

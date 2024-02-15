@@ -79,7 +79,7 @@ const AddressForm: FC<AddressProps> = ({ defaultValues, id }) => {
 								</FormLabel>
 								<FormControl>
 									<Input
-										placeholder="contact name*"
+										placeholder="Contact name*"
 										className="input-field-sm"
 										{...field}
 									/>

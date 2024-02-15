@@ -1,6 +1,9 @@
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import OrderList from './order-list';
 import { fetchOrdersByAdmin } from '@/lib/actions/order.action';
+export const metadata = {
+	title: 'Manage Orders - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

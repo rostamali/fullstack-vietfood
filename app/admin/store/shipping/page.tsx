@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { ShipPageLinks } from '@/constants';
 import { fetchShipZoneByAdmin } from '@/lib/actions/ship.action';
 import Link from 'next/link';
+export const metadata = {
+	title: 'Shipping Settings - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

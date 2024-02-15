@@ -3,6 +3,9 @@ import UploadCSV from '@/components/elements/modals/upload-csv';
 import CategoryList from '@/app/admin/store/category/category-list';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchCategoryByAdmin } from '@/lib/actions/category.action';
+export const metadata = {
+	title: 'Product Categories - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

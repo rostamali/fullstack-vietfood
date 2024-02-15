@@ -272,6 +272,13 @@
 		@apply table-cell-data border-r rounded-tr-md rounded-br-md;
 	}
 
+	.order-t-head-data {
+		@apply h-full flex items-center border-b font-poppins bg-white px-4 py-5;
+	}
+	.order-t-cell-data {
+		@apply flex font-poppins bg-white items-center w-full !mt-0 px-4 pt-2.5;
+	}
+
 	/* Flex Class */
 	.flex-center {
 		@apply flex items-center justify-center;

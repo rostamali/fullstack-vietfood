@@ -1,4 +1,7 @@
 import { CircleDollarSign } from 'lucide-react';
+export const metadata = {
+	title: 'My Account - Vietfood User Dashboard',
+};
 
 const UserAccountPage = () => {
 	return (

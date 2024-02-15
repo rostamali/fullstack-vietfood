@@ -7,6 +7,7 @@ const FormTypes = ['CREATE', 'UPDATE'];
 const UserStatus = ['ACTIVE', 'INACTIVE'];
 const ProductCollection = ['NEW_ARRIVAL', 'BEST_SELLING', 'RECOMENDED'];
 const ProductStatus = ['PUBLISH', 'DRAFT'];
+const OrderStatus = ['PENDING', 'ACCEPT', 'CANCELLED', 'DELIVERED'];
 
 export const LoginFormSchema = z.object({
 	email: z
@@ -149,7 +150,55 @@ export const ChangePasswordFormSchema = z
 		message: `Old & new password must be different`,
 		path: ['newPassword'],
 	});
-
+export const ProfileFormSchema = z.object({
+	firstName: z
+		.string({
+			required_error: 'Name is required',
+		})
+		.min(1, { message: 'Firstname is required' })
+		.max(30, { message: 'Firstname must not exceed 30 characters' }),
+	lastName: z.string(),
+	bio: z.string().max(200, { message: 'Bio must not exceed 200 characters' }),
+});
+export const ForgotPasswordSchema = z.object({
+	email: z
+		.string({
+			invalid_type_error: 'Email Must be valid',
+			required_error: 'Email is required',
+		})
+		.min(1, { message: 'Email is required' })
+		.email({
+			message: 'Email Must be valid',
+		}),
+});
+export const ResetPasswordSchema = z
+	.object({
+		newPassword: z
+			.string({
+				required_error: 'New password is required',
+			})
+			.min(6, { message: 'New password must be atleast 6 characters' })
+			.max(12, { message: 'New password must be within 12 characters' }),
+		confirmPassword: z
+			.string({
+				required_error: 'Confirm password is required',
+			})
+			.min(6, {
+				message: 'Confirm password must be atleast 6 characters',
+			})
+			.max(12, {
+				message: 'Confirm password must be within 12 characters',
+			}),
+	})
+	.refine(
+		(values) => {
+			return values.newPassword === values.confirmPassword;
+		},
+		{
+			message: 'Passwords must match!',
+			path: ['confirmPassword'],
+		},
+	);
 /* ================================== */
 // Address Schemas
 /* ================================== */
@@ -182,6 +231,46 @@ export const AddressFormSchema = z.object({
 	addressLine1: z.string().min(2, { message: 'Address is required' }),
 	addressLine2: z.string(),
 	setDefaultAddress: z.boolean(),
+});
+
+export const OrderDetailsFormSchema = z.object({
+	email: z
+		.string({
+			invalid_type_error: 'Email Must be valid',
+			required_error: 'Email is required',
+		})
+		.min(1, { message: 'Email is required' })
+		.email({
+			message: 'Must be a valid email',
+		}),
+	contactName: z
+		.string()
+		.min(1, { message: 'Name is required' })
+		.max(30, { message: 'Name must not exceed 30 characters' }),
+	phoneNumber: z
+		.string()
+		.min(1, { message: 'Phone number is required' })
+		.max(30, { message: 'Phone number must not exceed 30 characters' }),
+	countryCode: z.string().min(2, { message: 'Country is required' }),
+	stateCode: z.string().min(2, { message: 'State is required' }),
+	cityName: z.string(),
+	zipCode: z.string().min(2, { message: 'Zipcode is required' }),
+	addressLine1: z.string().min(2, { message: 'Address is required' }),
+	addressLine2: z.string(),
+	status: z
+		.string({
+			required_error: 'Status is required',
+		})
+		.refine((value) => OrderStatus.includes(value), {
+			message:
+				'Status must be one of the options: ' + OrderStatus.join(', '),
+		})
+		.refine(
+			(value) => value !== undefined && value !== null && value !== '',
+			{
+				message: 'Status is required',
+			},
+		),
 });
 /* ================================== */
 // Files Schemas

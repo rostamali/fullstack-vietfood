@@ -18,31 +18,23 @@ type TableProps = {
 	}[];
 };
 
-const OrderList: React.FC<TableProps> = ({ data }) => {
+const OrderItemList: React.FC<TableProps> = ({ data }) => {
 	return (
-		<div className="bg-white rounded-md">
+		<div className="bg-white rounded-md overflow-hidden pb-2.5">
 			<Table>
 				<TableHeader className="[&_tr]:border-b-0">
 					<TableRow className="border-b-0">
 						<TableHead className="p-0">
-							<div className="table-head-start !bg-white !border-transparent">
-								Product
-							</div>
+							<div className="order-t-head-data">Product</div>
 						</TableHead>
 						<TableHead className="p-0">
-							<div className="table-head-data !bg-white !border-transparent">
-								Price
-							</div>
+							<div className="order-t-head-data">Price</div>
 						</TableHead>
 						<TableHead className="p-0">
-							<div className="table-head-data !bg-white !border-transparent">
-								Quantity
-							</div>
+							<div className="order-t-head-data">Quantity</div>
 						</TableHead>
 						<TableHead className="p-0">
-							<div className="table-head-end !bg-white !border-transparent">
-								Total
-							</div>
+							<div className="order-t-head-data">Total</div>
 						</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -50,13 +42,13 @@ const OrderList: React.FC<TableProps> = ({ data }) => {
 					{data.map((item, index) => (
 						<TableRow className="border-b-0 border-t-0" key={index}>
 							<TableCell className="p-0">
-								<div className="table-cell-start !mt-0 border-transparent">
+								<div className="order-t-cell-data">
 									<div className="flex items-center gap-1.5">
 										<div
 											className={`h-[55px] w-[55px] border-light flex-center rounded-md ${
 												item.thumbnail
 													? 'bg-transparent'
-													: 'bg-primary-gray bg-opacity-30'
+													: 'bg-[#D7DBE0] bg-opacity-30'
 											}`}
 										>
 											<Image
@@ -83,17 +75,17 @@ const OrderList: React.FC<TableProps> = ({ data }) => {
 								</div>
 							</TableCell>
 							<TableCell className="p-0">
-								<div className="table-cell-data !mt-0 border-transparent">
+								<div className="order-t-cell-data">
 									${item.unitPrice.toFixed(2)}
 								</div>
 							</TableCell>
 							<TableCell className="p-0">
-								<div className="table-cell-data !mt-0 border-transparent">
+								<div className="order-t-cell-data">
 									{item.quantity}
 								</div>
 							</TableCell>
 							<TableCell className="p-0">
-								<div className="table-cell-end !mt-0 border-transparent">
+								<div className="order-t-cell-data">
 									${item.totalCost.toFixed(2)}
 								</div>
 							</TableCell>
@@ -105,4 +97,4 @@ const OrderList: React.FC<TableProps> = ({ data }) => {
 	);
 };
 
-export default OrderList;
+export default OrderItemList;

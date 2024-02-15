@@ -1,6 +1,10 @@
 import AuthFooter from '@/components/auth/auth-form-footer';
 import AuthHeader from '@/components/auth/auth-form-header';
 import LoginForm from '@/components/auth/login-form';
+export const metadata = {
+	title: 'Login to Vietfood | Online shopping platform',
+	description: `Log in to your Vietfood account and explore our wide range of food products. Enjoy convenient shopping and secure transactions on Vietfood, your trusted online food shopping platform.`,
+};
 
 const LoginPage = () => {
 	return (

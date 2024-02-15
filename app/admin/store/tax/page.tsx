@@ -2,6 +2,9 @@ import CreateTaxModal from '@/app/admin/store/tax/create-tax-modal';
 import TaxList from '@/app/admin/store/tax/tax-list';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchTaxRateByAdmin } from '@/lib/actions/tax.action';
+export const metadata = {
+	title: 'Tax Settings - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

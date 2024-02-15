@@ -2,9 +2,11 @@ import UploadCSV from '@/components/elements/modals/upload-csv';
 import ProductList from '@/app/admin/product/product-list';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { Button } from '@/components/ui/button';
-import { ProductPageLinks } from '@/constants';
 import { fetchProductByAdmin } from '@/lib/actions/product.action';
 import Link from 'next/link';
+export const metadata = {
+	title: 'Manage Products - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

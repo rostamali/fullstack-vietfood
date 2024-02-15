@@ -18,8 +18,10 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import Image from 'next/image';
-import { dateFormat } from '@/lib/helpers/formater';
+import { OrderStatusFormat, dateFormat } from '@/lib/helpers/formater';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import PaymentStatus from './payment-status';
 type OrderListProps = {
 	data: AdminOrderList[];
 	pages: number;
@@ -105,7 +107,7 @@ const OrderList: FC<OrderListProps> = ({ data, pages }) => {
 												alt={item.name}
 												width={100}
 												height={100}
-												className={`h-[55px] w-[55px] border-light rounded object-cover ${
+												className={`h-[50px] w-[50px] border-light rounded object-cover ${
 													item.avatar
 														? 'bg-transparent'
 														: 'bg-primary-gray bg-opacity-30'
@@ -116,7 +118,7 @@ const OrderList: FC<OrderListProps> = ({ data, pages }) => {
 													{item.name}
 												</span>
 												<span className="text-base-2">
-													{item.email}
+													#{item.orderId}
 												</span>
 											</div>
 										</div>
@@ -124,7 +126,11 @@ const OrderList: FC<OrderListProps> = ({ data, pages }) => {
 								</TableCell>
 								<TableCell className="p-0">
 									<div className="table-cell-data min-h-[80px]">
-										#{item.orderId}
+										{
+											OrderStatusFormat[
+												item.orderStatus as OrderStatus
+											]
+										}
 									</div>
 								</TableCell>
 								<TableCell className="p-0">
@@ -144,14 +150,20 @@ const OrderList: FC<OrderListProps> = ({ data, pages }) => {
 								</TableCell>
 								<TableCell className="p-0">
 									<div className="table-cell-data min-h-[80px]">
-										<Badge className="border-light">
-											{item.paymentStatus}
-										</Badge>
+										<PaymentStatus
+											status={item.paymentStatus}
+										/>
 									</div>
 								</TableCell>
 								<TableCell className="p-0">
 									<div className="table-cell-end min-h-[80px]">
-										--
+										<Link
+											href={`/admin/store/order/${item.orderId}`}
+										>
+											<Button className="bg-action-success h-[30px] text-[13px] text-white">
+												View
+											</Button>
+										</Link>
 									</div>
 								</TableCell>
 							</TableRow>

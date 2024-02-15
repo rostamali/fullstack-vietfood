@@ -14,9 +14,11 @@ import {
 } from '../helpers/bcrypt-code';
 import {
 	createEmailVerifyToken,
+	createForgotPasswordToken,
 	isAuthEdge,
 	sendAuthToken,
 	verifyEmailConfirmToken,
+	verifyForgotPasswordToken,
 } from '../helpers/jwt-token';
 import sendMail from '../helpers/send-mail';
 import { verifyEmailTokenOptions } from '../helpers/cookie-options';
@@ -24,8 +26,11 @@ import { revalidatePath } from 'next/cache';
 import { AccountStatus } from '@prisma/client';
 import {
 	ChangePasswordFormSchema,
+	ForgotPasswordSchema,
 	LoginFormSchema,
+	ProfileFormSchema,
 	RegisterFormSchema,
+	ResetPasswordSchema,
 } from '../helpers/form-validation';
 
 export const signupUser = async (
@@ -477,6 +482,7 @@ export const fetchUserProfile = async () => {
 				lastName: true,
 				email: true,
 				createdAt: true,
+				bio: true,
 			},
 		});
 		const avatar = await prisma.avatar.findUnique({
@@ -529,6 +535,35 @@ export const deleteUserByAdmin = async (params: {
 		return handleResponse(false, `Account action failed`);
 	}
 };
+export const updateUserProfile = async (
+	params: z.infer<typeof ProfileFormSchema>,
+) => {
+	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return handleResponse(false, `You don't have permission`);
+
+		const { firstName, lastName, bio } = params;
+
+		await prisma.user.update({
+			where: {
+				id: isAuth.id,
+			},
+			data: {
+				firstName,
+				lastName,
+				bio,
+			},
+		});
+		revalidatePath('/admin/profile');
+		revalidatePath('/user/profile');
+		return handleResponse(true, `Profile updated successfully`);
+	} catch (error) {
+		return handleResponse(false, `Profile update failed`);
+	}
+};
+/* ================================== */
+// Account password actions
+/* ================================== */
 export const updateAccountPassword = async (
 	params: z.infer<typeof ChangePasswordFormSchema>,
 ) => {
@@ -575,6 +610,137 @@ export const updateAccountPassword = async (
 		return handleResponse(false, `Password update failed`);
 	}
 };
+export const forgotPasswordByUser = async (
+	params: z.infer<typeof ForgotPasswordSchema>,
+) => {
+	try {
+		const { email } = params;
+		if (!email) return handleResponse(false, 'Email is required');
+		const userExist = await prisma.user.findUnique({
+			where: {
+				email,
+				status: 'ACTIVE',
+				isVerified: true,
+			},
+			select: {
+				id: true,
+				email: true,
+				passwordChangedAt: true,
+			},
+		});
+		if (!userExist)
+			return handleResponse(false, `We couldn't find your email`);
+
+		if (!checkPasswordChangedAt(userExist.passwordChangedAt))
+			return handleResponse(
+				false,
+				`Please wait 20 minutes before trying again`,
+			);
+
+		const forgotPasswordToken = await createForgotPasswordToken(email);
+		await sendMail({
+			email,
+			subject: 'Forgot Password Confirmation',
+			template: `forgot-password.ejs`,
+			data: {
+				resetLink: `${process.env.HOST}/auth/reset-password?token=${forgotPasswordToken}`,
+			},
+		});
+		cookies().delete('vietfood_access_token');
+		cookies().delete('vietfood_refresh_token');
+		return {
+			success: true,
+			message: 'Password Reset Email Sent',
+		};
+	} catch (error) {
+		return handleResponse(false, 'Password reset failed');
+	}
+};
+export const checkPasswordChangedAt = (passwordChangedAt: Date | null) => {
+	if (!passwordChangedAt) return true;
+	const timeDifference: number =
+		(new Date().getTime() - new Date(passwordChangedAt).getTime()) /
+		(1000 * 60);
+	if (parseInt(timeDifference.toString()) < 20) return false;
+	return true;
+};
+export const resetPasswordByUser = async (params: {
+	token: string;
+	data: z.infer<typeof ResetPasswordSchema>;
+}) => {
+	try {
+		const {
+			token,
+			data: { newPassword },
+		} = params;
+
+		const verifiedToken = await verifyForgotPasswordToken(token);
+		if (!verifiedToken)
+			return handleResponse(false, 'Password reset token expired');
+		const userExist = await prisma.user.findUnique({
+			where: {
+				email: verifiedToken.email,
+				status: 'ACTIVE',
+				isVerified: true,
+			},
+			select: {
+				id: true,
+				email: true,
+				password: true,
+				passwordChangedAt: true,
+			},
+		});
+		if (!userExist) return handleResponse(false, `Incorrect email address`);
+		if (!checkPasswordChangedAt(userExist.passwordChangedAt))
+			return handleResponse(
+				false,
+				`Please wait 20 minutes before trying again`,
+			);
+		const compareNewPass = await comparePassword(
+			newPassword,
+			userExist.password,
+		);
+		if (compareNewPass)
+			return handleResponse(false, 'Choose a different password');
+
+		const bcryptPass = await bcryptPassword(newPassword);
+		await prisma.user.update({
+			where: {
+				id: userExist.id,
+			},
+			data: {
+				password: bcryptPass,
+				passwordChangedAt: new Date(),
+			},
+		});
+		cookies().delete('vietfood_access_token');
+		cookies().delete('vietfood_refresh_token');
+		return handleResponse(true, 'Password reset successfully');
+	} catch (error) {
+		return handleResponse(false, 'Password reset failed');
+	}
+};
+export const fetchForgotPasswordToken = async (token: string) => {
+	try {
+		const verifiedToken = await verifyForgotPasswordToken(token);
+		if (!verifiedToken) return;
+		const userExist = await prisma.user.findUnique({
+			where: {
+				email: verifiedToken.email,
+				status: 'ACTIVE',
+				isVerified: true,
+			},
+			select: {
+				id: true,
+				email: true,
+			},
+		});
+		if (!userExist) return;
+		return handleResponse(true, 'Authorized user');
+	} catch (error) {
+		return;
+	}
+};
 /* ================================== */
 // Check user authentications
 /* ================================== */
@@ -598,6 +764,7 @@ export const isAuthenticated = async () => {
 			},
 			select: {
 				id: true,
+				email: true,
 				status: true,
 				isVerified: true,
 				role: true,
@@ -608,6 +775,7 @@ export const isAuthenticated = async () => {
 		return {
 			id: userExist.id,
 			role: userExist.role,
+			email: userExist.email,
 		};
 	} catch (error) {
 		return;

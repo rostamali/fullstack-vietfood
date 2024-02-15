@@ -2,6 +2,9 @@ import UploadFile from '@/components/elements/modals/upload-files';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import FileLibrary from '@/components/media/files/file-library';
 import { fetchFilesByAdmin } from '@/lib/actions/file.action';
+export const metadata = {
+	title: 'File Management - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

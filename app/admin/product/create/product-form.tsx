@@ -40,7 +40,7 @@ const ProductForm: FC<productformProps> = ({
 	});
 	const { mutate: createProduct, isPending: isCreate } = useCreateProduct();
 	const { mutate: updateproduct, isPending: isUpdate } = useUpdateProduct();
-	const handleCategory = async (data: z.infer<typeof ProductFormSchema>) => {
+	const handleProduct = async (data: z.infer<typeof ProductFormSchema>) => {
 		if (form.watch('type') === 'CREATE') {
 			createProduct(data);
 		} else {
@@ -58,7 +58,7 @@ const ProductForm: FC<productformProps> = ({
 			<Form {...form}>
 				<form
 					className="form-flex-space"
-					onSubmit={form.handleSubmit(handleCategory)}
+					onSubmit={form.handleSubmit(handleProduct)}
 				>
 					<div className="flex sm:items-center justify-between max-sm:flex-col gap-[40px]">
 						<DashboardPageTitle

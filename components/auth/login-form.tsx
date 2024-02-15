@@ -111,7 +111,7 @@ const LoginForm = () => {
 					{showForgotPassword && (
 						<div className="text-base-1 text-right">
 							<Link
-								href="/"
+								href="/auth/forgot-password"
 								className="underline hover:text-action-danger"
 							>
 								Forget Password?

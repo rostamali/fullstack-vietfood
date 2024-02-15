@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { fetchWishlistProducts } from '@/lib/actions/shop.action';
 import Link from 'next/link';
 import WishlistCard from './wishlist-card';
+export const metadata = {
+	title: 'My Wishlist - Vietfood User Dashboard',
+};
 
 const Wishllist = async () => {
 	const result = await fetchWishlistProducts();

@@ -3,6 +3,9 @@ import ShipClassList from '@/app/admin/store/shipping/class/ship-class-list';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { ShipPageLinks } from '@/constants';
 import { fetchShipClassByAdmin } from '@/lib/actions/ship.action';
+export const metadata = {
+	title: 'Shipping Classes - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

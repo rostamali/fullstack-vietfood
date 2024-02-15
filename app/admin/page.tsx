@@ -1,5 +1,8 @@
 import Pie from '@/components/elements/charts/pie';
 import { CircleDollarSign } from 'lucide-react';
+export const metadata = {
+	title: 'Admin Dashboard - Vietfood E-commerce Management',
+};
 
 const AdminDashboard = () => {
 	return (

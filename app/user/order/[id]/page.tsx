@@ -1,6 +1,6 @@
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { CreditCard, Truck } from 'lucide-react';
-import OrderList from './order-list';
+import OrderList from './order-item-list';
 import { fetchUserOrderDetails } from '@/lib/actions/order.action';
 import {
 	OrderStatusFormat,

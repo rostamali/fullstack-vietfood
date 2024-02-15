@@ -3,6 +3,9 @@ import UploadCSV from '@/components/elements/modals/upload-csv';
 import BrandList from '@/app/admin/store/brand/brand-list';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchBrandByAdmin } from '@/lib/actions/brand.action';
+export const metadata = {
+	title: 'Product Brands - Admin Dashboard',
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

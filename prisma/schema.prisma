@@ -30,17 +30,18 @@ enum ProductStatus {
 }
 
 model User {
-  id         String        @id @unique @default(uuid())
-  firstName  String
-  lastName   String?
-  email      String        @unique
-  password   String
-  bio        String?
-  avatar     Avatar?
-  isVerified Boolean       @default(false)
-  role       Role          @default(USER)
-  status     AccountStatus @default(INACTIVE)
-  files      File[]
+  id                String        @id @unique @default(uuid())
+  firstName         String
+  lastName          String?
+  email             String        @unique
+  password          String
+  passwordChangedAt DateTime?
+  bio               String?
+  avatar            Avatar?
+  isVerified        Boolean       @default(false)
+  role              Role          @default(USER)
+  status            AccountStatus @default(INACTIVE)
+  files             File[]
 
   lastLogin DateTime?
   createdAt DateTime  @default(now())
@@ -219,6 +220,7 @@ enum Currency {
   usd
   euro
 }
+
 enum PaymentMethod {
   STRIPE
   PAYPAL
@@ -301,7 +303,7 @@ model PaymentInfo {
   clientSecret    String
   currency        Currency      @default(usd)
   amount          Float
-  method PaymentMethod @default(STRIPE)
+  method          PaymentMethod @default(STRIPE)
 
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String @unique
@@ -314,8 +316,7 @@ model ShippingInfo {
   id           String   @id @unique @default(uuid())
   order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId      String   @unique
-  firstName    String
-  lastName     String
+  name         String
   mobile       String
   email        String
   addressLine1 String
@@ -323,6 +324,7 @@ model ShippingInfo {
   state        String
   city         String
   country      String
+  zipCode      String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

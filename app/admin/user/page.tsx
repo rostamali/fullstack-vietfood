@@ -10,7 +10,9 @@ type SearchParams = {
 		q: string | null;
 	};
 };
-
+export const metadata = {
+	title: 'Manage Users - Admin Dashboard',
+};
 const UsersPage = async ({ searchParams }: SearchParams) => {
 	const result = await fetchUsersByAdmin({
 		pageSize: 8,

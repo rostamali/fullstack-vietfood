@@ -6,15 +6,21 @@ import {
 	createAccountByAdmin,
 	deleteUserByAdmin,
 	fetchUserProfileById,
+	forgotPasswordByUser,
 	loginUser,
+	resetPasswordByUser,
 	signupUser,
 	updateAccountPassword,
+	updateUserProfile,
 	updateUserProfileByAdmin,
 } from '@/lib/actions/auth.action';
 import {
 	ChangePasswordFormSchema,
+	ForgotPasswordSchema,
 	LoginFormSchema,
+	ProfileFormSchema,
 	RegisterFormSchema,
+	ResetPasswordSchema,
 	UserFormSchema,
 } from '@/lib/helpers/form-validation';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -82,7 +88,83 @@ export const useSignupUser = (onChange: (value: boolean) => void) => {
 		},
 	});
 };
-
+export const useUpdateProfile = () => {
+	return useMutation({
+		mutationFn: async (data: z.infer<typeof ProfileFormSchema>) => {
+			return await updateUserProfile(data);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+export const useForgotPassword = () => {
+	return useMutation({
+		mutationFn: async (data: z.infer<typeof ForgotPasswordSchema>) => {
+			return await forgotPasswordByUser(data);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
+export const useResetPassword = () => {
+	const router = useRouter();
+	return useMutation({
+		mutationFn: async (data: {
+			token: string;
+			values: z.infer<typeof ResetPasswordSchema>;
+		}) => {
+			return await resetPasswordByUser({
+				token: data.token,
+				data: data.values,
+			});
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.custom((t) => (
+					<ToastSuccess toastNumber={t} content={result.message} />
+				));
+				router.push('/auth/login');
+			} else {
+				toast.custom((t) => (
+					<ToastError toastNumber={t} content={result.message} />
+				));
+			}
+		},
+		onError: (error) => {
+			toast.custom((t) => (
+				<ToastError toastNumber={t} content={error.message} />
+			));
+		},
+	});
+};
 /* ================================ */
 // Admin actions for user accounts
 /* ================================ */

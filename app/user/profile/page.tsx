@@ -1,10 +1,13 @@
 import ProfileLoading from '@/app/admin/profile/loading';
-import Profile from '@/components/elements/forms/profile-form';
+import ProfileForm from '@/components/elements/forms/profile-form';
 import ProfilePicture from '@/components/elements/forms/profile-picture';
 import ChangePassword from '@/components/elements/modals/change-password';
 import { fetchUserProfile } from '@/lib/actions/auth.action';
 import { dateFormat } from '@/lib/helpers/formater';
 import { CalendarDays } from 'lucide-react';
+export const metadata = {
+	title: 'My Profile - Vietfood User Dashboard',
+};
 
 const UserProfilePage = async () => {
 	const result = await fetchUserProfile();
@@ -49,7 +52,13 @@ const UserProfilePage = async () => {
 					</div>
 				</div>
 			)}
-			<Profile />
+			<ProfileForm
+				defaultValues={{
+					firstName: result.profile.firstName,
+					lastName: result.profile.lastName || '',
+					bio: result.profile.bio || '',
+				}}
+			/>
 		</div>
 	);
 };

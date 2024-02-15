@@ -5,6 +5,7 @@ CREATE TABLE `User` (
     `lastName` VARCHAR(191) NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
+    `passwordChangedAt` DATETIME(3) NULL,
     `bio` VARCHAR(191) NULL,
     `isVerified` BOOLEAN NOT NULL DEFAULT false,
     `role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
@@ -253,8 +254,7 @@ CREATE TABLE `PaymentInfo` (
 CREATE TABLE `ShippingInfo` (
     `id` VARCHAR(191) NOT NULL,
     `orderId` VARCHAR(191) NOT NULL,
-    `firstName` VARCHAR(191) NOT NULL,
-    `lastName` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
     `mobile` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `addressLine1` VARCHAR(191) NOT NULL,
@@ -262,6 +262,7 @@ CREATE TABLE `ShippingInfo` (
     `state` VARCHAR(191) NOT NULL,
     `city` VARCHAR(191) NOT NULL,
     `country` VARCHAR(191) NOT NULL,
+    `zipCode` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 

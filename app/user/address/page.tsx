@@ -2,6 +2,9 @@ import CreateAddress from '@/components/elements/modals/create-address';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import AddressCard from './address-card';
 import { fetchAddresses } from '@/lib/actions/address.action';
+export const metadata = {
+	title: 'My Addresses - Vietfood User Dashboard',
+};
 
 const UserAddressPage = async () => {
 	const result = await fetchAddresses();

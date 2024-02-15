@@ -1,11 +1,17 @@
 'use server';
-import { generateOrderId, handleResponse } from '../helpers/formater';
+import {
+	dateFormat,
+	generateOrderId,
+	handleResponse,
+} from '../helpers/formater';
+import * as z from 'zod';
 import { isAuthenticated } from './auth.action';
 import prisma from '../prisma';
 import { countryNameByIso, stateNameByIso } from './country.action';
 import { revalidatePath } from 'next/cache';
 import { createPaymentIntent } from './payment.action';
 import { OrderStatus } from '@prisma/client';
+import { OrderDetailsFormSchema } from '../helpers/form-validation';
 
 /* ================================ */
 // Cart actions
@@ -384,15 +390,15 @@ export const createUserOrder = async (params: { cartId: string }) => {
 				total: subTotal + cartExist.shippingCost,
 				shippingInfo: {
 					create: {
-						firstName: cartExist.address?.contactName,
-						lastName: '',
+						name: cartExist.address?.contactName,
 						mobile: `(${cartExist.address.phoneCode}) ${cartExist.address.phoneNumber}`,
-						email: '',
+						email: isAuth.email,
 						addressLine1: cartExist.address.addressLine1 || '',
 						addressLine2: cartExist.address.addressLine2 || '',
 						state: cartExist.address.stateCode,
 						city: cartExist.address.cityName || '',
 						country: cartExist.address.countryCode,
+						zipCode: cartExist.address.zipCode,
 					},
 				},
 				payment: {
@@ -580,8 +586,7 @@ export const fetchUserOrderDetails = async (params: {
 				},
 				shippingInfo: {
 					select: {
-						firstName: true,
-						lastName: true,
+						name: true,
 						mobile: true,
 						addressLine1: true,
 						addressLine2: true,
@@ -630,7 +635,7 @@ export const fetchUserOrderDetails = async (params: {
 				},
 			],
 			shipping: {
-				name: `${orderItem.shippingInfo?.firstName} ${orderItem.shippingInfo?.lastName}`,
+				name: `${orderItem.shippingInfo?.name}`,
 				mobile: orderItem.shippingInfo?.mobile,
 				address: `${orderItem.shippingInfo?.addressLine1} ${orderItem.shippingInfo?.addressLine2} ${city}, ${state}, ${country}`,
 			},
@@ -1057,5 +1062,182 @@ export const fetchOrdersByAdmin = async (params: {
 		};
 	} catch (error) {
 		return;
+	}
+};
+export const fetchOrderDetailsByAdmin = async (params: {
+	orderId: string | null;
+}) => {
+	try {
+		const { orderId } = params;
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN' || !orderId) return;
+
+		const orderItem = await prisma.order.findUnique({
+			where: {
+				orderId,
+			},
+			select: {
+				orderId: true,
+				createdAt: true,
+				option: {
+					select: {
+						value: true,
+					},
+				},
+				status: true,
+				tax: true,
+				shippingCost: true,
+				total: true,
+				totalDiscount: true,
+				payment: {
+					select: {
+						status: true,
+						currency: true,
+						method: true,
+					},
+				},
+				shippingInfo: {
+					select: {
+						name: true,
+						mobile: true,
+						addressLine1: true,
+						addressLine2: true,
+						state: true,
+						city: true,
+						country: true,
+						zipCode: true,
+						email: true,
+					},
+				},
+			},
+		});
+		if (!orderItem) return;
+
+		const orderDetailsString = orderItem.option.value.toString('utf-8');
+		const orderDetails: OrderItemOptions = JSON.parse(orderDetailsString);
+
+		return {
+			orderId: orderItem.orderId,
+			items: orderDetails.orderItems,
+			orderStatus: orderItem.status,
+			paymentStaus: orderItem.payment?.status,
+			summary: [
+				{
+					label: 'Tax',
+					value: orderItem.tax,
+				},
+				{
+					label: 'Shipping Cost',
+					value: orderItem.shippingCost,
+				},
+				{
+					label: 'Total Discount',
+					value: orderItem.totalDiscount,
+				},
+				{
+					label: 'Total Amount',
+					value: orderItem.total,
+				},
+			],
+			shipping: {
+				countryCode: orderItem.shippingInfo?.country || '',
+				contactName: `${orderItem.shippingInfo?.name}` || '',
+				phoneNumber: orderItem.shippingInfo?.mobile || '',
+				addressLine1: orderItem.shippingInfo?.addressLine1 || '',
+				addressLine2: orderItem.shippingInfo?.addressLine2 || '',
+				stateCode: orderItem.shippingInfo?.state || '',
+				cityName: orderItem.shippingInfo?.city || '',
+				zipCode: orderItem.shippingInfo?.zipCode || '',
+				status: orderItem.status,
+				email: orderItem.shippingInfo?.email || '',
+			},
+			orderInfo: [
+				{
+					label: 'Order ID',
+					value: `#${orderItem.orderId}` || '',
+				},
+				{
+					label: 'Ordered On',
+					value: dateFormat(orderItem.createdAt) || '',
+				},
+				{
+					label: 'Currency',
+					value:
+						orderItem.payment?.currency === 'usd'
+							? 'USD'
+							: 'EURO' || '',
+				},
+				{
+					label: 'Currency',
+					value: orderItem.payment?.method || '',
+				},
+			],
+		};
+	} catch (error) {
+		return;
+	}
+};
+export const updateOrderDetails = async (params: {
+	data: z.infer<typeof OrderDetailsFormSchema>;
+	orderId: string;
+}) => {
+	try {
+		const {
+			orderId,
+			data: {
+				email,
+				contactName,
+				phoneNumber,
+				countryCode,
+				stateCode,
+				cityName,
+				zipCode,
+				addressLine1,
+				addressLine2,
+				status,
+			},
+		} = params;
+
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN')
+			return handleResponse(false, `You don't have permission`);
+
+		const orderExist = await prisma.order.findUnique({
+			where: {
+				orderId,
+			},
+			select: {
+				id: true,
+			},
+		});
+		if (!orderExist) return handleResponse(false, `Order doesn't exist`);
+
+		await prisma.order.update({
+			where: {
+				orderId,
+			},
+			data: {
+				status: status as OrderStatus,
+				shippingInfo: {
+					update: {
+						name: contactName,
+						mobile: phoneNumber,
+						email,
+						addressLine1,
+						addressLine2,
+						state: stateCode,
+						city: cityName,
+						country: countryCode,
+						zipCode,
+					},
+				},
+			},
+		});
+
+		revalidatePath('/admin/store/order');
+
+		return handleResponse(true, `Order updated successfully`);
+	} catch (error) {
+		return handleResponse(false, `Order update failed`);
 	}
 };

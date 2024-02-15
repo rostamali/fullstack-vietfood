@@ -100,6 +100,21 @@ export const createForgotPasswordToken = async (email: string) => {
 		)
 		.sign(new TextEncoder().encode(getForgotPasswordTokenSecret()));
 };
+export const verifyForgotPasswordToken = async (token: string) => {
+	try {
+		const verified = await jwtVerify(
+			token,
+			new TextEncoder().encode(getForgotPasswordTokenSecret()),
+		);
+
+		if (!verified) return;
+		return verified.payload as {
+			email: string;
+		};
+	} catch (error) {
+		return;
+	}
+};
 
 /* ============================================= */
 // Verify Tokens
