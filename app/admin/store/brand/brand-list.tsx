@@ -73,14 +73,11 @@ const BrandList: FC<BrandProps> = ({ data, pages }) => {
 							</div>
 						</div>
 						<div className="max-xm:hidden">
-							<SmallTooltip
-								trigger={
-									<Button className="btn-ghost-lg">
-										<Download strokeWidth={1.5} size={20} />
-									</Button>
-								}
-								content={'Export Data'}
-							/>
+							<SmallTooltip content={'Export Data'}>
+								<Button className="btn-ghost-lg">
+									<Download strokeWidth={1.5} size={20} />
+								</Button>
+							</SmallTooltip>
 						</div>
 					</div>
 				</div>

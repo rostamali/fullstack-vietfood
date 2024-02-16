@@ -1,7 +1,5 @@
 'use client';
 import 'swiper/css';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
 import BannerSlider from '@/components/elements/slider/banner-slider';
 import { HeroSlider } from '@/constants';
 

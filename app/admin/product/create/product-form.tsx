@@ -21,8 +21,6 @@ import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import ContentEditor from '../../../../components/elements/shared/content-editor';
 import { useCreateProduct, useUpdateProduct } from '@/lib/hooks/useProduct';
 import Spinner from '@/components/elements/shared/spinner';
-import SelectField from '@/components/elements/select/select-field';
-import { ProductCollection } from '@/constants';
 type productformProps = {
 	defaultValues: z.infer<typeof ProductFormSchema>;
 	pageTitle: string;

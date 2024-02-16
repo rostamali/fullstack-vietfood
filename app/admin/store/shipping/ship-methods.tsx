@@ -25,7 +25,6 @@ import { Input } from '@/components/ui/input';
 import SelectField from '@/components/elements/select/select-field';
 import { ShipFormSchema } from '@/lib/helpers/form-validation';
 import { useMethodClassList } from '@/lib/hooks/useShip';
-import { format } from 'path';
 import { X } from 'lucide-react';
 type TabProps = {
 	form: UseFormReturn<z.infer<typeof ShipFormSchema>>;

@@ -20,7 +20,6 @@ type FormProps = {
 const OrderDetailsForm: React.FC<FormProps> = ({
 	defaultValues,
 	orderInfo,
-	loading,
 	id,
 }) => {
 	const { mutate: orderUpdate, isPending } = useUpdateOrder();

@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { ProductStatus } from '@/constants';
 import { Download } from 'lucide-react';
 import { FC } from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Table,
 	TableBody,
@@ -19,7 +18,6 @@ import {
 } from '@/components/ui/table';
 import Image from 'next/image';
 import { OrderStatusFormat, dateFormat } from '@/lib/helpers/formater';
-import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import PaymentStatus from './payment-status';
 type OrderListProps = {
@@ -152,6 +150,7 @@ const OrderList: FC<OrderListProps> = ({ data, pages }) => {
 									<div className="table-cell-data min-h-[80px]">
 										<PaymentStatus
 											status={item.paymentStatus}
+											className={'w-[92px]'}
 										/>
 									</div>
 								</TableCell>

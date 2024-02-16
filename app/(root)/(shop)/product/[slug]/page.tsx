@@ -10,6 +10,7 @@ import {
 	getProductMetaDataBySlug,
 } from '@/lib/actions/shop.action';
 import Description from './description';
+import Image from 'next/image';
 
 export async function generateMetadata({ params }: SearchParams) {
 	const result = await getProductMetaDataBySlug({
@@ -37,12 +38,22 @@ const ProductDetails = async ({ params }: SearchParams) => {
 				<div className="product-info-wrapper space-y-16">
 					<div className="container product-info">
 						<div className="grid lg:grid-cols-2 grid-cols-1 gap-[40px] items-center">
-							<div className="">
-								{result && (
+							<div className="gallery-wrapp">
+								{result.gallery.length > 0 ? (
 									<ProductGallery
 										gallery={result.gallery}
 										alt={result.name}
 									/>
+								) : (
+									<div className="bg-[#F7F7F7] md:h-[450px] h-[400px] flex-center">
+										<Image
+											src="/assets/placeholder.png"
+											alt={result.name}
+											width={600}
+											height={600}
+											className="object-contain w-[70%]"
+										/>
+									</div>
 								)}
 							</div>
 							<div className="flex flex-col gap-5 items-start">

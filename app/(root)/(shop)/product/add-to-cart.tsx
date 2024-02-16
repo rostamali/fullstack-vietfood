@@ -102,7 +102,7 @@ const AddToCart: React.FC<FormProps> = ({ productId }) => {
 				</div>
 				<div className="flex items-center gap-4">
 					<Button
-						className="btn-primary-sm xm:w-[218px] w-full gap-1"
+						className="btn-primary-sm w-[218px] gap-1"
 						disabled={isPending}
 					>
 						{isPending && (
