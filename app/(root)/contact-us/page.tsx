@@ -1,6 +1,10 @@
 import { QuickContact, SocialLinks } from '@/constants';
 import ContactForm from './contact-form';
 import Link from 'next/link';
+export const metadata = {
+	title: `Get in Touch with Vietfood - Your Premier Food Wholesaler`,
+	description: `Have questions or feedback? Reach out to Vietfood for inquiries, assistance, or orders. Our dedicated team is here to serve you with quality products and exceptional service.`,
+};
 
 const ContactUs = () => {
 	return (

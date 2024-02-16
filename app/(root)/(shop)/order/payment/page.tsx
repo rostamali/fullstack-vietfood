@@ -4,6 +4,11 @@ import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import PaymentSuccess from '../thank-you/payment-success';
+export const metadata = {
+	title: `Secure Payment Processing at Vietfood Online Store`,
+	description: `Shop with confidence at Vietfood. Enjoy secure payment processing for your purchases of quality food products and ingredients.`,
+};
+
 type SearchParams = {
 	searchParams: {
 		orderId: string | null;

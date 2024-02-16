@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { fetchCartDetails } from '@/lib/actions/order.action';
 import EmptyError from '@/components/elements/shared/empty-error';
+export const metadata = {
+	title: `Cart -  Vietfood Online Shopping Cart`,
+	description: `View and manage your shopping cart. Fill it with your favorite food items and beverages before proceeding to checkout.`,
+};
 
 const CartPage = async () => {
 	const result = await fetchCartDetails();

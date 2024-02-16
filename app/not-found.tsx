@@ -2,6 +2,10 @@ import RootFooter from '@/components/elements/headers/root-footer';
 import RootHeader from '@/components/elements/headers/root-header';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+export const metadata = {
+	title: `404 - Page Not Found`,
+	description: `The page you are looking for is not exists`,
+};
 
 export default function NotFound() {
 	return (

@@ -4,24 +4,28 @@ import CategorySlider from './category-slider';
 import { StoreFeature } from '@/constants';
 import { fetchHomepageDetails } from '@/lib/actions/shop.action';
 import type { Metadata } from 'next';
-import ogImage1 from '../../../public/assets/seo/beef.png';
 
 export const metadata: Metadata = {
 	title: `Vietfood - Your Ultimate Food Wholesaler In New Zealand`,
 	description: `Vietfood - Your premier food wholesaler in New Zealand, providing a diverse range of fresh, frozen, and pantry essentials, along with beverages and consumables. Catering to the needs of food enthusiasts and businesses nationwide with quality products and exceptional service.`,
-	// openGraph: {
-	// 	title: `Vietfood - Your Ultimate Food Wholesaler In New Zealand`,
-	// 	description: `Vietfood - Your go-to food wholesaler in New Zealand. We supply fresh, frozen, and pantry essentials along with beverages and consumables. Quality products, exceptional service.`,
-	// 	url: process.env.HOST,
-	// 	siteName: `Vietfood`,
-	// 	images: [
-	// 		{
-	// 			url: ogImage1.src,
-	// 			width: 1260,
-	// 			height: 628,
-	// 		},
-	// 	],
-	// },
+	openGraph: {
+		title: `Vietfood - Your Ultimate Food Wholesaler In New Zealand`,
+		description: `Vietfood - Your go-to food wholesaler in New Zealand. We supply fresh, frozen, and pantry essentials along with beverages and consumables. Quality products, exceptional service.`,
+		url: process.env.HOST,
+		siteName: `Vietfood`,
+		images: [
+			{
+				url: `/assets/seo/beef.jpg`,
+				width: 1260,
+				height: 628,
+			},
+			{
+				url: `/assets/seo/salmon.jpg`,
+				width: 1260,
+				height: 628,
+			},
+		],
+	},
 };
 
 export default async function Home() {

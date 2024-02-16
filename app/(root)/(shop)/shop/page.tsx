@@ -5,6 +5,30 @@ import EmptyError from '@/components/elements/shared/empty-error';
 import BannerSlider from '@/components/elements/slider/banner-slider';
 import { ShopSlider } from '@/constants';
 import Pagination from '@/components/elements/filters/pagination';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: `Shop - Explore Vietfood Products`,
+	description: `Discover a wide variety of fresh, frozen, and pantry essentials. Shop now for quality products and exceptional service.`,
+	openGraph: {
+		title: `Shop - Explore Vietfood Products`,
+		description: `Discover a wide variety of fresh, frozen, and pantry essentials. Shop now for quality products and exceptional service.`,
+		url: process.env.HOST,
+		siteName: `Vietfood`,
+		images: [
+			{
+				url: `/assets/seo/beef.jpg`,
+				width: 1260,
+				height: 628,
+			},
+			{
+				url: `/assets/seo/salmon.jpg`,
+				width: 1260,
+				height: 628,
+			},
+		],
+	},
+};
 
 type SearchParams = {
 	searchParams: {

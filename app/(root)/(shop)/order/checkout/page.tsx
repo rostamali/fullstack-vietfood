@@ -7,6 +7,10 @@ import AddressCard from './address-card';
 import CartSummray from '../cart-summray';
 import CheckoutBtn from './checkout-btn';
 import CouponForm from '@/components/elements/forms/coupon-form';
+export const metadata = {
+	title: `Checkout - Complete Your Purchase at Vietfood Online Store`,
+	description: `Finalize your purchase confidently. Complete the checkout process and enjoy quality food products delivered to your doorstep.`,
+};
 
 const CheckoutPage = async () => {
 	const result = await fetchCheckoutDetails();

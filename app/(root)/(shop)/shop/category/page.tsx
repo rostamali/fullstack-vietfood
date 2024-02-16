@@ -3,6 +3,30 @@ import Pagination from '@/components/elements/filters/pagination';
 import CategoryCard from '@/components/elements/shared/category-card';
 import EmptyError from '@/components/elements/shared/empty-error';
 import { fetchCategoriesByUser } from '@/lib/actions/shop.action';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: `Product Categories - Vietfood Online Store`,
+	description: `Explore our wide range of food categories, featuring over 960 products sourced from around the world and locally. Find specialty ingredients and quality products for your cooking needs.`,
+	openGraph: {
+		title: `Product Categories - Vietfood Online Store`,
+		description: `Explore our wide range of food categories, featuring over so many products sourced from around the world and locally. Find specialty ingredients and quality products for your cooking needs.`,
+		url: process.env.HOST,
+		siteName: `Vietfood`,
+		images: [
+			{
+				url: `/assets/seo/beef.jpg`,
+				width: 1260,
+				height: 628,
+			},
+			{
+				url: `/assets/seo/salmon.jpg`,
+				width: 1260,
+				height: 628,
+			},
+		],
+	},
+};
 type SearchParams = {
 	searchParams: {
 		page: string;

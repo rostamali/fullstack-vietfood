@@ -187,8 +187,6 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 };
 export const getProductMetaDataBySlug = async (params: { slug: string }) => {
 	try {
-		const isAuth = await isAuthenticated();
-		if (!isAuth) return;
 		const product = await prisma.product.findFirst({
 			where: {
 				slug: params.slug,
@@ -196,14 +194,34 @@ export const getProductMetaDataBySlug = async (params: { slug: string }) => {
 			select: {
 				name: true,
 				excerpt: true,
+				thumbnail: {
+					select: {
+						url: true,
+					},
+				},
 			},
 		});
-		if (!product) return;
+		if (!product)
+			return {
+				name: `404 - Product not found`,
+				excerpt: `Explore our wide range of food categories, featuring over so many products sourced from around the world and locally. Find specialty ingredients and quality products for your cooking needs.`,
+				thumbnail: `/assets/seo/beef.jpg`,
+			};
 		return {
-			...product,
+			name: product.name,
+			excerpt: product.excerpt
+				? product.excerpt
+				: `Explore our wide range of food categories, featuring over so many products sourced from around the world and locally. Find specialty ingredients and quality products for your cooking needs.`,
+			thumbnail: product.thumbnail
+				? `/uploads/files/${product.thumbnail.url}`
+				: `/assets/seo/beef.jpg`,
 		};
 	} catch (error) {
-		return;
+		return {
+			name: `404 - Product not found`,
+			excerpt: `Explore our wide range of food categories, featuring over so many products sourced from around the world and locally. Find specialty ingredients and quality products for your cooking needs.`,
+			thumbnail: `/assets/seo/beef.jpg`,
+		};
 	}
 };
 export const fetchHomepageDetails = async () => {

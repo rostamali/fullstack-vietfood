@@ -17,7 +17,21 @@ export async function generateMetadata({ params }: SearchParams) {
 		slug: params.slug,
 	});
 	return {
-		title: result ? result.name : `404 - Product not found`,
+		title: result?.name,
+		description: result?.excerpt,
+		openGraph: {
+			title: result?.name,
+			description: result?.excerpt,
+			url: process.env.HOST,
+			siteName: `Vietfood`,
+			images: [
+				{
+					url: result.thumbnail,
+					width: 1260,
+					height: 628,
+				},
+			],
+		},
 	};
 }
 
@@ -45,13 +59,13 @@ const ProductDetails = async ({ params }: SearchParams) => {
 										alt={result.name}
 									/>
 								) : (
-									<div className="bg-[#F7F7F7] md:h-[450px] h-[400px] flex-center">
+									<div className="bg-white md:h-[450px] h-[400px] flex-center rounded-md">
 										<Image
 											src="/assets/placeholder.png"
 											alt={result.name}
 											width={600}
 											height={600}
-											className="object-contain w-[70%]"
+											className="object-contain w-[70%] invert-[100%]"
 										/>
 									</div>
 								)}
