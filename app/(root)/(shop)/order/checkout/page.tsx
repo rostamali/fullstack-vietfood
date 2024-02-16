@@ -7,6 +7,7 @@ import AddressCard from './address-card';
 import CartSummray from '../cart-summray';
 import CheckoutBtn from './checkout-btn';
 import CouponForm from '@/components/elements/forms/coupon-form';
+import CheckoutLoading from './loading';
 export const metadata = {
 	title: `Checkout - Complete Your Purchase at Vietfood Online Store`,
 	description: `Finalize your purchase confidently. Complete the checkout process and enjoy quality food products delivered to your doorstep.`,
@@ -19,7 +20,7 @@ const CheckoutPage = async () => {
 		<div className="checkout-page py-[60px]">
 			<div className="container">
 				{result ? (
-					<div className="grid grid-cols-[1fr,420px] gap-6">
+					<div className="grid xl:grid-cols-[1fr,420px] lg:grid-cols-[1fr,300px] grid-cols-1 gap-6">
 						<div className="space-y-6">
 							<div className="bg-white rounded-md">
 								<h4 className="heading-4 mb-3 p-4">

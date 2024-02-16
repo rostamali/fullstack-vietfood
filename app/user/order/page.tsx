@@ -57,10 +57,6 @@ const UserOrdersPage = async ({ searchParams }: SearchParams) => {
 					/>
 				</div>
 			</div>
-			{/* <OrderItems
-				data={result ? result.orders : []}
-				pages={result ? result.pages : 0}
-			/> */}
 			<OrderList data={result ? result.orders : []} />
 		</div>
 	);

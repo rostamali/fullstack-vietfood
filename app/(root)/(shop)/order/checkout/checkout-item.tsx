@@ -8,8 +8,8 @@ const CheckoutItem: React.FC<CardProps> = ({ data }) => {
 	return (
 		<>
 			<div className="bg-white border-b-2 border-b-gray-muted py-[18px] px-[20px]">
-				<div className="grid grid-cols-[80px,1fr,100px] gap-3.5 items-center">
-					<div className="">
+				<div className="grid sm:grid-cols-[80px,1fr,100px] grid-cols-[80px,1fr] gap-3.5 items-center">
+					<div className="h-[80px] w-[80px] border-light rounded-md flex-center">
 						<Image
 							src={
 								data?.thumbnail
@@ -19,12 +19,15 @@ const CheckoutItem: React.FC<CardProps> = ({ data }) => {
 							alt={data.name}
 							width={400}
 							height={400}
-							className="h-[80px] w-[80px] border-light rounded-md object-contain bg-transparent"
+							className="w-[80%] object-contain bg-transparent"
+							style={{
+								aspectRatio: '3/2',
+							}}
 						/>
 					</div>
 					<div className="space-y-1.5">
 						<h2 className="text-heading-6">{data.name}</h2>
-						<div className="flex items-center gap-4">
+						<div className="flex items-center gap-4 flex-wrap">
 							<div className="flex items-center gap-1">
 								<span className="text-base-1">Quantity: </span>
 								<span className="text-base-1 !font-medium">
@@ -40,50 +43,16 @@ const CheckoutItem: React.FC<CardProps> = ({ data }) => {
 							</div>
 						</div>
 					</div>
-					<div className="">
-						<h4 className="heading-4">
-							${data.totalCost.toFixed(2)}
-						</h4>
+					<div className="max-sm:col-span-2">
+						<div className="flex items-center gap-1.5">
+							<h4 className="sm:hidden heading-4">Total:</h4>
+							<h4 className="heading-4">
+								${data.totalCost.toFixed(2)}
+							</h4>
+						</div>
 					</div>
 				</div>
 			</div>
-
-			{/* <div className="flex items-center gap-2">
-			<Image
-				src={
-					data?.thumbnail
-						? `/uploads/files/${data.thumbnail}`
-						: '/assets/placeholder.svg'
-				}
-				alt={data.name}
-				width={400}
-				height={400}
-				className="h-[75px] w-[75px] border-light rounded-md object-contain bg-transparent"
-			/>
-			<div className="item-info space-y-1.5 flex-1">
-				<h2 className="text-heading-6">{data.name}</h2>
-				<div className="grid grid-cols-3 gap-3">
-					<div className="flex items-center gap-1">
-						<span className="text-base-1">QTY:</span>
-						<span className="text-base-1">
-							<strong>{data.quantity}</strong>
-						</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<span className="text-base-1">Unit Price:</span>
-						<span className="text-base-1">
-							<strong>${data.unitPrice.toFixed(2)}</strong>
-						</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<span className="text-base-1">Total Price:</span>
-						<span className="text-base-1">
-							<strong>${data.totalCost.toFixed(2)}</strong>
-						</span>
-					</div>
-				</div>
-			</div>
-		</div> */}
 		</>
 	);
 };

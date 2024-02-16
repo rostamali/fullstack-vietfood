@@ -8,6 +8,8 @@ import {
 	dateFormat,
 } from '@/lib/helpers/formater';
 import { Button } from '@/components/ui/button';
+import EmptyError from '@/components/elements/shared/empty-error';
+import Link from 'next/link';
 type SearchParams = {
 	params: {
 		id: string;
@@ -18,6 +20,7 @@ const OrderDteailsPage = async ({ params }: SearchParams) => {
 	const result = await fetchUserOrderDetails({
 		orderId: params.id,
 	});
+
 	return (
 		<div className="dashboard-col-space">
 			{result ? (
@@ -122,7 +125,21 @@ const OrderDteailsPage = async ({ params }: SearchParams) => {
 					</div>
 				</>
 			) : (
-				'Empty'
+				<EmptyError
+					contentClass={
+						'sm:max-w-[450px] justify-center mx-auto text-center items-center py-[60px]'
+					}
+					title={'Invalid order ID'}
+					description={`Oops! It looks like there are no order available at this ID. 🛍️ Please check the order ID and try again later! 🌟`}
+					Links={
+						<Link
+							href="/user/order"
+							className="btn-navlink btn-navlink-active !w-auto"
+						>
+							Go Back
+						</Link>
+					}
+				/>
 			)}
 		</div>
 	);
