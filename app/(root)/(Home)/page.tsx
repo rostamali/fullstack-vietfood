@@ -15,12 +15,12 @@ export const metadata: Metadata = {
 		siteName: `Vietfood`,
 		images: [
 			{
-				url: '/assets/seo/beef.png',
+				url: '/public/assets/seo/beef.png',
 				width: 1260,
 				height: 628,
 			},
 			{
-				url: '/assets/seo/salmon.png',
+				url: '/public/assets/seo/salmon.png',
 				width: 1260,
 				height: 628,
 			},
