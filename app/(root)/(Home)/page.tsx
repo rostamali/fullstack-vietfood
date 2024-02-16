@@ -4,6 +4,7 @@ import CategorySlider from './category-slider';
 import { StoreFeature } from '@/constants';
 import { fetchHomepageDetails } from '@/lib/actions/shop.action';
 import type { Metadata } from 'next';
+import ogImage1 from '../../../public/assets/seo/beef.png';
 
 export const metadata: Metadata = {
 	title: `Vietfood - Your Ultimate Food Wholesaler In New Zealand`,
@@ -15,12 +16,7 @@ export const metadata: Metadata = {
 		siteName: `Vietfood`,
 		images: [
 			{
-				url: '/public/assets/seo/beef.png',
-				width: 1260,
-				height: 628,
-			},
-			{
-				url: '/public/assets/seo/salmon.png',
+				url: ogImage1.src,
 				width: 1260,
 				height: 628,
 			},
