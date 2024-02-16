@@ -5,9 +5,21 @@ import SocialShare from '../social-share';
 import StarTating from '../star-rating';
 import AddToCart from '../add-to-cart';
 import EmptyError from '@/components/elements/shared/empty-error';
-import { fetchProductBySlug } from '@/lib/actions/shop.action';
+import {
+	fetchProductBySlug,
+	getProductMetaDataBySlug,
+} from '@/lib/actions/shop.action';
 import Description from './description';
-import ProductDetailsLoading from './loading';
+
+export async function generateMetadata({ params }: SearchParams) {
+	const result = await getProductMetaDataBySlug({
+		slug: params.slug,
+	});
+	return {
+		title: result ? result.name : `404 - Product not found`,
+	};
+}
+
 type SearchParams = {
 	params: {
 		slug: string;

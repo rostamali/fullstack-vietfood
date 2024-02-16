@@ -185,6 +185,27 @@ export const fetchProductBySlug = async (params: { slug: string }) => {
 		return;
 	}
 };
+export const getProductMetaDataBySlug = async (params: { slug: string }) => {
+	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return;
+		const product = await prisma.product.findFirst({
+			where: {
+				slug: params.slug,
+			},
+			select: {
+				name: true,
+				excerpt: true,
+			},
+		});
+		if (!product) return;
+		return {
+			...product,
+		};
+	} catch (error) {
+		return;
+	}
+};
 export const fetchHomepageDetails = async () => {
 	try {
 		const bestSell = await prisma.product.findMany({
