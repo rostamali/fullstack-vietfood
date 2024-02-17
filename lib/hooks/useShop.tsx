@@ -1,8 +1,9 @@
 'use client';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
 	addProductToWishlist,
 	removeProductFormWishlist,
+	searchGlobalProducts,
 } from '../actions/shop.action';
 import { toast } from 'sonner';
 import {
@@ -54,5 +55,11 @@ export const useRemoveFromWishlist = () => {
 				<ToastError toastNumber={t} content={error.message} />
 			));
 		},
+	});
+};
+export const useGlobalProductSearch = (query: string | null) => {
+	return useQuery({
+		queryKey: ['globalProducts', query],
+		queryFn: async () => await searchGlobalProducts({ query }),
 	});
 };

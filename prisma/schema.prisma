@@ -239,8 +239,8 @@ model Cart {
   shippingCost    Float
   shippingMethods String
 
-  taxName   String?
-  taxAmount Float?
+  taxName   String @default("none")
+  taxAmount Float @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -281,7 +281,8 @@ model Order {
   status        OrderStatus   @default(PENDING)
   orderItem     Int
   subTotal      Float
-  tax           Float
+  taxName       String @default("none")
+  taxAmount           Float
   totalDiscount Float
   shippingCost  Float
   total         Float

@@ -652,3 +652,114 @@ export const fetchHeaderDetails = async () => {
 		profileLink: `/auth/login?redirect=/user/account`,
 	};
 };
+export const fetchUserDashboard = async () => {
+	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth) return;
+	} catch (error) {
+		return;
+	}
+};
+export const fetchAdminDashboard = async () => {
+	try {
+		const isAuth = await isAuthenticated();
+		if (!isAuth || isAuth.role !== 'ADMIN') return;
+
+		const orderData = await prisma.order.findMany({
+			select: {
+				orderId: true,
+				status: true,
+				payment: {
+					select: {
+						status: true,
+					},
+				},
+			},
+		});
+		const userData = await prisma.user.findMany({
+			select: {
+				id: true,
+				status: true,
+				role: true,
+			},
+		});
+
+		const orderSummary = {
+			totalOrder: orderData.length,
+			unpaidOrder:
+				orderData.filter((item) => item.payment?.status === 'UNPAID')
+					.length || 0,
+			cancelledOrder: orderData.filter(
+				(item) => item.status === 'CANCELLED',
+			).length,
+			pendingOrder: orderData.filter((item) => item.status === 'PENDING')
+				.length,
+		};
+		const userSummary = {
+			registeredUser: userData.length,
+			bannedUser: userData.filter((item) => item.status === 'INACTIVE')
+				.length,
+			totalAdmin: userData.filter((item) => item.role === 'ADMIN').length,
+			totalUser: userData.filter((item) => item.role === 'USER').length,
+		};
+
+		return {
+			orderSummary,
+			userSummary,
+		};
+	} catch (error) {
+		return;
+	}
+};
+export const searchGlobalProducts = async (params: {
+	query: string | null;
+}) => {
+	try {
+		const { query } = params;
+
+		const productsDB = await prisma.product.findMany({
+			where: {
+				...(query && {
+					OR: [
+						{ name: { contains: query } },
+						{ excerpt: { contains: query } },
+					],
+				}),
+			},
+			select: {
+				name: true,
+				slug: true,
+				category: {
+					select: {
+						name: true,
+					},
+				},
+				thumbnail: {
+					select: {
+						url: true,
+						fileType: true,
+					},
+				},
+			},
+			take: 10,
+		});
+		const products = productsDB.map((item) => {
+			return {
+				name: item.name,
+				slug: item.slug,
+				category: item.category ? item.category.name : 'Uncategorized',
+				thumbnail: item.thumbnail
+					? item.thumbnail.fileType === 'image'
+						? item.thumbnail.url
+						: null
+					: null,
+			};
+		});
+
+		return {
+			products,
+		};
+	} catch (error) {
+		return;
+	}
+};

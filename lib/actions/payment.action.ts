@@ -11,7 +11,8 @@ interface IntentProps {
 export const createPaymentIntent = async (params: IntentProps) => {
 	try {
 		const { currency, total } = params;
-		const totalAmount = total * 100;
+		const totalCharge = parseFloat(total.toFixed(2));
+		const totalAmount = totalCharge * 100;
 		const paymentIntent = await stripe.paymentIntents.create({
 			amount: parseFloat(totalAmount.toFixed(2)),
 			currency: currency,

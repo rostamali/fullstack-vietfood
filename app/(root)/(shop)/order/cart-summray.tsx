@@ -27,7 +27,7 @@ const CartSummray: React.FC<SummrayProps> = ({ summary }) => {
 				<li className="cart-summary__between">
 					<span className="cart-summary__label">Tax</span>
 					<span className="cart-summary__value">
-						{summary.taxCost}%
+						${summary.taxCost.toFixed(2)}
 					</span>
 				</li>
 				<li className="cart-summary__between">

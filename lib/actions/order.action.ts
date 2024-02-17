@@ -216,15 +216,37 @@ export const fetchCartDetails = async () => {
 		const cartList = await fetchCartList(isAuth.id);
 		if (!cartList) return;
 		const subtotal = cartSubtotal(cartList.cartItems);
-
 		const shippingInfo = await calculateShipping(isAuth.id);
 
+		const userCart = await prisma.cart.findUnique({
+			where: {
+				userId: isAuth.id,
+			},
+			select: {
+				shippingCost: true,
+				taxName: true,
+				taxAmount: true,
+			},
+		});
+		if (!userCart) return;
+
+		const shippingCost = userCart.shippingCost
+			? userCart.shippingCost
+			: shippingInfo
+			? shippingInfo?.shippingCost
+			: 0;
+
+		const totalAmount = cartTotalCost(
+			subtotal,
+			shippingCost,
+			userCart.taxAmount,
+		);
 		const cartDetails = {
 			summary: {
 				subtotal,
-				shippingCost: shippingInfo?.shippingCost || 0,
-				taxCost: 0,
-				total: subtotal + (shippingInfo?.shippingCost || 0) + 0,
+				shippingCost: shippingCost,
+				taxCost: userCart.taxAmount,
+				total: totalAmount,
 			},
 			items: cartList.cartItems,
 		};
@@ -252,19 +274,26 @@ export const fetchCheckoutDetails = async () => {
 			},
 			select: {
 				shippingCost: true,
+				taxName: true,
+				taxAmount: true,
 			},
 		});
-
 		if (!userCart) return;
 
 		const shippingCost = userCart.shippingCost ? userCart.shippingCost : 0;
+		const totalAmount = cartTotalCost(
+			shippingDetails.subtotal,
+			shippingCost,
+			userCart.taxAmount,
+		);
 
 		return {
 			summary: {
 				subtotal: shippingDetails.subtotal,
 				shippingCost,
-				taxCost: 0,
-				total: shippingDetails.subtotal + shippingCost,
+				taxCost: userCart.taxAmount,
+				taxName: userCart.taxName,
+				total: totalAmount,
 			},
 			cartId: cartList.cartId,
 			items: cartList.cartItems,
@@ -363,7 +392,11 @@ export const createUserOrder = async (params: { cartId: string }) => {
 			};
 
 		const subTotal = cartSubtotal(cartDetails.cartItems);
-		const totalAmount = subTotal + cartExist.shippingCost;
+		const totalAmount = cartTotalCost(
+			subTotal,
+			cartExist.shippingCost,
+			cartExist.taxAmount,
+		);
 
 		const stripePayment = await createPaymentIntent({
 			currency: cartExist.currency,
@@ -384,10 +417,10 @@ export const createUserOrder = async (params: { cartId: string }) => {
 				user: { connect: { id: isAuth.id } },
 				status: 'PENDING',
 				subTotal,
-				tax: 0,
+				taxAmount: cartExist.taxAmount,
 				totalDiscount: 0,
 				shippingCost: cartExist.shippingCost,
-				total: subTotal + cartExist.shippingCost,
+				total: totalAmount,
 				shippingInfo: {
 					create: {
 						name: cartExist.address?.contactName,
@@ -575,7 +608,7 @@ export const fetchUserOrderDetails = async (params: {
 					},
 				},
 				status: true,
-				tax: true,
+				taxAmount: true,
 				shippingCost: true,
 				total: true,
 				totalDiscount: true,
@@ -619,7 +652,7 @@ export const fetchUserOrderDetails = async (params: {
 			summary: [
 				{
 					label: 'Tax',
-					value: orderItem.tax,
+					value: orderItem.taxAmount,
 				},
 				{
 					label: 'Shipping Cost',
@@ -657,6 +690,7 @@ export const calculateShipping = async (userId: string) => {
 	let classCostList: ClassListCost[] = [];
 	let shippingCost = 0;
 	let isFreeShippingApplicable = false;
+	let totalTax = 0;
 
 	const userAddress = await getShippingAddress();
 
@@ -720,6 +754,25 @@ export const calculateShipping = async (userId: string) => {
 				}),
 			};
 		});
+		const taxRate = await prisma.taxRate.findMany({
+			where: {
+				OR: [
+					{
+						country: userAddress.defaultAddress.countryCode,
+					},
+					{
+						state: userAddress.defaultAddress.stateCode,
+					},
+				],
+			},
+			select: {
+				name: true,
+				taxRate: true,
+				priority: true,
+			},
+		});
+		const selectedRate = taxRate.find((item) => item.priority === 1);
+
 		for (const cartItem of cartData.cartItems) {
 			for (const method of findZones) {
 				const applicableFlatMethods = method.flatMethods.map(
@@ -775,6 +828,10 @@ export const calculateShipping = async (userId: string) => {
 			if (isFreeShippingApplicable) {
 				shippingCost = 0;
 			}
+
+			totalTax = selectedRate
+				? totalTax + cartItem.totalCost * (selectedRate?.taxRate / 100)
+				: 0;
 		}
 
 		await prisma.cart.update({
@@ -784,9 +841,14 @@ export const calculateShipping = async (userId: string) => {
 			data: {
 				shippingCost: shippingCost,
 				shippingMethods: methodName,
+				taxName: selectedRate
+					? `${selectedRate.name} ${selectedRate.taxRate}%`
+					: 'none',
+				taxAmount: totalTax,
 			},
 		});
 	}
+
 	return {
 		shippingCost,
 		methodName,
@@ -971,6 +1033,13 @@ export const cartSubtotal = (cart: CartCustomItems[]) => {
 
 	return subtotal;
 };
+export const cartTotalCost = (
+	subtotal: number,
+	shippingCost: number,
+	taxCost: number,
+) => {
+	return subtotal + shippingCost + taxCost;
+};
 
 /* ================================ */
 // Admin actions for order
@@ -1085,7 +1154,7 @@ export const fetchOrderDetailsByAdmin = async (params: {
 					},
 				},
 				status: true,
-				tax: true,
+				taxAmount: true,
 				shippingCost: true,
 				total: true,
 				totalDiscount: true,
@@ -1124,7 +1193,7 @@ export const fetchOrderDetailsByAdmin = async (params: {
 			summary: [
 				{
 					label: 'Tax',
-					value: orderItem.tax,
+					value: orderItem.taxAmount,
 				},
 				{
 					label: 'Shipping Cost',
