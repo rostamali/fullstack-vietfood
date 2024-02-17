@@ -42,7 +42,7 @@ export const TopbarLinks = [
 ];
 export const NavbarLinks = [
 	{
-		label: 'Best Sales',
+		label: 'Home',
 		url: '/',
 	},
 	{
@@ -167,6 +167,24 @@ export const UserNavlinks = [
 		label: 'Profile',
 		url: '/user/profile',
 		icon: CircleUser,
+	},
+];
+export const RootMobileNavs = [
+	{
+		label: 'Home',
+		url: '/',
+	},
+	{
+		label: 'Shops',
+		url: '/shop',
+	},
+	{
+		label: 'Categories',
+		url: '/shop/category',
+	},
+	{
+		label: 'Contact us',
+		url: '/contact-us',
 	},
 ];
 
