@@ -29,7 +29,6 @@ const UsersPage = async ({ searchParams }: SearchParams) => {
 				<DashboardPageTitle title={'Users'} links={[]} params={null} />
 				<div className="flex items-center gap-[15px]">
 					<CreateUser />
-					<UploadCSV type={'USER'} />
 				</div>
 			</div>
 			<UserList

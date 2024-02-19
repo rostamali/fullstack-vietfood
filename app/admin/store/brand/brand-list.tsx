@@ -27,6 +27,7 @@ import EmptyError from '../../../../components/elements/shared/empty-error';
 import Pagination from '../../../../components/elements/filters/pagination';
 import Image from 'next/image';
 import UpdateBrand from '../../../../components/elements/modals/update-brand';
+import UploadCSV from '@/components/elements/modals/upload-csv';
 type BrandProps = {
 	data: BrandTable[];
 	pages: number;
@@ -73,11 +74,7 @@ const BrandList: FC<BrandProps> = ({ data, pages }) => {
 							</div>
 						</div>
 						<div className="max-xm:hidden">
-							<SmallTooltip content={'Export Data'}>
-								<Button className="btn-ghost-lg">
-									<Download strokeWidth={1.5} size={20} />
-								</Button>
-							</SmallTooltip>
+							<UploadCSV type={'BRAND'} />
 						</div>
 					</div>
 				</div>

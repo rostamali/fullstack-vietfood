@@ -3,6 +3,9 @@ import { revalidatePath } from 'next/cache';
 import { handleResponse } from '../helpers/formater';
 import prisma from '../prisma';
 import { isAuthenticated } from './auth.action';
+import sendMail from '../helpers/send-mail';
+import { ContactFormSchema } from '../helpers/form-validation';
+import { z } from 'zod';
 
 export const fetchShopProducts = async (params: {
 	pageSize: number;
@@ -761,5 +764,26 @@ export const searchGlobalProducts = async (params: {
 		};
 	} catch (error) {
 		return;
+	}
+};
+export const submitContactForm = async (
+	params: z.infer<typeof ContactFormSchema>,
+) => {
+	try {
+		const { firstName, lastName, email, phoneNumber, message } = params;
+		await sendMail({
+			email,
+			subject: 'New Contact Form Submission',
+			template: `contact-form.ejs`,
+			data: {
+				name: `${firstName} ${lastName}`,
+				email,
+				phone: phoneNumber,
+				message,
+			},
+		});
+		return handleResponse(true, 'Form submitted successfully');
+	} catch (error) {
+		return handleResponse(false, `Form submission failed`);
 	}
 };

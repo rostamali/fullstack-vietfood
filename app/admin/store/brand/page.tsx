@@ -1,5 +1,4 @@
 import NewBrand from '@/components/elements/modals/create-brand';
-import UploadCSV from '@/components/elements/modals/upload-csv';
 import BrandList from '@/app/admin/store/brand/brand-list';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchBrandByAdmin } from '@/lib/actions/brand.action';
@@ -26,7 +25,6 @@ const BrandPage = async ({ searchParams }: SearchParams) => {
 				<DashboardPageTitle title={'Brands'} links={[]} params={null} />
 				<div className="flex items-center gap-[15px]">
 					<NewBrand />
-					<UploadCSV type={'BRAND'} />
 				</div>
 			</div>
 			<BrandList

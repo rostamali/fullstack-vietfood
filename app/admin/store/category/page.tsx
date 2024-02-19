@@ -1,5 +1,4 @@
 import CreateCategory from '@/components/elements/modals/create-category';
-import UploadCSV from '@/components/elements/modals/upload-csv';
 import CategoryList from '@/app/admin/store/category/category-list';
 import DashboardPageTitle from '@/components/elements/shared/db-page-title';
 import { fetchCategoryByAdmin } from '@/lib/actions/category.action';
@@ -32,7 +31,6 @@ const CategoryPage = async ({ searchParams }: SearchParams) => {
 					<div className="max-xm:hidden">
 						<CreateCategory />
 					</div>
-					<UploadCSV type={'CATEGORY'} />
 				</div>
 			</div>
 			<CategoryList

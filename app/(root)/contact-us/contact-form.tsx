@@ -15,7 +15,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { ContactFormSchema } from '@/lib/helpers/form-validation';
 import { Textarea } from '@/components/ui/textarea';
+import { useSubmitContactForm } from '@/lib/hooks/useShop';
+import Spinner from '@/components/elements/shared/spinner';
 const ContactForm = () => {
+	const { mutate: submitForm, isPending } = useSubmitContactForm();
+
 	const form = useForm<z.infer<typeof ContactFormSchema>>({
 		resolver: zodResolver(ContactFormSchema),
 		defaultValues: {
@@ -26,7 +30,13 @@ const ContactForm = () => {
 			message: '',
 		},
 	});
-	const handleContactForm = (values: z.infer<typeof ContactFormSchema>) => {};
+	const handleContactForm = (values: z.infer<typeof ContactFormSchema>) => {
+		submitForm(values, {
+			onSuccess: () => {
+				form.reset();
+			},
+		});
+	};
 
 	return (
 		<Form {...form}>
@@ -131,7 +141,16 @@ const ContactForm = () => {
 						</FormItem>
 					)}
 				/>
-				<Button className="btn-primary-lg">Send Message</Button>
+				<Button className="btn-primary-lg">
+					{isPending ? (
+						<div className="flex items-center gap-1">
+							<Spinner className="h-[20px] w-[20px] stroke-white" />
+							Sending...
+						</div>
+					) : (
+						'Send Message'
+					)}
+				</Button>
 			</form>
 		</Form>
 	);

@@ -28,6 +28,7 @@ import {
 	toggleSelectAll,
 	toggleSelectList,
 } from '@/lib/helpers/formater';
+import UploadCSV from '@/components/elements/modals/upload-csv';
 type ProductListProps = {
 	data: ProductList[];
 	pages: number;
@@ -69,11 +70,7 @@ const ProductList: FC<ProductListProps> = ({ data, pages }) => {
 							</div>
 						</div>
 						<div className="max-xm:hidden">
-							<SmallTooltip content={'Export Data'}>
-								<Button className="btn-ghost-lg">
-									<Download strokeWidth={1.5} size={20} />
-								</Button>
-							</SmallTooltip>
+							<UploadCSV type={'PRODUCT'} />
 						</div>
 					</div>
 				</div>

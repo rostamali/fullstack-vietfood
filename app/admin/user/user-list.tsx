@@ -33,6 +33,7 @@ import { useDeleteAccount } from '@/lib/hooks/useAuth';
 import SelectField from '../../../components/elements/select/select-field';
 import { toast } from 'sonner';
 import { ToastError } from '../../../components/elements/shared/custom-toast';
+import UploadCSV from '@/components/elements/modals/upload-csv';
 type UserListProps = {
 	data: UserList[];
 	pages: number;
@@ -109,11 +110,7 @@ const UserList: FC<UserListProps> = ({ data, pages }) => {
 							</div>
 						</div>
 						<div className="max-xm:hidden">
-							<SmallTooltip content={'Export Data'}>
-								<Button className="btn-ghost-lg">
-									<Download strokeWidth={1.5} size={20} />
-								</Button>
-							</SmallTooltip>
+							<UploadCSV type={'USER'} />
 						</div>
 					</div>
 				</div>

@@ -28,6 +28,7 @@ import Pagination from '../../../../components/elements/filters/pagination';
 import Image from 'next/image';
 import UpdateCategory from '../../../../components/elements/modals/update-category';
 import { useDeleteCategory } from '@/lib/hooks/useCategory';
+import UploadCSV from '@/components/elements/modals/upload-csv';
 
 type CategoryProps = {
 	data: CategoryTable[];
@@ -82,11 +83,7 @@ const CategoryList: FC<CategoryProps> = ({ data, pages }) => {
 							</div>
 						</div>
 						<div className="max-xm:hidden">
-							<SmallTooltip content={'Export Data'}>
-								<Button className="btn-ghost-lg">
-									<Download strokeWidth={1.5} size={20} />
-								</Button>
-							</SmallTooltip>
+							<UploadCSV type={'CATEGORY'} />
 						</div>
 					</div>
 				</div>
